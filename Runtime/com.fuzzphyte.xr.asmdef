@@ -1,0 +1,17 @@
+{
+    "name": "com.fuzzphyte.xr",
+    "rootNamespace": "FuzzPhyte.XR",
+    "references": [
+        "com.fuzzphyte.utility",
+        "com.fuzzphyte.ray"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
