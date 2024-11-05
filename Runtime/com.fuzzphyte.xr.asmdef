@@ -3,7 +3,9 @@
     "rootNamespace": "FuzzPhyte.XR",
     "references": [
         "com.fuzzphyte.utility",
-        "com.fuzzphyte.ray"
+        "com.fuzzphyte.ray",
+        "Unity.Mathematics",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
