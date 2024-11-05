@@ -10,20 +10,21 @@ namespace FuzzPhyte.XR
         #region Setup Variables
         [Header("Raycaster!")]
         public string RaycastInformation;
-        public SO_FPRaycaster RayData;
+        public SO_FPRaycaster SurfaceLockRayData;
+        public SO_FPRaycaster InverseSurfaceRayData;
         public Transform RaycastOrigin;
         public Transform RaycastEndDir;
 
         [Header("Surface Lock Settings")]
-        public bool EnableSurfaceLock; // Boolean flag to enable/disable surface lock
+        public bool ActivateSurfaceLock; // Boolean flag to enable/disable surface lock
         public GameObject ObjectToLock; // The object you want to lock to the surface
         public Renderer ObjectRenderer; // Renderer to calculate the bounding box
         #endregion
         #region Interface Requirements
         public SO_FPRaycaster FPRayInformation
         {
-            get { return RayData; }
-            set { RayData = value; }
+            get { return SurfaceLockRayData; }
+            set { SurfaceLockRayData = value; }
         }
         public Transform RayOrigin
         {
@@ -51,9 +52,18 @@ namespace FuzzPhyte.XR
             _raycaster = new FP_Raycaster(this);
         }
         #endregion
+        protected FPSurfaceLock fPSurfaceLock;
+        [SerializeField] protected bool SurfaceLocked;
+        public GameObject GhostPrefabVariant;
+        [SerializeField] private GameObject ghostCreated;
         protected virtual void Awake()
         {
             SetupRaycaster();
+        }
+        protected virtual void Start()
+        {
+            fPSurfaceLock = new FPSurfaceLock();
+            ghostCreated= fPSurfaceLock.InitializeGhostObject(ObjectToLock.transform, GhostPrefabVariant);
         }
         public virtual void OnEnable()
         {
@@ -74,7 +84,7 @@ namespace FuzzPhyte.XR
         {
             if (arg.HitObject != null)
             {
-                Debug.LogWarning($"RAY Enter: {arg.HitObject.name}");
+                //Debug.LogWarning($"RAY Enter: {arg.HitObject.name}");
             }
 
             _rayHit = arg;
@@ -83,7 +93,7 @@ namespace FuzzPhyte.XR
         {
             if (arg.HitObject != null)
             {
-                Debug.LogWarning($"RAY Stay: {arg.HitObject.name}");
+                //Debug.LogWarning($"RAY Stay: {arg.HitObject.name}");
             }
 
             _rayHit = arg;
@@ -92,46 +102,53 @@ namespace FuzzPhyte.XR
         {
             if (arg.HitObject != null)
             {
-                Debug.LogWarning($"RAY Exit: {arg.HitObject.name}");
+                //Debug.LogWarning($"RAY Exit: {arg.HitObject.name}");
             }
 
             _rayHit = arg;
         }
         #endregion
-        /// <summary>
-        /// Using FixedUpdate to send the Physics Raycast
-        /// </summary>
-        public virtual void FixedUpdate()
-        {
-            //_raycaster.FireRaycast();
-        }
+        
         public virtual void Update()
         {
-            if (EnableSurfaceLock && ObjectToLock != null && ObjectRenderer != null)
+            if (ActivateSurfaceLock && ObjectToLock != null && ObjectRenderer != null)
             {
                 // Calculate the bounding box of the object
-                var boundingBoxInfo = FP_UtilityData.CreateBoundingBox(ObjectToLock, ObjectRenderer);
+                var boundingBoxInfo = FP_UtilityData.CreateBoundingBox(ObjectToLock.transform.position,ObjectToLock.transform.rotation, ObjectRenderer);
 
                 if (boundingBoxInfo.HasValue)
                 {
                     // Try to lock the object to the surface
-                    var bBox = boundingBoxInfo.Value;
-                    bool locked = FPSurfaceLock.LockToSurface(bBox, _raycaster, ObjectToLock, ObjectRenderer,collisionCheck: true, alignment: true);
-
+                    //var bBox = boundingBoxInfo.Value;
+                    SurfaceLocked = fPSurfaceLock.LockToSurface(_raycaster, InverseSurfaceRayData, ObjectToLock, ObjectRenderer,collisionCheck: true, alignment: false);
+                    /*
                     if (locked)
                     {
                         Debug.Log("Object successfully locked to surface.");
-                        EnableSurfaceLock = false;
+                        //ActivateSurfaceLock = false;
                     }
                     else
                     {
                         Debug.Log("Failed to lock object to surface.");
                     }
+                    */
                 }
                 else
                 {
                     Debug.LogError("BoundingBoxInfo could not be calculated.");
                 }
+                if (!SurfaceLocked && ghostCreated != null)
+                {
+                    ghostCreated.SetActive(false);
+                }
+            }
+            if(!ActivateSurfaceLock && SurfaceLocked && ghostCreated!=null)
+            {
+                //we have a surface and we want to jump our item to this location of our ghost and then turn it off
+                ObjectToLock.transform.position = ghostCreated.transform.position;
+                ObjectToLock.transform.rotation = ghostCreated.transform.rotation;
+                ghostCreated.SetActive(false);
+                SurfaceLocked = false;
             }
         }
 
