@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce33cf22d5436eb43ab841dd6d615194, type: 3}
+  m_Name: XRSamples_HelloEnglishEX
+  m_EditorClassIdentifier: 
+  UniqueID: WFJTYW1wbGVzfEhlbGxvRlBWb2NhYkV4YW1wbGV8MSwxLDEsMQ==
+  Word: Hello
+  IPAPronunciation: "h\u0259l\u0259\u0301w"
+  Language: 1
+  Definition: used as a greeting or to begin a phone conversation.
+  WordAudio:
+    AudioClip: {fileID: 0}
+    URLAudioType: 0
+    URLReference: 
+  Translations:
+  - {fileID: 11400000, guid: 94300f39d59304babb886bd35dab5a8a, type: 2}
+  - {fileID: 11400000, guid: e14af56e5ae49405c9979abebcf79e59, type: 2}

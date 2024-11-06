@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce33cf22d5436eb43ab841dd6d615194, type: 3}
+  m_Name: XRSamples_HelloFrenchEX
+  m_EditorClassIdentifier: 
+  UniqueID: WFJTYW1wbGVzfEhlbGxvRlBWb2NhYkV4YW1wbGV8MSwxLDEsMQFrench
+  Word: Bonjour
+  IPAPronunciation: "b\u0252n\u02C8\u0292\u028A\u0259"
+  Language: 3
+  Definition: "utilis\xE9 comme salutation ou pour commencer une conversation t\xE9l\xE9phonique."
+  WordAudio:
+    AudioClip: {fileID: 0}
+    URLAudioType: 0
+    URLReference: 
+  Translations:
+  - {fileID: 11400000, guid: e6f4b7053b32b4ed4a5932da81518d9d, type: 2}
