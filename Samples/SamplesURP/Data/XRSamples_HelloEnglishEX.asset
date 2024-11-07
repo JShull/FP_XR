@@ -16,10 +16,14 @@ MonoBehaviour:
   Word: Hello
   IPAPronunciation: "h\u0259l\u0259\u0301w"
   Language: 1
-  Definition: used as a greeting or to begin a phone conversation.
+  Definition: Hello, is used as a greeting or to begin a phone conversation.
   WordAudio:
-    AudioClip: {fileID: 0}
-    URLAudioType: 0
+    AudioClip: {fileID: 8300000, guid: 113993a7d78f8e74a804d074f10c481b, type: 3}
+    URLAudioType: 13
+    URLReference: 
+  DefinitionAudio:
+    AudioClip: {fileID: 8300000, guid: 70314af6e58da1c47b5660eb4f768c75, type: 3}
+    URLAudioType: 13
     URLReference: 
   Translations:
   - {fileID: 11400000, guid: 94300f39d59304babb886bd35dab5a8a, type: 2}

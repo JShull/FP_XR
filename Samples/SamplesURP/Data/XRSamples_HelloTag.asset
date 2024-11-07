@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: XRSamples_HelloTag
   m_EditorClassIdentifier: 
   UniqueID: WFJTYW1wbGV8VGFnIERpc3BsYXkgU2FtcGxlfDAuOTUyODMwMiwwLjY1MDQyNDksMC40MzU5NjQ4LDETAG
-  TagName: Hello
+  TagName: VOCAB_Hello
   Description: A word

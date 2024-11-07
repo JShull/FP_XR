@@ -26,6 +26,7 @@ namespace FuzzPhyte.XR
                 splinePoints[i] = CalculateBezierPoint(t, start, controlPoint, end);
             }
             _lineRenderer.SetPositions(splinePoints);
+            
         }
 
         Vector3 GetControlPoint(Vector3 start, Vector3 end)

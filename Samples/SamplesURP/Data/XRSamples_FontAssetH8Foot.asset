@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: XRSamples_FontAssetH8Foot
   m_EditorClassIdentifier: 
   UniqueID: WFJTYW1wbGVzfFhSU2FtcGxlRm9udHwwLjAwODU0Nzc4MywwLDEsMQH8
-  Label: 6
+  Label: 8
   Font: {fileID: 11400000, guid: b882393e533293145b763d469ad09844, type: 2}
   MinSize: 6
   MaxSize: 8
   UseAutoSizing: 1
   FontStyle: 256
-  FontAlignment: 257
+  FontAlignment: 1025
   FontColor: {r: 0, g: 0, b: 0, a: 1}

@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: XRSamples_FontAssetH3Ex
   m_EditorClassIdentifier: 
   UniqueID: WFJTYW1wbGVzfFhSU2FtcGxlRm9udHwwLjAwODU0Nzc4MywwLDEsMQH3
-  Label: 2
-  Font: {fileID: 11400000, guid: 7f7a57f625a46457da2df7084396adf5, type: 2}
+  Label: 3
+  Font: {fileID: 11400000, guid: b9304722a3053ed429fc3cf800f7399f, type: 2}
   MinSize: 12
   MaxSize: 16
   UseAutoSizing: 1
   FontStyle: 2
-  FontAlignment: 514
-  FontColor: {r: 0.12156863, g: 0.1254902, b: 0.12941177, a: 1}
+  FontAlignment: 520
+  FontColor: {r: 0.5754717, g: 0.13300997, b: 0.2422844, a: 1}

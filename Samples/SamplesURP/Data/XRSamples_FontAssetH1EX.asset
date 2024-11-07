@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: XRSamples_FontAssetH1EX
   m_EditorClassIdentifier: 
   UniqueID: WFJTYW1wbGVzfFhSU2FtcGxlRm9udHwwLjAwODU0Nzc4MywwLDEsMQ==
-  Label: 0
+  Label: 1
   Font: {fileID: 11400000, guid: 7f7a57f625a46457da2df7084396adf5, type: 2}
   MinSize: 16
   MaxSize: 24

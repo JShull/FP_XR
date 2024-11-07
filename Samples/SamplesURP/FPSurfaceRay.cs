@@ -3,7 +3,6 @@ namespace FuzzPhyte.XR
     using UnityEngine;
     using FuzzPhyte.Ray;
     using Unity.Mathematics;
-
     using FuzzPhyte.Utility;
     public class FPSurfaceRay : MonoBehaviour, IFPRaySetup
     {
@@ -157,18 +156,24 @@ namespace FuzzPhyte.XR
         /// </summary>
         protected virtual void OnDrawGizmos()
         {
-            if (RaycastOrigin != null && RaycastEndDir != null)
+#if UNITY_EDITOR
+            if (UnityEditor.Selection.activeGameObject == this.gameObject)
             {
-                // Draw the ray line
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(RaycastOrigin.position, RaycastEndDir.position);
-                
-                // Draw spheres at the start and end points for clarity
-                Gizmos.color = Color.green;
-                Gizmos.DrawWireSphere(RaycastOrigin.position, 0.1f);
-                Gizmos.color = Color.blue;
-                Gizmos.DrawSphere(RaycastEndDir.position, 0.1f);
+                if (RaycastOrigin != null && RaycastEndDir != null)
+                {
+                    // Draw the ray line
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawLine(RaycastOrigin.position, RaycastEndDir.position);
+
+                    // Draw spheres at the start and end points for clarity
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawWireSphere(RaycastOrigin.position, 0.1f);
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawSphere(RaycastEndDir.position, 0.1f);
+                }
             }
+            
+#endif
         }
     }
 }

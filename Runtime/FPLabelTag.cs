@@ -26,7 +26,7 @@ namespace FuzzPhyte.XR
         }
         /// <summary>
         /// Send the list of fonts for the display system you're using
-        /// This function will make sure they have the correct settings by theme by FontSetingLabel
+        /// This function will make sure they have the correct settings by theme by FontSetingLabel based on order H1-H7
         /// </summary>
         /// <param name="FontsInOrder">In order of Header 1 thru</param>
         public void SetupFonts(List<TextMeshPro> HeaderFontsInOrder)
@@ -48,6 +48,27 @@ namespace FuzzPhyte.XR
                             HeaderFontsInOrder[j].alignment = curThemeFont.FontAlignment;
                         }
                     }
+                }
+            }
+        }
+        /// <summary>
+        /// Setup Individual Fonts by a Category
+        /// </summary>
+        /// <param name="font"></param>
+        /// <param name="category"></param>
+        public void SetupFontByCategory(TextMeshPro font,FontSettingLabel category)
+        {
+            for (int i = 0; i < themeData.FontSettings.Count; i++)
+            {
+                var curThemeFont = themeData.FontSettings[i];
+                if (curThemeFont.Label == category)
+                {
+                    font.font = curThemeFont.Font;
+                    font.fontSize = curThemeFont.MinSize;
+                    font.color = curThemeFont.FontColor;
+                    font.fontStyle = curThemeFont.FontStyle;
+                    font.alignment = curThemeFont.FontAlignment;
+                    return;
                 }
             }
         }
@@ -107,12 +128,16 @@ namespace FuzzPhyte.XR
         /// <param name="language"></param>
         /// <returns></returns>
         #region Returns and Visuals
-        public string ReturnTranslation(FP_Language language)
+        public string ReturnTranslation(FP_Language language, bool useDefin=false)
         {
             for(int i = 0; i < vocabData.Translations.Count; i++)
             {
                 if(vocabData.Translations[i].Language == language)
                 {
+                    if (useDefin)
+                    {
+                        return vocabData.Translations[i].Definition;
+                    }
                     return vocabData.Translations[i].Word;
                 }
             }
@@ -123,36 +148,76 @@ namespace FuzzPhyte.XR
         /// </summary>
         /// <param name="language"></param>
         /// <returns></returns>
-        public AudioClip ReturnAudio(FP_Language language,ref AudioType audioType)
+        public AudioClip ReturnAudio(FP_Language language,ref AudioType audioType, bool useDefinition=false, bool useTranslation=false)
         {
             //go through my own language and my translations for a match
-            if(vocabData.Language == language)
+
+            if (!useTranslation)
             {
-                audioType = vocabData.WordAudio.URLAudioType;
-                return vocabData.WordAudio.AudioClip;
-            }
-            for(int i = 0; i < vocabData.Translations.Count; i++)
-            {
-                if(vocabData.Translations[i].Language == language)
+                if (vocabData.Language == language)
                 {
-                    audioType = vocabData.Translations[i].WordAudio.URLAudioType;
-                    return vocabData.Translations[i].WordAudio.AudioClip;
+                    if (useDefinition)
+                    {
+                        audioType = vocabData.DefinitionAudio.URLAudioType;
+                        return vocabData.DefinitionAudio.AudioClip;
+                    }
+                    else
+                    {
+                        audioType = vocabData.WordAudio.URLAudioType;
+                        return vocabData.WordAudio.AudioClip;
+                    }
+
                 }
             }
+            else
+            {
+                for (int i = 0; i < vocabData.Translations.Count; i++)
+                {
+                    if (vocabData.Translations[i].Language == language)
+                    {
+                        if (useDefinition)
+                        {
+                            audioType = vocabData.Translations[i].DefinitionAudio.URLAudioType;
+                            return vocabData.Translations[i].DefinitionAudio.AudioClip;
+                        }
+                        else
+                        {
+                            audioType = vocabData.Translations[i].WordAudio.URLAudioType;
+                            return vocabData.Translations[i].WordAudio.AudioClip;
+                        }
+
+                    }
+                }
+            }
+            
+            Debug.LogError($"No match found, returning null for {language} language with user passed settings| Use Defn:{useDefinition} and use Translation:{useTranslation}.");
             audioType = AudioType.UNKNOWN;
             return null;
         }
-        public void ApplyTagTextData(TextMeshPro fontTagDisplay)
+        public string ApplyTagTextData(TextMeshPro fontTagDisplay)
         {
             fontTagDisplay.text = dataTag.TagName;
+            return fontTagDisplay.text;
         }
-        public void ApplyVocabTextData(TextMeshPro vocabDisplay)
+        public string ApplyVocabTextData(TextMeshPro vocabDisplay)
         {
             vocabDisplay.text = vocabData.Word;
+            return vocabDisplay.text;
         }
-        public void ApplyTranslationTextData(TextMeshPro vocabDisplay,FP_Language language)
+        public string ApplyDefinitionTextData(TextMeshPro defnDisplay)
         {
-            vocabDisplay.text = ReturnTranslation(language);
+            defnDisplay.text = vocabData.Definition;
+            return defnDisplay.text;
+        }
+        public string ApplyVocabTranslationTextData(TextMeshPro vocabDisplay,FP_Language language)
+        {
+            vocabDisplay.text = ReturnTranslation(language,false);
+            return vocabDisplay.text;
+        }
+        public string ApplyDefnTranslationTextData(TextMeshPro defnDisplay,FP_Language language)
+        {
+            defnDisplay.text = ReturnTranslation(language, true);
+            return defnDisplay.text;
         }
         #endregion
     }

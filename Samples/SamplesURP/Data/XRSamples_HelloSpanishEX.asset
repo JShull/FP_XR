@@ -16,10 +16,15 @@ MonoBehaviour:
   Word: Hola
   IPAPronunciation: hola
   Language: 2
-  Definition: "Se utiliza como saludo o para iniciar una conversaci\xF3n telef\xF3nica."
+  Definition: "Hola, se utiliza como saludo o para iniciar una conversaci\xF3n telef\xF3nica."
   WordAudio:
-    AudioClip: {fileID: 0}
-    URLAudioType: 0
+    AudioClip: {fileID: 8300000, guid: bcc1e95560d12fd47a249de08a2b3475, type: 3}
+    URLAudioType: 13
+    URLReference: 
+  DefinitionAudio:
+    AudioClip: {fileID: 8300000, guid: beb9aab3cc7061848958ca6f5c653ead, type: 3}
+    URLAudioType: 13
     URLReference: 
   Translations:
   - {fileID: 11400000, guid: e6f4b7053b32b4ed4a5932da81518d9d, type: 2}
+  - {fileID: 11400000, guid: 94300f39d59304babb886bd35dab5a8a, type: 2}

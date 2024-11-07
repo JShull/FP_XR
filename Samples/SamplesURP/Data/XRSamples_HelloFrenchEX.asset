@@ -16,10 +16,16 @@ MonoBehaviour:
   Word: Bonjour
   IPAPronunciation: "b\u0252n\u02C8\u0292\u028A\u0259"
   Language: 3
-  Definition: "utilis\xE9 comme salutation ou pour commencer une conversation t\xE9l\xE9phonique."
+  Definition: "Bonjour, est utilis\xE9 comme message d\u2019accueil ou pour d\xE9marrer
+    une conversation t\xE9l\xE9phonique."
   WordAudio:
-    AudioClip: {fileID: 0}
-    URLAudioType: 0
+    AudioClip: {fileID: 8300000, guid: dd43e2897eefcd743bf3b64ffdaf1801, type: 3}
+    URLAudioType: 13
+    URLReference: 
+  DefinitionAudio:
+    AudioClip: {fileID: 8300000, guid: 45723bdcbba468d4b8a630cda2f57f55, type: 3}
+    URLAudioType: 13
     URLReference: 
   Translations:
   - {fileID: 11400000, guid: e6f4b7053b32b4ed4a5932da81518d9d, type: 2}
+  - {fileID: 11400000, guid: e14af56e5ae49405c9979abebcf79e59, type: 2}
