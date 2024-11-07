@@ -22,7 +22,7 @@ namespace FuzzPhyte.XR
         public FPLabelTag(FP_Tag dataTag, FP_Vocab vocabData, FP_Theme theme): this(dataTag)
         {
             this.vocabData = vocabData;
-            this.themeData = theme;
+            themeData = theme;
         }
         /// <summary>
         /// Send the list of fonts for the display system you're using

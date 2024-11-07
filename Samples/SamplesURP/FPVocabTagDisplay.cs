@@ -38,6 +38,10 @@ namespace FuzzPhyte.XR
         {
 
         }
+        public void PlayAudio()
+        {
+            
+        }
         public Vector3 ReturnPivotLocation()
         {
             Vector3[] points = labelTag.GetEdgePoints(BackDrop);
@@ -73,9 +77,7 @@ namespace FuzzPhyte.XR
                     break;
             }
             return pivot;
-
         }
-    
     }
 
 }
