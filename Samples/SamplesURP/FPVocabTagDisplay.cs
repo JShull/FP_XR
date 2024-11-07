@@ -4,21 +4,26 @@ namespace FuzzPhyte.XR
     using TMPro;
     using FuzzPhyte.Utility.Meta;
     using FuzzPhyte.Utility.EDU;
+    using FuzzPhyte.Utility;
 
     public class FPVocabTagDisplay : MonoBehaviour
     {
         public SpriteRenderer BackDrop;
         public TextMeshPro MainTextDisplay;
         public TextMeshPro SecondaryTextDisplay;
+        [Space]
+        [Header("Data")]
         public FP_Tag TagData;
         public FP_Vocab VocabData;
+        public FP_Theme ThemeData;
+        [Header("Layout")]
         public TextAlignmentOptions TagPivotLocation;
         protected FPLabelTag labelTag;
         [SerializeField]protected Vector3 pivotLocation;
         public Vector3 WorldPivotLocation => pivotLocation;
         public void Start()
         {
-            labelTag = new FPLabelTag(TagData, VocabData);
+            labelTag = new FPLabelTag(TagData, VocabData, ThemeData);
             pivotLocation = ReturnPivotLocation();
         }
         public void DisplayTag()

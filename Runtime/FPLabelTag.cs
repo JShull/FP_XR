@@ -4,20 +4,68 @@ namespace FuzzPhyte.XR
     using FuzzPhyte.Utility.EDU;
     using FuzzPhyte.Utility;
     using UnityEngine;
+    using TMPro;
+    using System.Collections.Generic;
 
+    // https://github.com/Antoshidza/NSprites
+    // https://github.com/Fribur/TextMeshDOTS
     public class FPLabelTag
     {
         protected FP_Tag dataTag;
         protected FP_Vocab vocabData;
+        protected FP_Theme themeData;
+        #region Setup
         public FPLabelTag(FP_Tag dataTag)
         {
             this.dataTag = dataTag;
         }
-        public FPLabelTag(FP_Tag dataTag, FP_Vocab vocabData): this(dataTag)
+        public FPLabelTag(FP_Tag dataTag, FP_Vocab vocabData, FP_Theme theme): this(dataTag)
         {
             this.vocabData = vocabData;
+            this.themeData = theme;
         }
-        
+        /// <summary>
+        /// Send the list of fonts for the display system you're using
+        /// This function will make sure they have the correct settings by theme by FontSetingLabel
+        /// </summary>
+        /// <param name="FontsInOrder">In order of Header 1 thru</param>
+        public void SetupFonts(List<TextMeshPro> HeaderFontsInOrder)
+        {
+            if (themeData.FontSettings.Count > 0)
+            {
+                //we have font settings - lets update our visuals
+                for (int i = 0; i < themeData.FontSettings.Count; i++)
+                {
+                    var curThemeFont = themeData.FontSettings[i];
+                    for (int j = 0; j < HeaderFontsInOrder.Count; j++)
+                    {
+                        if (curThemeFont.Label == (FontSettingLabel)j)
+                        {
+                            HeaderFontsInOrder[j].font = curThemeFont.Font;
+                            HeaderFontsInOrder[j].fontSize = curThemeFont.MinSize;
+                            HeaderFontsInOrder[j].color = curThemeFont.FontColor;
+                            HeaderFontsInOrder[j].fontStyle = curThemeFont.FontStyle;
+                            HeaderFontsInOrder[j].alignment = curThemeFont.FontAlignment;
+                        }
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// This will use the theme backdrop for the passed sprite renderer
+        /// </summary>
+        /// <param name="backdrop"></param>
+        /// <param name="useThemeColor"></param>
+        public void SetupBackdrop(SpriteRenderer backdrop, bool useThemeColor = false)
+        {
+            backdrop.sprite = themeData.BackgroundImage;
+            if (useThemeColor)
+            {
+                backdrop.color = themeData.MainColor;
+            }
+        }
+        #endregion
+        #region Layout Based
         /// <summary>
         /// Get Edge Points of the BackDrop SpriteRenderer
         /// </summary>
@@ -52,12 +100,13 @@ namespace FuzzPhyte.XR
 
             return points;
         }
-        
+        #endregion
         /// <summary>
         /// Return the vocabulary word by matching language
         /// </summary>
         /// <param name="language"></param>
         /// <returns></returns>
+        #region Returns and Visuals
         public string ReturnTranslation(FP_Language language)
         {
             for(int i = 0; i < vocabData.Translations.Count; i++)
@@ -93,5 +142,18 @@ namespace FuzzPhyte.XR
             audioType = AudioType.UNKNOWN;
             return null;
         }
+        public void ApplyTagTextData(TextMeshPro fontTagDisplay)
+        {
+            fontTagDisplay.text = dataTag.TagName;
+        }
+        public void ApplyVocabTextData(TextMeshPro vocabDisplay)
+        {
+            vocabDisplay.text = vocabData.Word;
+        }
+        public void ApplyTranslationTextData(TextMeshPro vocabDisplay,FP_Language language)
+        {
+            vocabDisplay.text = ReturnTranslation(language);
+        }
+        #endregion
     }
 }

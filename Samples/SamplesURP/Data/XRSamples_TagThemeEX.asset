@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 814c8a5b041eb814c936bfb98799fab4, type: 3}
+  m_Name: XRSamples_TagThemeEX
+  m_EditorClassIdentifier: 
+  UniqueID: WFJTYW1wbGVzfFRhZyBUaGVtZXwwLjE5MzM5NjIsMC45MDE2ODE4LDEsMQTAGTheme
+  ThemeLabel: XRSample Tag Theme
+  MainColor: {r: 1, g: 1, b: 1, a: 1}
+  SecondaryColor: {r: 0, g: 0, b: 0, a: 1}
+  TertiaryColor: {r: 1, g: 0, b: 0.8533139, a: 1}
+  FontSettings:
+  - {fileID: 11400000, guid: 325279b34e53b6d49bbc8e281edf97d7, type: 2}
+  - {fileID: 11400000, guid: 18baaace27a86114b9a21d88cbce79ac, type: 2}
+  - {fileID: 11400000, guid: cb701e9d809769847b067362e59cd2f6, type: 2}
+  - {fileID: 11400000, guid: 64efb127f0067e9428b96c9d444cabeb, type: 2}
+  - {fileID: 11400000, guid: aad5fcd1e6f07e645a0975e0f767a3c6, type: 2}
+  - {fileID: 11400000, guid: 57358ac237773034d865e24545229cfc, type: 2}
+  - {fileID: 11400000, guid: fa146f7e35524d54fbe7c1f27183ebd7, type: 2}
+  - {fileID: 11400000, guid: fed7f3ec1e04cb643b1e5b0dc2104661, type: 2}
+  FontPrimaryColor: {r: 1, g: 0.29245266, b: 0.29245266, a: 1}
+  FontSecondaryColor: {r: 0.12156863, g: 0.1254902, b: 0.12941177, a: 1}
+  Icon: {fileID: 21300000, guid: d05f9407705d9824491c144edb3b47e3, type: 3}
+  TexIcon: {fileID: 0}
+  BackgroundImage: {fileID: 21300000, guid: e339c4d453a10af4ba88f59263ad2524, type: 3}
+  Description: General Sample of a theme in use

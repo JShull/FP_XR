@@ -210,8 +210,7 @@ MonoBehaviour:
   m_text: TAG
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7f7a57f625a46457da2df7084396adf5, type: 2}
-  m_sharedMaterial: {fileID: -632423444857818724, guid: 7f7a57f625a46457da2df7084396adf5,
-    type: 2}
+  m_sharedMaterial: {fileID: -632423444857818724, guid: 7f7a57f625a46457da2df7084396adf5, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -465,8 +464,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0495b9e1aff110348b22c41e188933ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PinPrefab: {fileID: 278468786983399547, guid: 35480c67e7b84914cb7a5d8bc91d07bc,
-    type: 3}
+  PinPrefab: {fileID: 278468786983399547, guid: 35480c67e7b84914cb7a5d8bc91d07bc, type: 3}
   pinHead: {fileID: 0}
   pinTail: {fileID: 0}
   lineR: {fileID: 0}
@@ -630,6 +628,7 @@ MonoBehaviour:
   SecondaryTextDisplay: {fileID: 1677671786}
   TagData: {fileID: 11400000, guid: 87dcbd1712984493ba95a7d6c8328a4c, type: 2}
   VocabData: {fileID: 11400000, guid: e6f4b7053b32b4ed4a5932da81518d9d, type: 2}
+  ThemeData: {fileID: 11400000, guid: 9fbeea3a0ce7a8743ae2636144f1f17e, type: 2}
   TagPivotLocation: 1026
   pivotLocation: {x: 0, y: 0, z: 0}
 --- !u!4 &847711112
@@ -660,6 +659,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1180489632}
   - component: {fileID: 1180489631}
+  - component: {fileID: 1180489633}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -747,6 +747,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &1180489633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1180489630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
 --- !u!1 &1212176086
 GameObject:
   m_ObjectHideFlags: 0
@@ -839,8 +862,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b,
-    type: 3}
+  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -927,8 +949,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b,
-    type: 3}
+  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -995,8 +1016,7 @@ MonoBehaviour:
   m_text: TAG
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7f7a57f625a46457da2df7084396adf5, type: 2}
-  m_sharedMaterial: {fileID: -632423444857818724, guid: 7f7a57f625a46457da2df7084396adf5,
-    type: 2}
+  m_sharedMaterial: {fileID: -632423444857818724, guid: 7f7a57f625a46457da2df7084396adf5, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1128,7 +1148,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -0.254}
   m_SizeDelta: {x: 20, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1776574697
@@ -1180,16 +1200,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RaycastInformation: Surface Lock Test
   SurfaceLockRayData: {fileID: 11400000, guid: 7cb1a190871be984fbd87655c9ac9359, type: 2}
-  InverseSurfaceRayData: {fileID: 11400000, guid: d982149011f4a2945974379b1cbba463,
-    type: 2}
+  InverseSurfaceRayData: {fileID: 11400000, guid: d982149011f4a2945974379b1cbba463, type: 2}
   RaycastOrigin: {fileID: 69685398}
   RaycastEndDir: {fileID: 1212176087}
   ActivateSurfaceLock: 1
   ObjectToLock: {fileID: 4912725137770339302}
   ObjectRenderer: {fileID: 1073002202313192490}
   SurfaceLocked: 0
-  GhostPrefabVariant: {fileID: 1235289095179359318, guid: 359ab45c1ad7ec8428f1cc7dee416230,
-    type: 3}
+  GhostPrefabVariant: {fileID: 1235289095179359318, guid: 359ab45c1ad7ec8428f1cc7dee416230, type: 3}
   ghostCreated: {fileID: 0}
 --- !u!1 &2030320468
 GameObject:
@@ -1233,6 +1251,7 @@ GameObject:
   - component: {fileID: 2133360320}
   - component: {fileID: 2133360319}
   - component: {fileID: 2133360318}
+  - component: {fileID: 2133360321}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1314,6 +1333,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2133360321
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2133360317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
 --- !u!4 &18719435447576540
 Transform:
   m_ObjectHideFlags: 0

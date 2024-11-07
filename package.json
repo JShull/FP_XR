@@ -15,7 +15,9 @@
     "dependencies": {
       "com.unity.mathematics": "1.2.6",
       "com.unity.textmeshpro": "3.0.9",
+      "com.unity.2d.sprite":"1.0.0",
       "com.fuzzphyte.utility":"https://github.com/jshull/FP_Utility.git",
+      "com.fuzzphyte.utility.edu":"https://github.com/JShull/FP_Utility_EDU.git",
       "com.fuzzphyte.ray":"https://github.com/jshull/FP_Ray.git"
     },
     "samples": [
