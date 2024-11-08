@@ -6,14 +6,7 @@ namespace FuzzPhyte.XR
     {
         protected IFPXREventBinder eventBinder;
 
-        // on an extension class I would create a IFPXREventBinder tied to OVR
-        // I would then in start/awake call Initialize with the OVR event binder
-        /*
-         * public void Start()
-         * {
-         * Initialize(new OVREventBinder(this));
-         * }
-         */
+        
         public virtual void Initialize(IFPXREventBinder eventBinder)
         {
             this.eventBinder = eventBinder;
