@@ -4,6 +4,7 @@ namespace FuzzPhyte.XR
     using System.Collections.Generic;
     using UnityEngine;
     using UnityEngine.Events;
+    
     public class FPDistanceCloseItem : MonoBehaviour
     {
         public GameObject RealWorldObject;
@@ -89,5 +90,10 @@ namespace FuzzPhyte.XR
             AdditionalEventBeforeClose.Invoke();
             RealWorldObject.SetActive(false);
         }
+    }
+
+    public class OVRFPDistanceCloseItem : MonoBehaviour
+    {
+        //FAKE
     }
 }
