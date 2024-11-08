@@ -1,5 +1,6 @@
 namespace FuzzPhyte.XR
 {
+    using FuzzPhyte.Utility.Meta;
     using System;
     using UnityEngine;
     using UnityEngine.Events;
@@ -13,6 +14,20 @@ namespace FuzzPhyte.XR
         None = 0,
         Open = 1,
         Closed = 2
+    }
+    [Serializable]
+    public enum RotaterStatus
+    {
+        None,
+        Open,
+        Closed
+    }
+    [Serializable]
+    public struct ContainerRequirementD
+    {
+        public FP_Tag RequirementTag;
+        public string RequirementName;
+        public LatchState LatchState;
     }
     public interface IFPXREventBinder
     {
