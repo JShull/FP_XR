@@ -11,12 +11,12 @@ namespace FuzzPhyte.XR
         public GameObject FPObject;
         public FPPinPlacement PinComponent;
         public FPVocabTagDisplay DisplayComponent;
-        protected List<IFPLerpController> Lerpers = new List<IFPLerpController>();
+        protected List<IFPMotionController> Lerpers = new List<IFPMotionController>();
 
         public void Awake()
         {
             //get components that are using IFPLerpControllers on this transform
-            Lerpers.AddRange(GetComponents<IFPLerpController>());
+            Lerpers.AddRange(GetComponents<IFPMotionController>());
         }
         public void Start()
         {
@@ -39,7 +39,7 @@ namespace FuzzPhyte.XR
             }
             for (int i = 0; i < Lerpers.Count; i++)
             {
-                Lerpers[i].SetupLerp();
+                Lerpers[i].SetupMotion();
             }
         }
         public void ActivateSystem()
@@ -51,7 +51,7 @@ namespace FuzzPhyte.XR
             
             for(int i = 0; i < Lerpers.Count; i++)
             {
-                Lerpers[i].StartLerp();
+                Lerpers[i].StartMotion();
             }
         }
     }
