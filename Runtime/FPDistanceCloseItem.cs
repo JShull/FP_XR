@@ -12,7 +12,7 @@ namespace FuzzPhyte.XR
         public List<GameObject> SubRealObjects = new List<GameObject>();
         protected List<Vector3> SubRealStartingLocalPositions = new List<Vector3>();
         public Transform VRPivotPoint;
-        [SerializeField] private OVRTool toolRelated;
+        [SerializeField] private FPXRTool toolRelated;
         public UnityEvent AdditionalEventBeforeClose;
 
         public void Start()
@@ -25,9 +25,9 @@ namespace FuzzPhyte.XR
             }
             if (RealWorldObject != null && toolRelated == null)
             {
-                if (RealWorldObject.GetComponent<OVRTool>() != null)
+                if (RealWorldObject.GetComponent<FPXRTool>() != null)
                 {
-                    toolRelated = RealWorldObject.GetComponent<OVRTool>();
+                    toolRelated = RealWorldObject.GetComponent<FPXRTool>();
                 }
             }
             for (int i = 0; i < SubRealObjects.Count; i++)
