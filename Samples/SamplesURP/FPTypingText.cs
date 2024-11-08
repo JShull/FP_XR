@@ -3,9 +3,7 @@ namespace FuzzPhyte.XR
     using FuzzPhyte.Utility;
     using System.Collections;
     using TMPro;
-    using Unity.VisualScripting;
     using UnityEngine;
-    using UnityEngine.Audio;
 
     public class FPTypingText : MonoBehaviour
     {
