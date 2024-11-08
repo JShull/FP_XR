@@ -23,6 +23,12 @@ namespace FuzzPhyte.XR
         Closed
     }
     [Serializable]
+    public enum XRHandedness
+    {
+        Left = 0,
+        Right = 1,
+    }
+    [Serializable]
     public struct ContainerRequirementD
     {
         public FP_Tag RequirementTag;
