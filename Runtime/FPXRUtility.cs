@@ -1,10 +1,18 @@
 namespace FuzzPhyte.XR
 {
+    using System;
     using UnityEngine;
     using UnityEngine.Events;
     public static class FPXRUtility
     {
         //XR static class for various needs
+    }
+    [Serializable]
+    public enum LatchState
+    {
+        None = 0,
+        Open = 1,
+        Closed = 2
     }
     public interface IFPXREventBinder
     {
