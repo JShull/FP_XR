@@ -29,6 +29,38 @@ namespace FuzzPhyte.XR
         Right = 1,
     }
     [Serializable]
+    public enum XRInteractionStatus
+    {
+        None = 0,
+        Hover = 1,
+        Select = 2,
+        Unselect = 3,
+        InteractorViewAdded = 4,
+        InteractorViewRemoved = 5,
+        SelectingInteractorViewAdded = 6,
+        SelectingInteractorViewRemoved = 7
+    }
+    [Serializable]
+    public enum XRInteractorType
+    {
+        None = 0,
+        Hand = 1,
+        Grab = 2,
+        Ray = 3,
+        Poke = 4,
+        Distance = 5,
+        Custom = 9,
+    }
+    [Serializable]
+    public enum XRInteractorState
+    {
+        None = 0,
+        Locked = 1,
+        Closed = 2,
+        Open = 3,
+        Custom = 9
+    }
+    [Serializable]
     public struct ContainerRequirementD
     {
         public FP_Tag RequirementTag;
