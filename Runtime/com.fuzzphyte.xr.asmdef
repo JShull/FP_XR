@@ -6,7 +6,8 @@
         "com.fuzzphyte.ray",
         "Unity.Mathematics",
         "Unity.TextMeshPro",
-        "com.fuzzphyte.utility.edu"
+        "com.fuzzphyte.utility.edu",
+        "com.fuzzphyte.sgraph"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

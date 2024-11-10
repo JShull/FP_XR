@@ -41,6 +41,13 @@ namespace FuzzPhyte.XR
         SelectingInteractorViewRemoved = 7
     }
     [Serializable]
+    public enum XRAxis
+    {
+        Right = 0,
+        Up = 1,
+        Forward = 2
+    }
+    [Serializable]
     public enum XRInteractorType
     {
         None = 0,

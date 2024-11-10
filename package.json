@@ -18,7 +18,8 @@
       "com.unity.2d.sprite":"1.0.0",
       "com.fuzzphyte.utility":"https://github.com/jshull/FP_Utility.git",
       "com.fuzzphyte.utility.edu":"https://github.com/JShull/FP_Utility_EDU.git",
-      "com.fuzzphyte.ray":"https://github.com/jshull/FP_Ray.git"
+      "com.fuzzphyte.ray":"https://github.com/jshull/FP_Ray.git",
+      "com.fuzzphyte.sgraph":"https://github.com/jshull/FP_SGraph.git"
     },
     "samples": [
       {
