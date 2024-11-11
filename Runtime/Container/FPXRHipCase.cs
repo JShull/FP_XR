@@ -2,6 +2,10 @@ namespace FuzzPhyte.XR
 {
     using System.Collections.Generic;
     using UnityEngine;
+    /// <summary>
+    /// Manage locations of sockets and relationships of those items given/taken from sockets
+    /// For Example: If you're using OVR, you would want to put their socket as a child of one of our Sockets
+    /// </summary>
     [ExecuteInEditMode]
     public class FPXRHipCase : FPXRCase
     {
@@ -32,15 +36,15 @@ namespace FuzzPhyte.XR
         [SerializeField]protected Vector3 middlePosition;
         [SerializeField]protected List<FPSocket> sockets = new List<FPSocket>();
         
-        public void OnEnable()
+        public virtual void OnEnable()
         {
             Setup();
         }
-        public void OnDisable()
+        public virtual void OnDisable()
         {
             sockets.Clear();
         }
-        public void Setup()
+        public virtual void Setup()
         {
             if (centerPoint == null)
             {
@@ -66,7 +70,7 @@ namespace FuzzPhyte.XR
                 CalculateSocketPositions();
                 for(int i=0;i<numSockets;i++)
                 {
-                    centerPoint.GetChild(i).GetComponent<FPSocket>().PositionInCase(i,socketPositions[i]);
+                    centerPoint.GetChild(i).GetComponent<FPSocket>().PositionInCase(i,socketPositions[i],this);
                     sockets.Add(centerPoint.GetChild(i).GetComponent<FPSocket>());
                 }
             }else
@@ -75,7 +79,7 @@ namespace FuzzPhyte.XR
                 arcPoints = new Vector3[numSockets+2];
             }
         }
-        public void Update()
+        public virtual void Update()
         {
             if (centerPoint == null)
             {
@@ -85,7 +89,53 @@ namespace FuzzPhyte.XR
             CalculateSocketPositions();
             AdjustPositions();
         }
-        private void OnDrawGizmos()
+        #region Interacting with Items in our Case
+        public virtual bool PassedItemIn(GameObject anItem)
+        {
+            var worldItem = anItem.GetComponent<FPWorldItem>();
+            if(worldItem!=null)
+            {
+                //identify location of item and relative position to sockets
+                //closest socket gets the item
+                float closestDistance = float.MaxValue;
+                FPSocket closestSocket = null;
+                for(int i=1;i<socketPositions.Length-1;i++)
+                {
+                    //only want the interior sockets not the left and right point
+                    var socketPos = socketPositions[i];
+                    
+                    float socketDistance = Vector3.Distance(anItem.transform.position,socketPos);
+                    var socketState = sockets[i-1].SpaceTaken;
+                    if(socketState == XRInteractorState.Open && socketDistance<closestDistance)
+                    {
+                        closestDistance = socketDistance;
+                        closestSocket = sockets[i-1];
+                    }
+                }
+                if(closestSocket!=null)
+                {
+                    return closestSocket.GivenItem(worldItem);
+                }
+            }
+            return false;
+        }
+        public virtual bool RemoveAnItem(GameObject anItem)
+        {
+            var worldItem = anItem.GetComponent<FPWorldItem>();
+            if(worldItem!=null)
+            {
+                for(int i=0;i<sockets.Count;i++)
+                {
+                    if(sockets[i].CurrentItem == worldItem)
+                    {
+                        return sockets[i].RemoveItem(worldItem);
+                    }
+                }
+            }
+            return false;
+        }
+        #endregion
+        protected virtual void OnDrawGizmos()
         {
             if (centerPoint == null)
             {
@@ -163,7 +213,7 @@ namespace FuzzPhyte.XR
             }
             for(int i=0;i<sockets.Count;i++)
             {
-                sockets[i].PositionInCase(i,socketPositions[i]);
+                sockets[i].PositionInCase(i,socketPositions[i],this);
             }
         }
         private Vector3 CalculateArcPoint(Vector3 left, Vector3 middle, Vector3 right, float t)

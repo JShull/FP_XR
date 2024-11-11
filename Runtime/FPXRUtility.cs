@@ -27,6 +27,7 @@ namespace FuzzPhyte.XR
     {
         Left = 0,
         Right = 1,
+        NONE=2
     }
     [Serializable]
     public enum XRInteractionStatus

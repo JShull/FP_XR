@@ -8,6 +8,7 @@ namespace FuzzPhyte.XR
 
     /// <summary>
     /// This assumes that there is a collider directly on this object of some sorts...
+    /// Needs to know when it gets picked up and dropped to maintain state
     /// </summary>
     public class FPWorldItem : MonoBehaviour
     {
@@ -30,18 +31,32 @@ namespace FuzzPhyte.XR
         public FP_Data TheFPData;
         [SerializeField]
         protected FPSocket currentSocket;
+        [SerializeField]
+        protected XRHandedness handState;
+        public XRHandedness InHandState { get { return handState; } }
         #endregion
         /// <summary>
         /// If we get attached to something
         /// </summary>
         /// <param name="parent"></param>
-        public virtual void Attached(FPSocket parent)
+        public virtual void LinkSocket(FPSocket parent)
         {
             currentSocket = parent;
         }
-        public virtual void Detached()
+        public virtual void PickedUP(int handState)
         {
-            currentSocket = null;
+            this.handState = (XRHandedness)handState;
+        }
+        public virtual void Dropped()
+        {
+            this.handState = XRHandedness.NONE;
+        }
+        public virtual void UnlinkSocket(FPSocket passedParent)
+        {
+            if(currentSocket == passedParent)
+            {
+                currentSocket = null;
+            }
         }
         public virtual void Start()
         {
