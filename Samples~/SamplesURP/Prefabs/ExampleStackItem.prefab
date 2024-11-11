@@ -9,6 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2685829348837974734}
+  - component: {fileID: 4037674772882738700}
+  - component: {fileID: 126115361482957194}
   m_Layer: 0
   m_Name: ExampleStackItem
   m_TagString: Untagged
@@ -32,6 +34,57 @@ Transform:
   - {fileID: 4736387289580094926}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4037674772882738700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 676192394454425941}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 514aa3c2ebf787d479a2c9e8af60650d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ItemCollider: {fileID: 1978538275284632297}
+  ItemTransform: {fileID: 2685829348837974734}
+  ItemRigidBody: {fileID: 126115361482957194}
+  ResetWorldEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  _startPosition: {x: 0, y: 0, z: 0}
+  _startRotation: {x: 0, y: 0, z: 0, w: 0}
+  TheFPTag: {fileID: 11400000, guid: d28942a5752a3ca498007d847c25931d, type: 2}
+  TheFPData: {fileID: 0}
+  currentSocket: {fileID: 0}
+  handState: 2
+--- !u!54 &126115361482957194
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 676192394454425941}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1422270864344808635
 GameObject:
   m_ObjectHideFlags: 0

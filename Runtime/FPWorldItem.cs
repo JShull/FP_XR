@@ -5,6 +5,7 @@ namespace FuzzPhyte.XR
     using FuzzPhyte.Utility.Meta;
     using UnityEngine;
     using UnityEngine.Events;
+    using System;
 
     /// <summary>
     /// This assumes that there is a collider directly on this object of some sorts...
@@ -35,6 +36,19 @@ namespace FuzzPhyte.XR
         protected XRHandedness handState;
         public XRHandedness InHandState { get { return handState; } }
         #endregion
+        #region Action Related
+        // Action events for external listeners
+        public event Action<FPWorldItem,XRHandedness> ItemGrabbed;
+        public event Action<FPWorldItem,XRHandedness> ItemDropped;
+        public event Action<FPWorldItem> ItemDestroyed;
+        public event Action<FPWorldItem> ItemSpawned;
+        public event Action<FPWorldItem,FPSocket> ItemSocketSet;
+        public event Action<FPWorldItem,FPSocket> ItemSocketRemoved;
+        #endregion
+
+        #region Methods for Actions
+        /// these are called probably from some sort of Unity Event or external system
+        
         /// <summary>
         /// If we get attached to something
         /// </summary>
@@ -42,13 +56,24 @@ namespace FuzzPhyte.XR
         public virtual void LinkSocket(FPSocket parent)
         {
             currentSocket = parent;
+            ItemSocketSet?.Invoke(this, parent);
         }
-        public virtual void PickedUP(int handState)
+        public virtual void PickedUpItem(int handState)
         {
             this.handState = (XRHandedness)handState;
+            ItemGrabbed?.Invoke(this, this.handState);
         }
-        public virtual void Dropped()
+        public virtual void DroppedItem()
         {
+            if(this.handState != XRHandedness.NONE)
+            {
+               
+                ItemDropped?.Invoke(this,this.handState);
+            }
+            else
+            {
+                ItemDropped?.Invoke(this, XRHandedness.NONE);
+            }
             this.handState = XRHandedness.NONE;
         }
         public virtual void UnlinkSocket(FPSocket passedParent)
@@ -56,8 +81,18 @@ namespace FuzzPhyte.XR
             if(currentSocket == passedParent)
             {
                 currentSocket = null;
+                ItemSocketRemoved?.Invoke(this, passedParent);
             }
         }
+        /// <summary>
+        /// Called if something else spawns this item - don't want this in start/onEnable
+        /// basically an external way for a spawner system to fire this off without knowing it exactly...
+        /// </summary>
+        public virtual void ItemSpawnedEvent()
+        {
+            ItemSpawned?.Invoke(this);
+        }
+        #endregion
         public virtual void Start()
         {
             if(ItemCollider == null)

@@ -7,6 +7,7 @@ namespace FuzzPhyte.XR
 
     public class FPXRSpawnStack : FPSpawner
     {
+        public bool Testing = false;
         [SerializeField] private List<GameObject> spawnStack = new List<GameObject>(); // List of prefabs in stack order
 
         [SerializeField] protected int currentIndex = 0;
@@ -17,10 +18,19 @@ namespace FuzzPhyte.XR
         [SerializeField] protected GameObject UnderStackVisualization;
         [SerializeField] protected float verticalScaleMeasure;
         [SerializeField] protected GameObject currentOnStackItem;
+        [SerializeField] protected Transform SpawnParentRoot;
         [Space]
         public GameObject TestItem;
+        #region Cached Listeners
+        [SerializeField]private List<FPWorldItem> grabbedItemListenerList = new List<FPWorldItem>();
+        #endregion
         protected virtual void Start()
         {
+            if (SpawnParentRoot == null)
+            {
+                SpawnParentRoot = this.transform;
+            }
+
             stackRange = Vector3.Distance(BottomStackPosition.position, TopStackPosition.position);
             //assumption is that the UnderStackVisualization visual fits the distance between the two points
             verticalScaleMeasure = stackRange / (UnderStackVisualization.transform.localScale.y);
@@ -29,12 +39,16 @@ namespace FuzzPhyte.XR
            
             stackStepSize = stackRange / (currentIndex);
             AdjustSpawnPosition(TopStackPosition.position);
-            currentOnStackItem = Spawn();
+            currentOnStackItem = SpawnNextItem();
             AdjustSpawnPosition(ReturnPointOnLine((currentIndex) * stackStepSize));
         }
         
-        public void Update()
+        public virtual void Update()
         {
+            if (!Testing)
+            {
+                return;
+            }
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 SpawnNextItem();
@@ -43,15 +57,59 @@ namespace FuzzPhyte.XR
             {
                 ReturnItem(TestItem);
             }
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                //fake grabber
+                Debug.Log($"Fake grab!");
+                if(currentOnStackItem != null)
+                {
+                    //toss item off the top of the stack
+                    currentOnStackItem.GetComponent<FPWorldItem>().ItemRigidBody.AddRelativeForce(Vector3.up*250);
+                    currentOnStackItem.GetComponent<FPWorldItem>().PickedUpItem(0);
+                }
+                    
+            }
         }
-        public void SpawnNextItem()
+        public GameObject SpawnNextItem()
         {
             currentOnStackItem = Spawn();
-            if(currentOnStackItem != null)
+            //check if our item is a World Item
+            currentOnStackItem.transform.SetParent(SpawnParentRoot);
+            if (currentOnStackItem != null)
             {
                 UpdateVisualStackSize();
                 AdjustSpawnPosition(ReturnPointOnLine(currentIndex * stackStepSize));
-                
+                var fpWorld = currentOnStackItem.GetComponent<FPWorldItem>();
+                if (fpWorld != null)
+                {
+                    fpWorld.ItemSpawnedEvent();
+                    fpWorld.ItemGrabbed += ListenForFirstGrab;
+                    if (!grabbedItemListenerList.Contains(fpWorld))
+                    {
+                        grabbedItemListenerList.Add(fpWorld);
+                    }
+                }
+            }
+            return currentOnStackItem;
+        }
+        
+
+        protected void ListenForFirstGrab(FPWorldItem theItem, XRHandedness theHandItsIn)
+        {
+            Debug.LogWarning($"An item was just grabbed and we cared about it, {theItem.gameObject.name} and it was apparently grabbed by the {theHandItsIn.ToString()} hand");
+            //when we fire this off we are going to remove ourselves from it as well
+            if(grabbedItemListenerList.Contains(theItem))
+            {
+                theItem.ItemGrabbed -= ListenForFirstGrab;
+                grabbedItemListenerList.Remove(theItem);
+                SpawnNextItem();
+            }
+        }
+        public void OnDisable()
+        {
+            foreach (var item in grabbedItemListenerList)
+            {
+                item.ItemGrabbed -= ListenForFirstGrab;
             }
         }
         public void ReturnItem(GameObject theItemPassedToUs)
