@@ -5,11 +5,11 @@ namespace FuzzPhyte.XR
     using UnityEngine;
     using UnityEngine.Events;
 
-    public class FPXRContainer<GRT, G, GI, PEW> : MonoBehaviour where GRT : MonoBehaviour where G : MonoBehaviour where GI : MonoBehaviour where PEW : MonoBehaviour
+    public class FPXRContainer<GRT, G, GI, PEW> : FPXRCase where GRT : MonoBehaviour where G : MonoBehaviour where GI : MonoBehaviour where PEW : MonoBehaviour
     {
-        [Tooltip("Status of our Container")]
-        public SequenceStatus ContainerStatus;
-        public RotaterStatus ContainerRotaterStatus = RotaterStatus.Closed;
+        //[Tooltip("Status of our Container")]
+        //public SequenceStatus ContainerStatus;
+        //public CaseStatus ContainerStatus = CaseStatus.Closed;
         public GRT ContainerRotateManager;
         public float ContainerRotateManagerMinAngle;
         public float ContainerRotateManagerMaxAngle;
@@ -79,9 +79,9 @@ namespace FuzzPhyte.XR
             {
                 //all are open!
                 //are we currently locked? if we are then we can unlock
-                if (ContainerStatus == SequenceStatus.Locked)
+                if (ContainerSequence == SequenceStatus.Locked)
                 {
-                    ContainerStatus = SequenceStatus.Unlocked;
+                    ContainerSequence = SequenceStatus.Unlocked;
                     OnContainerUnlock?.Invoke();
                     OnUnlockedEvent.Invoke();
                 }
@@ -111,9 +111,9 @@ namespace FuzzPhyte.XR
             {
                 //all are open!
                 //are we currently locked? if we are then we can unlock
-                if (ContainerStatus == SequenceStatus.Unlocked)
+                if (ContainerSequence == SequenceStatus.Unlocked)
                 {
-                    ContainerStatus = SequenceStatus.Locked;
+                    ContainerSequence = SequenceStatus.Locked;
                     OnContainerLock?.Invoke();
                     OnLockedEvent.Invoke();
                 }
@@ -123,7 +123,7 @@ namespace FuzzPhyte.XR
                 //do we have one of our latches closed?
                 if (latchesClosed > 0)
                 {
-                    if (ContainerStatus == SequenceStatus.Unlocked)
+                    if (ContainerSequence == SequenceStatus.Unlocked)
                     {
                         //ContainerStatus = SequenceStatus.Locked;
                         OnContainerLock?.Invoke();
@@ -167,7 +167,7 @@ namespace FuzzPhyte.XR
             if (angleCheck > minValue + minValueOffset)
             {
                 //open
-                ContainerRotaterStatus = RotaterStatus.Open;
+                ContainerStatus = CaseStatus.Open;
                 //make sure our latches stay disabled
                 for (int i = 0; i < Latches.Count; i++)
                 {
@@ -185,7 +185,7 @@ namespace FuzzPhyte.XR
             else
             {
                 //closed
-                ContainerRotaterStatus = RotaterStatus.Closed;
+                ContainerStatus = CaseStatus.Closed;
                 //make sure our latches are enabled
                 for (int i = 0; i < Latches.Count; i++)
                 {

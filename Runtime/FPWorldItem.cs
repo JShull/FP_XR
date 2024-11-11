@@ -27,9 +27,24 @@ namespace FuzzPhyte.XR
         protected bool _useGravity;
         #region FP Related
         public FP_Tag TheFPTag;
+        public FPXRSocketTag SocketTag;
         public FP_Data TheFPData;
+        [SerializeField]
+        protected FPSocket currentSocket;
         #endregion
-        public void Start()
+        /// <summary>
+        /// If we get attached to something
+        /// </summary>
+        /// <param name="parent"></param>
+        public virtual void Attached(FPSocket parent)
+        {
+            currentSocket = parent;
+        }
+        public virtual void Detached()
+        {
+            currentSocket = null;
+        }
+        public virtual void Start()
         {
             if(ItemCollider == null)
             {
@@ -49,7 +64,7 @@ namespace FuzzPhyte.XR
                 _useGravity = ItemRigidBody.useGravity;
             }
         }
-        public void ResetLocation()
+        public virtual void ResetLocation()
         {
             ItemTransform.position = _startPosition;
             ItemTransform.rotation = _startRotation;

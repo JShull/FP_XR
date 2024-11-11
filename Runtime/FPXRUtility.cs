@@ -16,7 +16,7 @@ namespace FuzzPhyte.XR
         Closed = 2
     }
     [Serializable]
-    public enum RotaterStatus
+    public enum CaseStatus
     {
         None,
         Open,
@@ -65,6 +65,7 @@ namespace FuzzPhyte.XR
         Locked = 1,
         Closed = 2,
         Open = 3,
+        IsOccupied=4,
         Custom = 9
     }
     [Serializable]
