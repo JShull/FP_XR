@@ -27,7 +27,6 @@ namespace FuzzPhyte.XR
         protected bool _useGravity;
         #region FP Related
         public FP_Tag TheFPTag;
-        public FPXRSocketTag SocketTag;
         public FP_Data TheFPData;
         [SerializeField]
         protected FPSocket currentSocket;

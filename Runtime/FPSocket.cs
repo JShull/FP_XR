@@ -12,6 +12,7 @@ namespace FuzzPhyte.XR
         [Tooltip("Whatever item comes into our socket has to have this Tag")]
         public FPXRSocketTag SocketRequirement;
         public XRInteractorState SocketStatus;
+        public XRInteractorState SpaceTaken;
 
         public void PositionInCase(int index, Vector3 position)
         {
@@ -25,30 +26,66 @@ namespace FuzzPhyte.XR
             {
                 Debug.LogError($"Socket at index {socketIndex} requires a trigger collider.");
             }
-            SocketStatus = XRInteractorState.Open;
+            SpaceTaken = XRInteractorState.Open;
+            SocketStatus = XRInteractorState.None;
         }
         private void OnTriggerEnter(Collider other)
         {
-            if(SocketStatus != XRInteractorState.Open)
+            if(SpaceTaken != XRInteractorState.Open)
             {
                 return;
             }
-            if (currentItem == null && other.TryGetComponent(out FPWorldItem worldItem))
+            if(SocketStatus == XRInteractorState.SocketBit)
             {
-                if(worldItem.SocketTag != SocketRequirement)
+                //a bit owns this space, are we the returning bit?
+                if(other.TryGetComponent(out FPBit bit))
                 {
-                    return;
+                    if(bit.Socket == this)
+                    {
+                        //we are returning to our socket via the Trigger
+                        SpaceTaken = XRInteractorState.IsOccupied;
+                        SocketStatus = XRInteractorState.SocketBit;
+                        AttachItem(other.GetComponent<FPWorldItem>());
+                        bit.ReturnedToSocket();
+                        return;
+                    }
                 }
-                AttachItem(worldItem);
-                SocketStatus = XRInteractorState.IsOccupied;
+                return;
+            }else if(currentItem == null && other.TryGetComponent(out FPWorldItem worldItem))
+            {
+                if(other.TryGetComponent(out FPBit bit))
+                {
+                    //we are a bit...
+                    if(bit.SocketTag != SocketRequirement)
+                    {
+                        //the wrong socket requirement (still a bit)
+                        SpaceTaken = XRInteractorState.Open;
+                        SocketStatus = XRInteractorState.Open;
+                        return;
+                    }
+                    //we are a bit and the right socket requirement
+                    AttachItem(worldItem);
+                    SocketStatus = XRInteractorState.SocketBit;
+                    SpaceTaken = XRInteractorState.IsOccupied;
+                    bit.SetInSocket(this);
+                
+                }
+                else
+                {
+                    //not a bit but an item we can place here
+                    AttachItem(worldItem);
+                    SocketStatus = XRInteractorState.Open;
+                    SpaceTaken = XRInteractorState.IsOccupied;
+                }
             }
+            
         }
         private void OnTriggerExit(Collider other)
         {
             if (currentItem != null && other.GetComponent<FPWorldItem>() == currentItem)
             {
                 DetachItem();
-                SocketStatus = XRInteractorState.Open;
+                SpaceTaken = XRInteractorState.Open;
             }
         }
 
@@ -70,7 +107,12 @@ namespace FuzzPhyte.XR
                 currentItem.ItemRigidBody.isKinematic = isKinematicState; // Restore RB state
                 currentItem.ItemRigidBody.useGravity = useGravityState; // Restore RB state
                 currentItem.Detached();
-                currentItem = null;
+                if(SocketStatus == XRInteractorState.SocketBit)
+                {
+                    //we are a bit and we are not nulling out the current item  
+                }else{
+                    currentItem = null;
+                }
             }
         }
 

@@ -66,6 +66,7 @@ namespace FuzzPhyte.XR
         Closed = 2,
         Open = 3,
         IsOccupied=4,
+        SocketBit=5,
         Custom = 9
     }
     [Serializable]
