@@ -113,7 +113,7 @@ namespace FuzzPhyte.XR
 #endif
         protected void OnDrawGizmos()
         {
-            if (spawnPiecesPrefab.Count != spawnLocations.Count && spawnPosition!=null && VisualizationGroupObject!=null)
+            if ((spawnPiecesPrefab.Count == spawnLocations.Count) && spawnPosition!=null && VisualizationGroupObject!=null)
             {
                 Gizmos.color = Color.red;
                 for(int i = 0; i < spawnLocations.Count; i++)
@@ -122,9 +122,6 @@ namespace FuzzPhyte.XR
                     Gizmos.color = Color.cyan;
                     Gizmos.DrawWireSphere(spawnLocations[i].position,0.1f);
                 }
-#if UNITY_EDITOR
-                //UnityEditor.Handles.Label(spawnPosition.position, "Spawn Position");
-#endif
             }
         }
     }
