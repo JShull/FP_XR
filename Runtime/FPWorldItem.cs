@@ -127,5 +127,19 @@ namespace FuzzPhyte.XR
                 ItemRigidBody.isKinematic = _isKinematic;
             }
         }
+        public virtual void SetParentNull()
+        {
+            if (ItemTransform != null)
+            {
+                ItemTransform.SetParent(null);
+            }
+        }
+        public virtual void SetParent(Transform parent)
+        {
+            if (ItemTransform != null)
+            {
+                ItemTransform.SetParent(parent);
+            }
+        }
     }
 }
