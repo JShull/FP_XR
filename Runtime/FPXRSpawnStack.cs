@@ -13,10 +13,10 @@ namespace FuzzPhyte.XR
         [SerializeField] protected int currentIndex = 0;
         [SerializeField] protected Transform BottomStackPosition;
         [SerializeField] protected Transform TopStackPosition;
-        protected float stackRange;
+        [SerializeField] protected float stackRange;
         [SerializeField] protected float stackStepSize;
         [SerializeField] protected GameObject UnderStackVisualization;
-        [SerializeField] protected float verticalScaleMeasure;
+        //[SerializeField] protected float verticalScaleMeasure;
         [SerializeField] protected GameObject currentOnStackItem;
         [SerializeField] protected Transform SpawnParentRoot;
         [Space]
@@ -33,7 +33,11 @@ namespace FuzzPhyte.XR
 
             stackRange = Vector3.Distance(BottomStackPosition.position, TopStackPosition.position);
             //assumption is that the UnderStackVisualization visual fits the distance between the two points
-            verticalScaleMeasure = stackRange / (UnderStackVisualization.transform.localScale.y);
+            if (UnderStackVisualization.transform.localScale.y != 1)
+            {
+                Debug.LogWarning($"Understack visualization should be a scale of 1 for starting scale, update it's children visual to make it 'fit'");
+            }
+            //verticalScaleMeasure = stackRange / (UnderStackVisualization.transform.localScale.y);
             currentIndex = spawnStack.Count - 1;
             //start and setup the stack
            
@@ -184,7 +188,7 @@ namespace FuzzPhyte.XR
             {
                 ratio = 0;
             }
-            var newScale = new Vector3(UnderStackVisualization.transform.localScale.x, verticalScaleMeasure * ratio, UnderStackVisualization.transform.localScale.z);
+            var newScale = new Vector3(UnderStackVisualization.transform.localScale.x, ratio, UnderStackVisualization.transform.localScale.z);
             UnderStackVisualization.transform.localScale = newScale;
         }
         protected void OnDrawGizmos()
