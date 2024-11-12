@@ -16,7 +16,7 @@ namespace FuzzPhyte.XR
         [SerializeField] protected float stackRange;
         [SerializeField] protected float stackStepSize;
         [SerializeField] protected GameObject UnderStackVisualization;
-        //[SerializeField] protected float verticalScaleMeasure;
+       
         [SerializeField] protected GameObject currentOnStackItem;
         [SerializeField] protected Transform SpawnParentRoot;
         [Space]
@@ -46,7 +46,8 @@ namespace FuzzPhyte.XR
             currentOnStackItem = SpawnNextItem();
             AdjustSpawnPosition(ReturnPointOnLine((currentIndex) * stackStepSize));
         }
-        
+
+#if UNITY_EDITOR
         public virtual void Update()
         {
             if (!Testing)
@@ -74,6 +75,7 @@ namespace FuzzPhyte.XR
                     
             }
         }
+#endif
         public GameObject SpawnNextItem()
         {
             currentOnStackItem = Spawn();
