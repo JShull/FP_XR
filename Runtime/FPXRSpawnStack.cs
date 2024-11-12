@@ -78,9 +78,10 @@ namespace FuzzPhyte.XR
         {
             currentOnStackItem = Spawn();
             //check if our item is a World Item
-            currentOnStackItem.transform.SetParent(SpawnParentRoot);
+            
             if (currentOnStackItem != null)
             {
+                currentOnStackItem.transform.SetParent(SpawnParentRoot);
                 UpdateVisualStackSize();
                 AdjustSpawnPosition(ReturnPointOnLine(currentIndex * stackStepSize));
                 var fpWorld = currentOnStackItem.GetComponent<FPWorldItem>();
