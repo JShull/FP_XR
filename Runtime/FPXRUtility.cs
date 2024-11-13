@@ -1,5 +1,7 @@
 namespace FuzzPhyte.XR
 {
+    using FuzzPhyte.Utility.EDU;
+    using FuzzPhyte.Utility;
     using FuzzPhyte.Utility.Meta;
     using System;
     using UnityEngine;
@@ -98,6 +100,13 @@ namespace FuzzPhyte.XR
         void UNBindSelectingInteractorViewAdded(UnityAction action);
         void UNBindSelectingInteractorViewRemoved(UnityAction action);
         
+    }
+    [Serializable]
+    public struct XRDetailedLabelData
+    {
+        [Space]
+        public FP_Vocab VocabData;
+        public FP_Theme ThemeData;
     }
     /*
          *public class OVREventBinder : IEventBinder

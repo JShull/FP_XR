@@ -37,8 +37,14 @@ namespace FuzzPhyte.XR
         protected bool _isKinematic;
         protected bool _useGravity;
         #region FP Related
+        [Space]
+        [Header("FP Data")]
+        [Tooltip("Highest Level Tag")]
         public FP_Tag TheFPTag;
+        [Tooltip("Generic Data Object")]
         public FP_Data TheFPData;
+        [Tooltip("Place to centralize all the data for this item")]
+        public XRDetailedLabelData DetailedLabelData;
         [SerializeField]
         protected FPSocket currentSocket;
         [SerializeField]
@@ -212,6 +218,7 @@ namespace FuzzPhyte.XR
                 ItemTransform.SetParent(parent);
             }
         }
+        #region Label Related Information
         public virtual void SetupInteractionLabelText(string text)
         {
             if (InteractionDisplayText != null)
@@ -243,5 +250,19 @@ namespace FuzzPhyte.XR
                 }
             }
         }
+    
+        public virtual void SetupDetailedLabel()
+        {
+
+        }
+        public virtual void ActivateDetailedLabel()
+        {
+
+        }
+        public void ActivateDetailedLabelTimer(float time)
+        {
+
+        }
+        #endregion
     }
 }
