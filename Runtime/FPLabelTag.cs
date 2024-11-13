@@ -29,7 +29,7 @@ namespace FuzzPhyte.XR
         /// This function will make sure they have the correct settings by theme by FontSetingLabel based on order H1-H7
         /// </summary>
         /// <param name="FontsInOrder">In order of Header 1 thru</param>
-        public void SetupFonts(List<TextMeshPro> HeaderFontsInOrder)
+        public void SetupFonts(List<TMP_Text> HeaderFontsInOrder)
         {
             if (themeData.FontSettings.Count > 0)
             {
@@ -56,7 +56,7 @@ namespace FuzzPhyte.XR
         /// </summary>
         /// <param name="font"></param>
         /// <param name="category"></param>
-        public void SetupFontByCategory(TextMeshPro font,FontSettingLabel category)
+        public void SetupFontByCategory(TMP_Text font,FontSettingLabel category)
         {
             for (int i = 0; i < themeData.FontSettings.Count; i++)
             {
@@ -194,27 +194,27 @@ namespace FuzzPhyte.XR
             audioType = AudioType.UNKNOWN;
             return null;
         }
-        public string ApplyTagTextData(TextMeshPro fontTagDisplay)
+        public string ApplyTagTextData(TMP_Text fontTagDisplay)
         {
             fontTagDisplay.text = dataTag.TagName;
             return fontTagDisplay.text;
         }
-        public string ApplyVocabTextData(TextMeshPro vocabDisplay)
+        public string ApplyVocabTextData(TMP_Text vocabDisplay)
         {
             vocabDisplay.text = vocabData.Word;
             return vocabDisplay.text;
         }
-        public string ApplyDefinitionTextData(TextMeshPro defnDisplay)
+        public string ApplyDefinitionTextData(TMP_Text defnDisplay)
         {
             defnDisplay.text = vocabData.Definition;
             return defnDisplay.text;
         }
-        public string ApplyVocabTranslationTextData(TextMeshPro vocabDisplay,FP_Language language)
+        public string ApplyVocabTranslationTextData(TMP_Text vocabDisplay,FP_Language language)
         {
             vocabDisplay.text = ReturnTranslation(language,false);
             return vocabDisplay.text;
         }
-        public string ApplyDefnTranslationTextData(TextMeshPro defnDisplay,FP_Language language)
+        public string ApplyDefnTranslationTextData(TMP_Text defnDisplay,FP_Language language)
         {
             defnDisplay.text = ReturnTranslation(language, true);
             return defnDisplay.text;

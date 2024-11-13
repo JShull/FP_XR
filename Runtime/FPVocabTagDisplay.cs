@@ -16,11 +16,11 @@ namespace FuzzPhyte.XR
         public SpriteRenderer BackDrop;
         [Space]
         [Header("Font Renderers")]
-        public TextMeshPro MainTextDisplay;
+        public TMP_Text MainTextDisplay;
         public FontSettingLabel MainTextDisplaySetting;
-        public TextMeshPro SecondaryTextDisplay;
+        public TMP_Text SecondaryTextDisplay;
         public FontSettingLabel SecondaryTextDisplaySetting;
-        public TextMeshPro TertiaryTextDisplay;
+        public TMP_Text TertiaryTextDisplay;
         public FontSettingLabel TertiaryTextDisplaySetting;
         [Space]
         [Header("Data")]
@@ -28,6 +28,8 @@ namespace FuzzPhyte.XR
         public FP_Vocab VocabData;
         public FP_Theme ThemeData;
         public FP_Language AudioStartLanguage;
+        public bool SetupOnStart = true;
+        public bool HideOnStart = false;
         [Tooltip("All renderers associated with this tag")]
         public List<Renderer> RendererList = new List<Renderer>();
         [Space]
@@ -80,6 +82,34 @@ namespace FuzzPhyte.XR
         }
         public virtual void Start()
         {
+            if (SetupOnStart)
+            {
+                labelTag = new FPLabelTag(TagData, VocabData, ThemeData);
+                pivotLocation = ReturnPivotLocation();
+                if (AttachmentLocation != null)
+                {
+                    AttachmentLocation.position = pivotLocation;
+                }
+                if (MainTextDisplay && SecondaryTextDisplay)
+                {
+                    SetupIndividualFontByCategory();
+                    //SetupTagVocabDefnText();
+                    SetupVocabDefnText();
+                    if (AudioStartLanguage != FP_Language.NA)
+                    {
+                        SetupAudioClip(AudioStartLanguage, false, false);
+                    }
+                }
+            }
+
+            HideShowAllRenderers(!HideOnStart);
+        }
+        public virtual void Setup(FP_Tag tag, FP_Vocab vocab, FP_Theme theme, FP_Language startLanguage, bool display=false)
+        {
+            TagData = tag;
+            VocabData = vocab;
+            ThemeData = theme;
+            AudioStartLanguage = startLanguage;
             labelTag = new FPLabelTag(TagData, VocabData, ThemeData);
             pivotLocation = ReturnPivotLocation();
             if (AttachmentLocation != null)
@@ -93,11 +123,12 @@ namespace FuzzPhyte.XR
                 SetupVocabDefnText();
                 if (AudioStartLanguage != FP_Language.NA)
                 {
-                    SetupAudioClip(AudioStartLanguage,false,false);
+                    SetupAudioClip(AudioStartLanguage, false, false);
                 }
             }
+            HideShowAllRenderers(display);
         }
-       
+
         public virtual void DisplayTag()
         {
             DisplayTagEvent.Invoke();
@@ -121,8 +152,12 @@ namespace FuzzPhyte.XR
         }
         public virtual string DisplayVocabTranslation(FP_Language choice)
         {
+            return DisplayVocabTranslation(SecondaryTextDisplay, choice);
+        }
+        public virtual string DisplayVocabTranslation(TMP_Text textDisplay,FP_Language choice)
+        {
             DisplayTranslationEvent.Invoke();
-            return labelTag.ApplyVocabTranslationTextData(SecondaryTextDisplay, choice);
+            return labelTag.ApplyVocabTranslationTextData(textDisplay, choice);
         }
         /// <summary>
         /// Returns the definition or translation based on the language requested

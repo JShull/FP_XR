@@ -96,7 +96,7 @@ namespace FuzzPhyte.XR
                 StartTypingEffect(TypingData.SecondaryTextDisplay, txtContent, theClip, rplFont);
             }
         }
-        public void StartTypingEffect(TextMeshPro TxtComponent, string Txt, AudioClip audioFile, string startingTxt = "")
+        public void StartTypingEffect(TMP_Text TxtComponent, string Txt, AudioClip audioFile, string startingTxt = "")
         {
             if (typingCoroutine != null)
             {
@@ -104,7 +104,7 @@ namespace FuzzPhyte.XR
             }
             typingCoroutine = StartCoroutine(TypeText(TxtComponent,Txt,audioFile, startingTxt));
         }
-        protected IEnumerator TypeText(TextMeshPro textComponent,string fullText,AudioClip aFile, string startingText="")
+        protected IEnumerator TypeText(TMP_Text textComponent,string fullText,AudioClip aFile, string startingText="")
         {
             AudioSource.clip = aFile;
             AudioSource.Play();
