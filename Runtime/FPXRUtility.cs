@@ -39,7 +39,8 @@ namespace FuzzPhyte.XR
         InteractorViewAdded = 4,
         InteractorViewRemoved = 5,
         SelectingInteractorViewAdded = 6,
-        SelectingInteractorViewRemoved = 7
+        SelectingInteractorViewRemoved = 7,
+        UnHover = 8
     }
     [Serializable]
     public enum XRAxis
