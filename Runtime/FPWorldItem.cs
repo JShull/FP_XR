@@ -54,6 +54,7 @@ namespace FuzzPhyte.XR
         public event Action<FPWorldItem, FPSocket> ItemSocketSet;
         public event Action<FPWorldItem, FPSocket> ItemSocketRemoved;
         public event Action<FPWorldItem, XRHandedness> ItemRaySelect;
+        public event Action<FPWorldItem> ItemRayUnselected;
         #endregion
 
         #region Methods for Actions
@@ -68,6 +69,57 @@ namespace FuzzPhyte.XR
             currentSocket = parent;
             ItemSocketSet?.Invoke(this, parent);
         }
+        /// <summary>
+        /// Stubout for if we need to process the data object
+        /// </summary>
+        /// <param name="interactionType"></param>
+        /// <param name="passedObject"></param>
+        public virtual void EventActionPassedBack(XRInteractionStatus interactionType, object passedObject)
+        {
+            
+        }
+        public virtual void EventActionPassedBack(XRInteractorType interactor,XRInteractionStatus interactionType, XRHandedness hand)
+        {
+            switch (interactionType)
+            {
+                case XRInteractionStatus.None:
+                    break;
+                case XRInteractionStatus.Hover:
+                    break;
+                case XRInteractionStatus.Select:
+                    if(interactor == XRInteractorType.Ray)
+                    {
+                        RayInteracted((int)hand);
+                        break;
+                    }
+                    if(interactor == XRInteractorType.Grab)
+                    { 
+                        PickedUpItem((int)hand);
+                        break;
+                    }
+                    break;
+                case XRInteractionStatus.Unselect:
+                    if (interactor == XRInteractorType.Ray)
+                    {
+                        RayUnselect();
+                        break;
+                    }
+                    if (interactor == XRInteractorType.Grab)
+                    {
+                        DroppedItem();
+                        break;
+                    }
+                    break;
+                case XRInteractionStatus.InteractorViewAdded:
+                    break;
+                case XRInteractionStatus.InteractorViewRemoved:
+                    break;
+                case XRInteractionStatus.SelectingInteractorViewAdded:
+                    break;
+                case XRInteractionStatus.SelectingInteractorViewRemoved:
+                    break;
+            }
+        }
         public virtual void PickedUpItem(int handState)
         {
             this.handState = (XRHandedness)handState;
@@ -77,6 +129,10 @@ namespace FuzzPhyte.XR
         {
             this.handState = (XRHandedness)handState;
             ItemRaySelect?.Invoke(this, this.handState);
+        }
+        public virtual void RayUnselect()
+        {
+            ItemRayUnselected?.Invoke(this);
         }
         public virtual void DroppedItem()
         {
