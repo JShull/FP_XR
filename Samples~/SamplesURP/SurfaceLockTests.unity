@@ -2574,6 +2574,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   useTimer: 0
   timerDuration: 5
+  useRotation: 1
 --- !u!1 &2063746484
 GameObject:
   m_ObjectHideFlags: 0
