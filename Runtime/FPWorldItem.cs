@@ -7,6 +7,7 @@ namespace FuzzPhyte.XR
     using UnityEngine.Events;
     using System;
     using TMPro;
+    using System.Collections.Generic;
 
     /// <summary>
     /// This assumes that there is a collider directly on this object of some sorts...
@@ -39,12 +40,42 @@ namespace FuzzPhyte.XR
         #region FP Related
         [Space]
         [Header("FP Data")]
-        [Tooltip("Highest Level Tag")]
-        public FP_Tag TheFPTag;
         [Tooltip("Generic Data Object")]
         public FP_Data TheFPData;
         [Tooltip("Place to centralize all the data for this item")]
         public XRDetailedLabelData DetailedLabelData;
+        public FP_Language StartingFPLanguage;
+        public bool StartDetailedLabelOnStart;
+        [SerializeField] private List<UnityEngine.Object> interfaceObjects = new List<UnityEngine.Object>();
+        public List<IFPXRLabel> LabelInterfaces
+        {
+            get
+            {
+                var interfaces = new List<IFPXRLabel>();
+                for (int i = 0; i < interfaceObjects.Count; i++)
+                {
+                    var obj = interfaceObjects[i];
+                    if (obj is IFPXRLabel label)
+                    {
+                        interfaces.Add(label);
+                    }
+                }
+                return interfaces;
+            }
+        }
+        private void OnValidate()
+        {
+            // Validate that all objects in the list implement the interface
+            for (int i = 0; i < interfaceObjects.Count; i++)
+            {
+                if (!(interfaceObjects[i] is IFPXRLabel))
+                {
+                    Debug.LogError($"Object {interfaceObjects[i]?.name} does not implement IPFXRLabel.");
+                    interfaceObjects[i] = null; // Clear invalid entries
+                }
+            }
+        }
+        [Space]
         [SerializeField]
         protected FPSocket currentSocket;
         [SerializeField]
@@ -189,6 +220,11 @@ namespace FuzzPhyte.XR
                 _isKinematic = ItemRigidBody.isKinematic;
                 _useGravity = ItemRigidBody.useGravity;
             }
+            //setup details on label if we have them
+            for(int i = 0; i < LabelInterfaces.Count; i++)
+            {
+                LabelInterfaces[i].SetupLabelData(DetailedLabelData, StartingFPLanguage, StartDetailedLabelOnStart);
+            }
         }
         public virtual void ResetLocation()
         {
@@ -251,18 +287,33 @@ namespace FuzzPhyte.XR
             }
         }
     
-        public virtual void SetupDetailedLabel()
-        {
-
-        }
         public virtual void ActivateDetailedLabel()
         {
-
+            for(int i=0;i< LabelInterfaces.Count; i++)
+            {
+                LabelInterfaces[i].ShowAllRenderers(true);
+            }
+        }
+        public virtual void DeactivateAllLabels()
+        {
+            for (int i = 0; i < LabelInterfaces.Count; i++)
+            {
+                LabelInterfaces[i].ShowAllRenderers(false);
+            }
         }
         public void ActivateDetailedLabelTimer(float time)
         {
-
+            for (int i = 0; i < LabelInterfaces.Count; i++) 
+            {
+                LabelInterfaces[i].ShowAllRenderers(true);
+                
+            }
+            if (FP_Timer.CCTimer != null)
+            {
+                FP_Timer.CCTimer.StartTimer(time, () => { DeactivateAllLabels(); });
+            }
         }
+        
         #endregion
     }
 }

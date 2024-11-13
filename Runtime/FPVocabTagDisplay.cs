@@ -11,7 +11,7 @@ namespace FuzzPhyte.XR
     /// <summary>
     /// Mono Wrapper Class for FPLabelTag and for connecting various events, visuals etc.
     /// </summary>
-    public class FPVocabTagDisplay : MonoBehaviour
+    public class FPVocabTagDisplay : MonoBehaviour, IFPXRLabel
     {
         public SpriteRenderer BackDrop;
         [Space]
@@ -104,7 +104,21 @@ namespace FuzzPhyte.XR
 
             HideShowAllRenderers(!HideOnStart);
         }
-        public virtual void Setup(FP_Tag tag, FP_Vocab vocab, FP_Theme theme, FP_Language startLanguage, bool display=false)
+        #region Interface Requirements
+        public void SetupLabelData(XRDetailedLabelData data, FP_Language startingLanguage, bool startActive)
+        {
+            Setup(data.TagData, data.VocabData, data.ThemeData, startingLanguage, startActive);
+        }
+        public virtual string DisplayVocabTranslation(FP_Language choice)
+        {
+            return DisplayVocabTranslation(SecondaryTextDisplay, choice);
+        }
+        public virtual void ShowAllRenderers(bool status)
+        {
+            HideShowAllRenderers(status);
+        }
+        #endregion
+        protected virtual void Setup(FP_Tag tag, FP_Vocab vocab, FP_Theme theme, FP_Language startLanguage, bool display=false)
         {
             TagData = tag;
             VocabData = vocab;
@@ -128,7 +142,6 @@ namespace FuzzPhyte.XR
             }
             HideShowAllRenderers(display);
         }
-
         public virtual void DisplayTag()
         {
             DisplayTagEvent.Invoke();
@@ -150,10 +163,7 @@ namespace FuzzPhyte.XR
                 AttachmentLocation.position = pivotLocation;
             }
         }
-        public virtual string DisplayVocabTranslation(FP_Language choice)
-        {
-            return DisplayVocabTranslation(SecondaryTextDisplay, choice);
-        }
+        
         public virtual string DisplayVocabTranslation(TMP_Text textDisplay,FP_Language choice)
         {
             DisplayTranslationEvent.Invoke();
@@ -306,6 +316,8 @@ namespace FuzzPhyte.XR
             }
             return pivot;
         }
+
+       
         #endregion
     }
 

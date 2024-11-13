@@ -105,8 +105,15 @@ namespace FuzzPhyte.XR
     public struct XRDetailedLabelData
     {
         [Space]
+        public FP_Tag TagData;
         public FP_Vocab VocabData;
         public FP_Theme ThemeData;
+    }
+    public interface IFPXRLabel
+    {
+        void SetupLabelData(XRDetailedLabelData data, FP_Language startingLanguage, bool startActive=true);
+        string DisplayVocabTranslation(FP_Language language=FP_Language.USEnglish);
+        void ShowAllRenderers(bool status);
     }
     /*
          *public class OVREventBinder : IEventBinder
