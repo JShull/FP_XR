@@ -6,10 +6,13 @@ namespace FuzzPhyte.XR
     using UnityEngine;
     using UnityEngine.Events;
     using System;
+    using TMPro;
 
     /// <summary>
     /// This assumes that there is a collider directly on this object of some sorts...
     /// Needs to know when it gets picked up and dropped to maintain state
+    /// Manages connection points to labels if needed
+    /// One-stop shop for references associated with what a 'world item' might actually be
     /// </summary>
     public class FPWorldItem : MonoBehaviour
     {
@@ -21,6 +24,12 @@ namespace FuzzPhyte.XR
         public Rigidbody ItemRigidBody;
         [Tooltip("Event to reset the world")]
         public UnityEvent ResetWorldEvent;
+        [Space]
+        [Header("Label Related")]
+        [Tooltip("The Interaction Label")]
+        public GameObject InteractionLabelRoot;
+        public TMP_Text InteractionDisplayText;
+        public UnityEvent ActivatedInteractionLabelEvent;        
         [Space]
         [SerializeField] protected Vector3 _startPosition;
         [SerializeField] protected Quaternion _startRotation;
@@ -38,17 +47,18 @@ namespace FuzzPhyte.XR
         #endregion
         #region Action Related
         // Action events for external listeners
-        public event Action<FPWorldItem,XRHandedness> ItemGrabbed;
-        public event Action<FPWorldItem,XRHandedness> ItemDropped;
+        public event Action<FPWorldItem, XRHandedness> ItemGrabbed;
+        public event Action<FPWorldItem, XRHandedness> ItemDropped;
         public event Action<FPWorldItem> ItemDestroyed;
         public event Action<FPWorldItem> ItemSpawned;
-        public event Action<FPWorldItem,FPSocket> ItemSocketSet;
-        public event Action<FPWorldItem,FPSocket> ItemSocketRemoved;
+        public event Action<FPWorldItem, FPSocket> ItemSocketSet;
+        public event Action<FPWorldItem, FPSocket> ItemSocketRemoved;
+        public event Action<FPWorldItem, XRHandedness> ItemRaySelect;
         #endregion
 
         #region Methods for Actions
         /// these are called probably from some sort of Unity Event or external system
-        
+
         /// <summary>
         /// If we get attached to something
         /// </summary>
@@ -63,12 +73,17 @@ namespace FuzzPhyte.XR
             this.handState = (XRHandedness)handState;
             ItemGrabbed?.Invoke(this, this.handState);
         }
+        public virtual void RayInteracted(int handState)
+        {
+            this.handState = (XRHandedness)handState;
+            ItemRaySelect?.Invoke(this, this.handState);
+        }
         public virtual void DroppedItem()
         {
-            if(this.handState != XRHandedness.NONE)
+            if (this.handState != XRHandedness.NONE)
             {
-               
-                ItemDropped?.Invoke(this,this.handState);
+
+                ItemDropped?.Invoke(this, this.handState);
             }
             else
             {
@@ -78,7 +93,7 @@ namespace FuzzPhyte.XR
         }
         public virtual void UnlinkSocket(FPSocket passedParent)
         {
-            if(currentSocket == passedParent)
+            if (currentSocket == passedParent)
             {
                 currentSocket = null;
                 ItemSocketRemoved?.Invoke(this, passedParent);
@@ -95,7 +110,7 @@ namespace FuzzPhyte.XR
         #endregion
         public virtual void Start()
         {
-            if(ItemCollider == null)
+            if (ItemCollider == null)
             {
                 Debug.LogError($"I am missing a collider and I am throwing myself off a cliff");
                 Destroy(this);
@@ -139,6 +154,37 @@ namespace FuzzPhyte.XR
             if (ItemTransform != null)
             {
                 ItemTransform.SetParent(parent);
+            }
+        }
+        public virtual void SetupInteractionLabelText(string text)
+        {
+            if (InteractionDisplayText != null)
+            {
+                InteractionDisplayText.text = text;
+            }
+        }
+        public virtual void ActivateInteractionLabel(bool state)
+        {
+            if (InteractionLabelRoot != null)
+            {
+                InteractionLabelRoot.SetActive(state);
+                ActivatedInteractionLabelEvent.Invoke();
+            }
+        }
+        /// <summary>
+        /// Turns on the label and then will turn it off after a certain amount of time
+        /// </summary>
+        /// <param name="time"></param>
+        public virtual void ActivateInteractionLabelTimer(float time)
+        {
+            if (InteractionLabelRoot != null)
+            {
+                InteractionLabelRoot.SetActive(true);
+                ActivatedInteractionLabelEvent.Invoke();
+                if (FP_Timer.CCTimer != null)
+                {
+                    FP_Timer.CCTimer.StartTimer(time, () => { InteractionLabelRoot.SetActive(false); });
+                }
             }
         }
     }
