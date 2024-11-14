@@ -257,16 +257,32 @@ namespace FuzzPhyte.XR
         #region Label Related Information
         public virtual void SetupInteractionLabelText(string text)
         {
-            if (InteractionDisplayText != null)
+            if (InteractionLabelRoot != null)
             {
-                InteractionDisplayText.text = text;
-            }
+                var ILabelRef = InteractionLabelRoot.GetComponent<FPXRInteractableLabel>();
+                if (ILabelRef)
+                {
+                    ILabelRef.DisplayVocabTranslation(StartingFPLanguage);
+                }
+                else
+                {
+                    if (InteractionDisplayText != null)
+                    {
+                        InteractionDisplayText.text = text;
+                    }
+                }
+            } 
         }
         public virtual void ActivateInteractionLabel(bool state)
         {
             if (InteractionLabelRoot != null)
             {
                 InteractionLabelRoot.SetActive(state);
+                var ILabelRef = InteractionLabelRoot.GetComponent<FPXRInteractableLabel>();
+                if (ILabelRef)
+                {
+                    ILabelRef.DisplayVocabTranslation(StartingFPLanguage);
+                }
                 ActivatedInteractionLabelEvent.Invoke();
             }
         }
