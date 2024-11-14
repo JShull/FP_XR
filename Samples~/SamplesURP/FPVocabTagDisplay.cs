@@ -7,6 +7,7 @@ namespace FuzzPhyte.XR
     using FuzzPhyte.Utility;
     using UnityEngine.Events;
     using System.Collections.Generic;
+    using UnityEngine.SearchService;
 
     /// <summary>
     /// Mono Wrapper Class for FPLabelTag and for connecting various events, visuals etc.
@@ -50,6 +51,8 @@ namespace FuzzPhyte.XR
         public UnityEvent DisplayTranslationEvent;
         [Space]
         public bool DisplayJustVocab = true;
+        public bool UseThemeBackdrop = true;
+        public bool UseThemeBackdropColor = false;
         [Space]
         public bool RenderersActive = true;
         public Vector3 WorldPivotLocation => pivotLocation;
@@ -97,8 +100,9 @@ namespace FuzzPhyte.XR
                 if (MainTextDisplay && SecondaryTextDisplay)
                 {
                     SetupIndividualFontByCategory();
+                    SetupBackdropByTheme();
                     //SetupTagVocabDefnText();
-                    if(DisplayJustVocab)
+                    if (DisplayJustVocab)
                     {
                         SetupJustVocabText();
                     }
@@ -145,6 +149,7 @@ namespace FuzzPhyte.XR
             if (MainTextDisplay && SecondaryTextDisplay)
             {
                 SetupIndividualFontByCategory();
+                SetupBackdropByTheme();
                 //SetupTagVocabDefnText();
                 if (DisplayJustVocab)
                 {
@@ -265,6 +270,13 @@ namespace FuzzPhyte.XR
             if (TertiaryTextDisplay)
             {
                 labelTag.SetupFontByCategory(TertiaryTextDisplay, TertiaryTextDisplaySetting);
+            }
+        }
+        protected virtual void SetupBackdropByTheme()
+        {
+            if (BackDrop && UseThemeBackdrop)
+            {
+                labelTag.SetupBackdrop(BackDrop, UseThemeBackdropColor);
             }
         }
         /// <summary>
