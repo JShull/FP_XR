@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2024-11-14
+
+See the samples for how a lot of the misc non vr related items can be used without VR libraries.
+
+### 0.2.0 Added
+
+- [@JShull](https://github.com/jshull).
+  - A ton of content has been Added
+  - FPSocket
+  - FPLabelTag
+  - FPDistanceCloseItem
+  - FPRespawnOnDrop
+  - FPSurfaceLock
+  - FPWorldCheck
+  - FPWorldItem
+  - FPXRManager
+  - FPXRSocketTag
+  - FPXRSpawnPieces
+  - FPXRSpawnStack
+  - FPXRTag
+  - FPXRTester
+  - FPXRTool
+  - FPXRUtility
+
+### 0.2.0 Changed
+
+- [@JShull](https://github.com/jshull).
+  - A majority of everything
+
 ## [0.1.0] - 2024-11-04
 
 ### 0.1.0 Added
