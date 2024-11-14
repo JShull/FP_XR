@@ -313,6 +313,13 @@ namespace FuzzPhyte.XR
                 FP_Timer.CCTimer.StartTimer(time, () => { DeactivateAllLabels(); });
             }
         }
+        public void DetailedLabelVocabTranslationDisplay()
+        {
+            for(int i = 0; i < LabelInterfaces.Count; i++)
+            {
+                LabelInterfaces[i].DisplayVocabTranslation(StartingFPLanguage);
+            }
+        }
         
         #endregion
     }

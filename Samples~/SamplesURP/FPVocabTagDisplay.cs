@@ -49,6 +49,8 @@ namespace FuzzPhyte.XR
         public UnityEvent DisplayVocabEvent;
         public UnityEvent DisplayTranslationEvent;
         [Space]
+        public bool DisplayJustVocab = true;
+        [Space]
         public bool RenderersActive = true;
         public Vector3 WorldPivotLocation => pivotLocation;
         public virtual void Awake()
@@ -96,7 +98,15 @@ namespace FuzzPhyte.XR
                 {
                     SetupIndividualFontByCategory();
                     //SetupTagVocabDefnText();
-                    SetupVocabDefnText();
+                    if(DisplayJustVocab)
+                    {
+                        SetupJustVocabText();
+                    }
+                    else
+                    {
+                        SetupVocabDefnText();
+                    }
+                    
                     if (AudioStartLanguage != FP_Language.NA)
                     {
                         SetupAudioClip(AudioStartLanguage, false, false);
@@ -136,7 +146,14 @@ namespace FuzzPhyte.XR
             {
                 SetupIndividualFontByCategory();
                 //SetupTagVocabDefnText();
-                SetupVocabDefnText();
+                if (DisplayJustVocab)
+                {
+                    SetupJustVocabText();
+                }
+                else
+                {
+                    SetupVocabDefnText();
+                }
                 if (AudioStartLanguage != FP_Language.NA)
                 {
                     SetupAudioClip(AudioStartLanguage, false, false);
@@ -263,8 +280,15 @@ namespace FuzzPhyte.XR
         }
         protected virtual void SetupVocabDefnText()
         {
+            TertiaryTextDisplay.gameObject.SetActive(true);
             labelTag.ApplyVocabTextData(SecondaryTextDisplay);
             labelTag.ApplyDefinitionTextData(TertiaryTextDisplay);
+        }
+        protected virtual void SetupJustVocabText()
+        {
+            labelTag.ApplyVocabTextData(SecondaryTextDisplay);
+            TertiaryTextDisplay.gameObject.SetActive(false);
+            MainTextDisplay.gameObject.SetActive(false);
         }
         /// <summary>
         /// Sets our AudioClip based on the language requested

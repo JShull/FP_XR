@@ -21,7 +21,9 @@ namespace FuzzPhyte.XR
                 StopCoroutine(typingCoroutine);
             }
         }
-        
+        public void StartTypingEffectVocabEnglish() => StartTypingEffectVocab(FP_Language.USEnglish);
+        public void StartTypingEffectVocabSpanish() => StartTypingEffectVocab(FP_Language.Spanish);
+        public void StartTypingEffectVocabFrench() => StartTypingEffectVocab(FP_Language.French);
         public void UIStartTypingEffectDefinition()
         {
             StartTypingEffectDefinition(CurrentLanguageSet);
