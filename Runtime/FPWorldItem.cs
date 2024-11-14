@@ -28,9 +28,9 @@ namespace FuzzPhyte.XR
         [Space]
         [Header("Label Related")]
         [Tooltip("The Interaction Label")]
-        public GameObject InteractionLabelRoot;
-        public TMP_Text InteractionDisplayText;
-        public UnityEvent ActivatedInteractionLabelEvent;        
+        public FPXRInteractableLabel InteractableLabel;
+        public UnityEvent ActivatedInteractionLabelEvent;       
+        
         [Space]
         [SerializeField] protected Vector3 _startPosition;
         [SerializeField] protected Quaternion _startRotation;
@@ -46,6 +46,7 @@ namespace FuzzPhyte.XR
         public XRDetailedLabelData DetailedLabelData;
         public FP_Language StartingFPLanguage;
         public bool StartDetailedLabelOnStart;
+        
         [SerializeField] private List<UnityEngine.Object> interfaceObjects = new List<UnityEngine.Object>();
         public List<IFPXRLabel> LabelInterfaces
         {
@@ -255,34 +256,19 @@ namespace FuzzPhyte.XR
             }
         }
         #region Label Related Information
-        public virtual void SetupInteractionLabelText(string text)
+        public virtual void SetupInteractionLabelText()
         {
-            if (InteractionLabelRoot != null)
+            if (InteractableLabel != null)
             {
-                var ILabelRef = InteractionLabelRoot.GetComponent<FPXRInteractableLabel>();
-                if (ILabelRef)
-                {
-                    ILabelRef.DisplayVocabTranslation(StartingFPLanguage);
-                }
-                else
-                {
-                    if (InteractionDisplayText != null)
-                    {
-                        InteractionDisplayText.text = text;
-                    }
-                }
+                InteractableLabel.SetupLabelData(DetailedLabelData, StartingFPLanguage, false);
             } 
         }
         public virtual void ActivateInteractionLabel(bool state)
         {
-            if (InteractionLabelRoot != null)
+            if (InteractableLabel != null)
             {
-                InteractionLabelRoot.SetActive(state);
-                var ILabelRef = InteractionLabelRoot.GetComponent<FPXRInteractableLabel>();
-                if (ILabelRef)
-                {
-                    ILabelRef.DisplayVocabTranslation(StartingFPLanguage);
-                }
+                InteractableLabel.gameObject.SetActive(state);
+                InteractableLabel.DisplayVocabTranslation(StartingFPLanguage);
                 ActivatedInteractionLabelEvent.Invoke();
             }
         }
@@ -292,15 +278,17 @@ namespace FuzzPhyte.XR
         /// <param name="time"></param>
         public virtual void ActivateInteractionLabelTimer(float time)
         {
-            if (InteractionLabelRoot != null)
+            if (InteractableLabel != null)
             {
-                InteractionLabelRoot.SetActive(true);
+                InteractableLabel.gameObject.SetActive(true);
+                InteractableLabel.DisplayVocabTranslation(StartingFPLanguage);
                 ActivatedInteractionLabelEvent.Invoke();
                 if (FP_Timer.CCTimer != null)
                 {
-                    FP_Timer.CCTimer.StartTimer(time, () => { InteractionLabelRoot.SetActive(false); });
+                    FP_Timer.CCTimer.StartTimer(time, () => { InteractableLabel.gameObject.SetActive(false); });
                 }
             }
+            
         }
     
         public virtual void ActivateDetailedLabel()
