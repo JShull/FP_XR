@@ -46,7 +46,8 @@ namespace FuzzPhyte.XR
         public XRDetailedLabelData DetailedLabelData;
         public FP_Language StartingFPLanguage;
         public bool StartDetailedLabelOnStart;
-        
+        public UnityEvent DetailedLabelActivated;
+        public UnityEvent DetailedLabelDeactivated;
         [SerializeField] private List<UnityEngine.Object> interfaceObjects = new List<UnityEngine.Object>();
         public List<IFPXRLabel> LabelInterfaces
         {
@@ -297,6 +298,7 @@ namespace FuzzPhyte.XR
             {
                 LabelInterfaces[i].ShowAllRenderers(true);
             }
+            DetailedLabelActivated.Invoke();
         }
         public virtual void DeactivateAllLabels()
         {
@@ -304,6 +306,7 @@ namespace FuzzPhyte.XR
             {
                 LabelInterfaces[i].ShowAllRenderers(false);
             }
+            DetailedLabelDeactivated.Invoke();
         }
         public void ActivateDetailedLabelTimer(float time)
         {
