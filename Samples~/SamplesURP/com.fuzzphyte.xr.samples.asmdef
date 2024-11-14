@@ -1,0 +1,22 @@
+{
+    "name": "com.fuzzphyte.xr.samples",
+    "rootNamespace": "FuzzPhyte.XR.Samples",
+    "references": [
+        "com.fuzzphyte.xr",
+        "Unity.TextMeshPro",
+        "com.fuzzphyte.utility",
+        "com.fuzzphyte.sgraph",
+        "com.fuzzphyte.ray",
+        "Unity.Mathematics",
+        "com.fuzzphyte.utility.edu"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

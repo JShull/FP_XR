@@ -48,6 +48,8 @@ namespace FuzzPhyte.XR
         public UnityEvent DisplayTagEvent;
         public UnityEvent DisplayVocabEvent;
         public UnityEvent DisplayTranslationEvent;
+        [Space]
+        public bool RenderersActive = true;
         public Vector3 WorldPivotLocation => pivotLocation;
         public virtual void Awake()
         {
@@ -227,6 +229,7 @@ namespace FuzzPhyte.XR
         /// <param name="showR">Show renderer?</param>
         protected virtual void HideShowAllRenderers(bool showR)
         {
+            RenderersActive = showR;
             foreach (var rend in RendererList)
             {
                 rend.enabled = showR;

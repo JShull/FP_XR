@@ -98,6 +98,10 @@ namespace FuzzPhyte.XR
         }
         public void StartTypingEffect(TMP_Text TxtComponent, string Txt, AudioClip audioFile, string startingTxt = "")
         {
+            if (!TypingData.RenderersActive)
+            {
+                return;
+            }
             if (typingCoroutine != null)
             {
                 StopCoroutine(typingCoroutine); // Stop if already running
