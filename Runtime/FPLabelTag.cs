@@ -154,19 +154,15 @@ namespace FuzzPhyte.XR
 
             if (!useTranslation)
             {
-                if (vocabData.Language == language)
+                if (useDefinition)
                 {
-                    if (useDefinition)
-                    {
-                        audioType = vocabData.DefinitionAudio.URLAudioType;
-                        return vocabData.DefinitionAudio.AudioClip;
-                    }
-                    else
-                    {
-                        audioType = vocabData.WordAudio.URLAudioType;
-                        return vocabData.WordAudio.AudioClip;
-                    }
-
+                    audioType = vocabData.DefinitionAudio.URLAudioType;
+                    return vocabData.DefinitionAudio.AudioClip;
+                }
+                else
+                {
+                    audioType = vocabData.WordAudio.URLAudioType;
+                    return vocabData.WordAudio.AudioClip;
                 }
             }
             else
@@ -190,7 +186,7 @@ namespace FuzzPhyte.XR
                 }
             }
             
-            Debug.LogError($"No match found, returning null for {language} language with user passed settings| Use Defn:{useDefinition} and use Translation:{useTranslation}.");
+            Debug.LogError($"No match found: current vocab {vocabData.Word}, returning null for {language} language with user passed settings| Use Defn:{useDefinition} and use Translation:{useTranslation}.");
             audioType = AudioType.UNKNOWN;
             return null;
         }
