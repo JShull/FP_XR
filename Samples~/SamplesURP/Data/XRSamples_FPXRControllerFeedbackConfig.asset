@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94ed79d490ae1b047849d42604375247, type: 3}
+  m_Name: XRSamples_FPXRControllerFeedbackConfig
+  m_EditorClassIdentifier: 
+  UniqueID: Samples_Controller_Feedback_LEFT
+  ControllerStartHandedness: 0
+  feedbacks:
+  - Button: 3
+    ButtonInteractionStates:
+    - XRState: 2
+      ButtonSound: {fileID: 8300000, guid: 27a310d3f1be13c41b390a2e9d6091c9, type: 3}
+      LabelText: A Down
+      Icon: {fileID: 21300000, guid: d05f9407705d9824491c144edb3b47e3, type: 3}
+      LabelFontSetting: {fileID: 11400000, guid: 6934f73a6a8888b4b8e550cd16d57a9f, type: 2}
+    - XRState: 3
+      ButtonSound: {fileID: 8300000, guid: c1b3e364fde8f9e4db0eac765ba33f45, type: 3}
+      LabelText: A Down
+      Icon: {fileID: 21300000, guid: d05f9407705d9824491c144edb3b47e3, type: 3}
+      LabelFontSetting: {fileID: 11400000, guid: 6934f73a6a8888b4b8e550cd16d57a9f, type: 2}
+    ActionIcon: {fileID: 0}
+    AnimationSpriteSheet: {fileID: 0}
+  - Button: 4
+    ButtonInteractionStates:
+    - XRState: 2
+      ButtonSound: {fileID: 8300000, guid: 27a310d3f1be13c41b390a2e9d6091c9, type: 3}
+      LabelText: A Down
+      Icon: {fileID: 21300000, guid: d05f9407705d9824491c144edb3b47e3, type: 3}
+      LabelFontSetting: {fileID: 11400000, guid: 6934f73a6a8888b4b8e550cd16d57a9f, type: 2}
+    - XRState: 3
+      ButtonSound: {fileID: 8300000, guid: c1b3e364fde8f9e4db0eac765ba33f45, type: 3}
+      LabelText: A Down
+      Icon: {fileID: 21300000, guid: d05f9407705d9824491c144edb3b47e3, type: 3}
+      LabelFontSetting: {fileID: 11400000, guid: 6934f73a6a8888b4b8e550cd16d57a9f, type: 2}
+    ActionIcon: {fileID: 0}
+    AnimationSpriteSheet: {fileID: 0}
+  DescriptionNotes: 

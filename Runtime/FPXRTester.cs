@@ -7,11 +7,15 @@ namespace FuzzPhyte.XR
     public class FPXRTester : MonoBehaviour
     {
         public float DelayTime = 3f;
+        
         [Header("Test Events")]
+        public bool TestOne;
         public UnityEvent TestEventOne;
         [Space]
+        public bool TestTwo;
         public UnityEvent TestEventTwo;
         [Space]
+        public bool TestThree;
         public UnityEvent TestEventThree;
         private FP_Timer testTimer;
 
@@ -23,9 +27,19 @@ namespace FuzzPhyte.XR
                 Debug.LogError("No Timer Found");
                 return;
             }
-            testTimer.StartTimer(DelayTime, TestEventOne.Invoke);
-            testTimer.StartTimer(DelayTime * 2, TestEventTwo.Invoke);
-            testTimer.StartTimer(DelayTime * 3, TestEventThree.Invoke);
+            if (TestOne)
+            {
+                testTimer.StartTimer(DelayTime, TestEventOne.Invoke);
+            }
+            if (TestTwo)
+            {
+                testTimer.StartTimer(DelayTime * 2, TestEventTwo.Invoke);
+            }
+            if (TestThree)
+            {
+                testTimer.StartTimer(DelayTime * 3, TestEventThree.Invoke);
+            }
+            
         }
         
     }

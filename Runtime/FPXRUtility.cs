@@ -6,6 +6,7 @@ namespace FuzzPhyte.XR
     using System;
     using UnityEngine;
     using UnityEngine.Events;
+    using System.Collections.Generic;
     public static class FPXRUtility
     {
         //XR static class for various needs
@@ -30,6 +31,17 @@ namespace FuzzPhyte.XR
         Left = 0,
         Right = 1,
         NONE=2
+    }
+    [Serializable]
+    public enum XRButton
+    {
+        NA = 0,
+        Trigger = 1,
+        Grip = 2,
+        PrimaryButton = 3,
+        SecondaryButton = 4,
+        Thumbstick = 5,
+        ExtraButton = 6
     }
     [Serializable]
     public enum XRInteractionStatus
@@ -79,6 +91,29 @@ namespace FuzzPhyte.XR
         public FP_Tag RequirementTag;
         public string RequirementName;
         public LatchState LatchState;
+    }
+    /// <summary>
+    /// Based on the Button State, the label will change
+    /// </summary>
+    [System.Serializable]
+    public struct ButtonFeedback
+    {
+        public XRButton Button;
+        public List<ButtonLabelState> ButtonInteractionStates;
+        [Tooltip("Used as a backup")]
+        public Sprite ActionIcon;
+        public Sprite AnimationSpriteSheet;
+    }
+    [Serializable]
+    public struct ButtonLabelState
+    {
+        public XRInteractionStatus XRState;
+        public AudioClip ButtonSound;
+        [TextArea(2,3)]
+        public string LabelText;
+        [Space]
+        public Sprite Icon;
+        public FontSetting LabelFontSetting;
     }
     public interface IFPXREventBinder
     {

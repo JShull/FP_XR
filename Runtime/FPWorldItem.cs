@@ -2,11 +2,9 @@
 namespace FuzzPhyte.XR
 {
     using FuzzPhyte.Utility;
-    using FuzzPhyte.Utility.Meta;
     using UnityEngine;
     using UnityEngine.Events;
     using System;
-    using TMPro;
     using System.Collections.Generic;
 
     /// <summary>
@@ -48,7 +46,7 @@ namespace FuzzPhyte.XR
         public bool StartDetailedLabelOnStart;
         public UnityEvent DetailedLabelActivated;
         public UnityEvent DetailedLabelDeactivated;
-        [SerializeField] private List<UnityEngine.Object> interfaceObjects = new List<UnityEngine.Object>();
+        [SerializeField] protected List<UnityEngine.Object> interfaceObjects = new List<UnityEngine.Object>();
         public List<IFPXRLabel> LabelInterfaces
         {
             get
@@ -65,7 +63,7 @@ namespace FuzzPhyte.XR
                 return interfaces;
             }
         }
-        private void OnValidate()
+        protected virtual void OnValidate()
         {
             // Validate that all objects in the list implement the interface
             for (int i = 0; i < interfaceObjects.Count; i++)
@@ -308,7 +306,7 @@ namespace FuzzPhyte.XR
             }
             DetailedLabelDeactivated.Invoke();
         }
-        public void ActivateDetailedLabelTimer(float time)
+        public virtual void ActivateDetailedLabelTimer(float time)
         {
             for (int i = 0; i < LabelInterfaces.Count; i++) 
             {
@@ -320,7 +318,7 @@ namespace FuzzPhyte.XR
                 FP_Timer.CCTimer.StartTimer(time, () => { DeactivateAllLabels(); });
             }
         }
-        public void DetailedLabelVocabTranslationDisplay()
+        public virtual void DetailedLabelVocabTranslationDisplay()
         {
             for(int i = 0; i < LabelInterfaces.Count; i++)
             {
