@@ -54,7 +54,8 @@ namespace FuzzPhyte.XR
         InteractorViewRemoved = 5,
         SelectingInteractorViewAdded = 6,
         SelectingInteractorViewRemoved = 7,
-        UnHover = 8
+        UnHover = 8,
+        Locked =9,
     }
     [Serializable]
     public enum XRAxis
@@ -91,6 +92,19 @@ namespace FuzzPhyte.XR
         public FP_Tag RequirementTag;
         public string RequirementName;
         public LatchState LatchState;
+    }
+    [Serializable]
+    public struct XRWorldButton
+    {
+        public XRButton ButtonType;
+        public Transform ButtonLocation;
+        public Vector3 ScaleAdjustment;
+
+    }
+    public struct XRButtonData
+    {
+        public GameObject WorldItem;
+        public XRWorldButton WorldButton;
     }
     /// <summary>
     /// Based on the Button State, the label will change

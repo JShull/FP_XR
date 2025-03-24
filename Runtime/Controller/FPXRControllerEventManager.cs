@@ -63,7 +63,7 @@ namespace FuzzPhyte.XR
 
             FPXRControllerFeedback feedback = GetFeedbackForHand(hand);
             //drives visuals and audio
-            feedback?.SetButtonActive(button, buttonState);
+            feedback?.SetButtonState(button, buttonState);
             switch(buttonState)
             {
                 case XRInteractionStatus.Select:
