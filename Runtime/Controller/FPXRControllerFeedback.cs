@@ -1,11 +1,8 @@
 namespace FuzzPhyte.XR
 {
-    using FuzzPhyte.Utility;
     using System.Collections.Generic;
-    using TMPro;
     using UnityEngine;
-    using UnityEngine.UI;
-    using UnityEngine.UIElements;
+    using System.Linq;
 
     public class FPXRControllerFeedback : MonoBehaviour
     {
@@ -25,17 +22,19 @@ namespace FuzzPhyte.XR
         protected Dictionary<XRButton,ButtonFeedback> spawnedData = new Dictionary<XRButton, ButtonFeedback>();
         protected Dictionary<XRButton, FPXRControllerRef> spawnedItems = new Dictionary<XRButton, FPXRControllerRef>();
         protected Dictionary<XRButton, bool> controllerLocked = new Dictionary<XRButton, bool>();
+        protected bool fullControllerLocked = false;
+        public bool ControllerLocked { get { return fullControllerLocked; } }
         [Tooltip("World Location Ref by Type")]
         public List<XRWorldButton> XRWorldButtons = new List<XRWorldButton>();
         
-        private XRHandedness controllerHandedness;
+        //private XRHandedness controllerHandedness;
         [Tooltip("Temp fix/cache internal recognize a 'lock' and ignore other commands")]
         
         protected ButtonLabelState lockStateDetails;
 
         public virtual void Awake()
         {
-            controllerHandedness = feedbackConfig.ControllerStartHandedness;
+            //controllerHandedness = feedbackConfig.ControllerStartHandedness;
             SpawnControllerItems();
         }
         /// <summary>
@@ -107,7 +106,8 @@ namespace FuzzPhyte.XR
             }
 
         }
-
+        /*
+        #region Testing
         [ContextMenu("Testing Primary, Select")]
         public void PrimaryControllerButtonDown()
         {
@@ -145,21 +145,75 @@ namespace FuzzPhyte.XR
         {
             SetButtonState(XRButton.PrimaryButton, XRInteractionStatus.Hover);
         }
-        public virtual void LockController(XRButton button)
+        #endregion
+        */
+        #region Public Accessors for events/Updates
+        public bool ReturnButtonLockState(XRButton button)
+        {
+            if (controllerLocked.ContainsKey(button))
+            {
+                return controllerLocked[button];
+            }
+            return false;
+        }
+        /// <summary>
+        /// Will lock all buttons in the dictionary
+        /// </summary>
+        public virtual void LockAllButtons()
+        {
+            var allKeys = controllerLocked.Keys.ToList();
+            for(int i = 0; i < allKeys.Count; i++)
+            {
+                var aKey = allKeys[i];
+                LockControllerButton(aKey);
+                SetButtonState(aKey,XRInteractionStatus.Locked);
+            }
+            fullControllerLocked = true;
+        }
+        /// <summary>
+        /// will unlock all buttons in the dictionary
+        /// </summary>
+        public virtual void UnlockAllButtons()
+        {
+            var allKeys = controllerLocked.Keys.ToList();
+            for (int i = 0; i < allKeys.Count; i++)
+            {
+                var aKey = allKeys[i];
+                UnlockControllerButton(aKey);
+                SetButtonState(aKey, XRInteractionStatus.None);
+            }
+            fullControllerLocked = false;
+        }
+        /// <summary>
+        /// Will lock a specific button
+        /// </summary>
+        /// <param name="button">Button to lock</param>
+        public virtual void LockControllerButton(XRButton button)
         {
             if (controllerLocked.ContainsKey(button)) 
             { 
                 controllerLocked[button] = true;
+                SetButtonState(button, XRInteractionStatus.Locked);
             }
         }
+        /// <summary>
+        /// Will unlock a specific button
+        /// </summary>
+        /// <param name="button"></param>
         public virtual void UnlockControllerButton(XRButton button)
         {
             if (controllerLocked.ContainsKey(button))
             {
                 controllerLocked[button] = false;
+                SetButtonState(button, XRInteractionStatus.None);
             }
-
         }
+        /// <summary>
+        /// primary public function to set button state
+        /// called via the EventManager
+        /// </summary>
+        /// <param name="button"></param>
+        /// <param name="currentButtonStatus"></param>
         public virtual void SetButtonState(XRButton button, XRInteractionStatus currentButtonStatus)
         {
             //if state is locked we need to set it and then not visually update anything until unlocked, keep firing locked events 
@@ -199,7 +253,7 @@ namespace FuzzPhyte.XR
                             if (currentButtonStatus == XRInteractionStatus.Locked)
                             {
                                 //lock us up
-                                LockController(button);
+                                LockControllerButton(button);
                             }
                         }
                     }
@@ -210,6 +264,7 @@ namespace FuzzPhyte.XR
                 }
             }
         }
+        #endregion
         /// <summary>
         /// Call the cached lock state we have on file
         /// </summary>
@@ -219,7 +274,5 @@ namespace FuzzPhyte.XR
         {
             cachedItem.ApplyUIChanges(lockStateDetails.Icon, lockStateDetails.LabelText, lockStateDetails.LabelFontSetting, lockStateDetails.ButtonSound, UseCanvas);
         }
-
-        
     }
 }
