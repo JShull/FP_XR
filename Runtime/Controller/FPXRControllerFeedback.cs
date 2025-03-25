@@ -4,7 +4,15 @@ namespace FuzzPhyte.XR
     using UnityEngine;
     using System.Linq;
 
-    public class FPXRControllerFeedback : MonoBehaviour
+    /// <summary>
+    /// Manage Button data UI/UX data associated with a controller
+    /// Allows direct communication the UI/UX FPXRControllerRef script that is associated with each button
+    /// Driven by the FPXRControllerFeedback data files
+    /// If you want to register a listener with 'SetupItemForListeningAllEvents' and utilize the IFPXButtonListener interface
+    /// This listener is ideal for specific button actions associated with specific left/right controller knowledge
+    /// e.g. you want to listen to when the right controller primary button is down/up
+    /// </summary>
+    public class FPXRControllerFeedback : MonoBehaviour, IFPXRControllerSetup<IFPXRButtonListener>
     {
         [Header("Config Data")]
         [SerializeField] protected FPXRControllerFeedbackConfig feedbackConfig;
@@ -16,32 +24,277 @@ namespace FuzzPhyte.XR
         public GameObject GripButtonPrefab;
         public GameObject TriggerButtonPrefab;
         public AudioSource WorldControllerAudioSource;
-        /// <summary>
-        /// Cached data and spawned gameobject ref
-        /// </summary>
+        public bool SetupOnAwake = true;
+        #region Delegate and Events
+        public delegate void FPXRButtonEvents(XRButton button, XRInteractionStatus buttonState);
+        private event FPXRButtonEvents primeButtonDown;
+        private event FPXRButtonEvents primeButtonUp;
+        private event FPXRButtonEvents primeButtonLocked;
+        private event FPXRButtonEvents primeButtonUnlocked;
+        public event FPXRButtonEvents PrimaryButtonDown 
+        {
+            add 
+            { 
+                primeButtonDown += value;
+                buttonDelegates.Add(value);
+            }
+            remove {
+                primeButtonDown -= value;
+                buttonDelegates.Remove(value);
+            }
+        }
+        public event FPXRButtonEvents PrimaryButtonUp
+        {
+            add 
+            {
+                primeButtonUp += value;
+                buttonDelegates.Add(value);
+            }
+            remove
+            {
+                primeButtonUp -= value;
+                buttonDelegates.Remove(value);
+            }
+        }
+        public event FPXRButtonEvents PrimaryButtonLocked
+        {
+            add 
+            { 
+                primeButtonLocked += value;
+                buttonDelegates.Add(value);
+            }
+            remove 
+            { 
+                primeButtonLocked -= value;
+                buttonDelegates.Remove(value);
+            }
+        }
+        public event FPXRButtonEvents PrimaryButtonUnlocked
+        {
+            add
+            {
+                primeButtonUnlocked += value;
+                buttonDelegates.Add(value);
+            }
+            remove
+            {
+                primeButtonUnlocked -= value;
+                buttonDelegates.Remove(value);
+            }
+        }
+        
+        private event FPXRButtonEvents secondButtonDown;
+        private event FPXRButtonEvents secondButtonUp;
+        private event FPXRButtonEvents secondButtonLocked;
+        private event FPXRButtonEvents secondButtonUnlocked;
+        public event FPXRButtonEvents SecondaryButtonDown
+        {
+            add
+            {
+                secondButtonDown += value;
+                buttonDelegates.Add(value);
+            }
+            remove
+            {
+                secondButtonDown -= value;
+                buttonDelegates.Remove(value);
+            }
+        }
+        public event FPXRButtonEvents SecondaryButtonUp
+        {
+            add
+            {
+                    secondButtonUp += value;
+                    buttonDelegates.Add(value);
+            }
+            remove
+            {
+                    secondButtonUp -= value;
+                    buttonDelegates.Remove(value);
+            }
+        }
+        public event FPXRButtonEvents SecondaryButtonLocked
+        {
+            add
+            {
+                secondButtonLocked += value;
+                buttonDelegates.Add(value);
+            }
+            remove
+            {
+                secondButtonLocked -= value;
+                buttonDelegates.Remove(value);
+            }
+        }
+        public event FPXRButtonEvents SecondaryButtonUnlocked
+        {
+            add
+            {
+                secondButtonUnlocked += value;
+                buttonDelegates.Add(value);
+            }
+            remove
+            {
+                secondButtonUnlocked -= value;
+                buttonDelegates.Remove(value);
+            }
+        }
+
+        private event FPXRButtonEvents triggerButtonDown;
+        private event FPXRButtonEvents triggerButtonUp;
+        private event FPXRButtonEvents triggerButtonLocked;
+        private event FPXRButtonEvents triggerButtonUnlocked;
+        public event FPXRButtonEvents TriggerButtonDown 
+        {
+            add
+            {
+                triggerButtonDown += value;
+                buttonDelegates.Add(value);
+            }
+            remove
+            {
+                triggerButtonDown -= value;
+                buttonDelegates.Remove(value);
+            }
+        }
+        public event FPXRButtonEvents TriggerButtonUp
+        {
+            add
+            {
+                triggerButtonUp += value;
+                buttonDelegates.Add(value);
+            }
+            remove
+            {
+                triggerButtonUp -= value;
+                buttonDelegates.Remove(value);
+            }
+        }
+        public event FPXRButtonEvents TriggerButtonLocked
+        {
+            add
+            {
+                triggerButtonLocked += value;
+                buttonDelegates.Add(value);
+            }
+            remove
+            {
+                triggerButtonLocked -= value;
+                buttonDelegates.Remove(value);
+            }
+        }
+        public event FPXRButtonEvents TriggerButtonUnlocked
+        {
+            add
+            {
+                triggerButtonUnlocked += value;
+                buttonDelegates.Add(value);
+            }
+            remove
+            {
+                triggerButtonUnlocked -= value;
+                buttonDelegates.Remove(value);
+            }
+        }
+
+        private event FPXRButtonEvents gripButtonDown;
+        private event FPXRButtonEvents gripButtonUp;
+        private event FPXRButtonEvents gripButtonLocked;
+        private event FPXRButtonEvents gripButtonUnlocked;
+        public event FPXRButtonEvents GripButtonDown
+        {
+            add
+            {
+                gripButtonDown += value;
+                buttonDelegates.Add(value);
+            }
+            remove
+            {
+                gripButtonDown -= value;
+                buttonDelegates.Remove(value);
+            }
+        }
+        public event FPXRButtonEvents GripButtonUp
+        {
+            add
+            {
+                gripButtonUp += value;
+                buttonDelegates.Add(value);
+            }
+            remove
+            {
+                gripButtonUp -= value;
+                buttonDelegates.Remove(value);
+            }
+        }
+        public event FPXRButtonEvents GripButtonLocked
+        {
+            add
+            {
+                gripButtonLocked += value;
+                buttonDelegates.Add(value);
+            }
+            remove
+            {
+                gripButtonLocked -= value;
+                buttonDelegates.Remove(value);
+            }
+        }
+        public event FPXRButtonEvents GripButtonUnlocked
+        {
+            add
+            {
+                gripButtonUnlocked += value;
+                buttonDelegates.Add(value);
+            }
+            remove
+            {
+                gripButtonUnlocked -= value;
+                buttonDelegates.Remove(value);
+            }
+        }
+        #endregion
+        #region Cached Data Parameters
         protected Dictionary<XRButton,ButtonFeedback> spawnedData = new Dictionary<XRButton, ButtonFeedback>();
         protected Dictionary<XRButton, FPXRControllerRef> spawnedItems = new Dictionary<XRButton, FPXRControllerRef>();
         protected Dictionary<XRButton, bool> controllerButtonsLocked = new Dictionary<XRButton, bool>();
         protected Dictionary<XRButton, bool> controllerButtonsHint = new Dictionary<XRButton, bool>();
         protected Dictionary<XRButton,bool> controllerButtonsInformation = new Dictionary<XRButton, bool>();
         protected bool fullControllerLocked = false;
-        [Tooltip("Controller level icon related states-information: used to check and/or manage delays/timers etc.")]
-        protected bool informationActive;
-        [Tooltip("Controller level icon related states-hint: used to check and/or manage delays/timers etc.")]
-        protected bool hintActive;
+        [Tooltip("Temp fix/cache internal recognize a 'lock' and ignore other commands")]
+        protected ButtonLabelState lockStateDetails;
+        #endregion
+        protected List<FPXRButtonEvents> buttonDelegates = new List<FPXRButtonEvents>();
         public bool ControllerLocked { get { return fullControllerLocked; } }
         [Tooltip("World Location Ref by Type")]
         public List<XRWorldButton> XRWorldButtons = new List<XRWorldButton>();
-        
-        //private XRHandedness controllerHandedness;
-        [Tooltip("Temp fix/cache internal recognize a 'lock' and ignore other commands")]
-        
-        protected ButtonLabelState lockStateDetails;
 
         public virtual void Awake()
         {
             //controllerHandedness = feedbackConfig.ControllerStartHandedness;
-            SpawnControllerItems();
+            if (SetupOnAwake && feedbackConfig!=null)
+            {
+                SpawnControllerItems();
+            }
+        }
+        
+        protected virtual void ResetController()
+        {
+            //need to loop through all spawned items and blast those gameobjects
+            
+            var controllRefKeys = spawnedItems.Keys.ToList();
+            for (int i = 0; i < controllRefKeys.Count; i++)
+            {
+                var anItem = spawnedItems[controllRefKeys[i]];
+                Destroy(anItem.gameObject);
+            }
+            //need to then clear data caches
+            spawnedData.Clear();
+            spawnedItems.Clear();
+            controllerButtonsLocked.Clear();
+            controllerButtonsHint.Clear();
+            controllerButtonsInformation.Clear();
+            fullControllerLocked = false;
         }
         /// <summary>
         /// Spawns our prefabs and populates all items based on data
@@ -117,48 +370,94 @@ namespace FuzzPhyte.XR
             }
 
         }
-        /*
-        #region Testing
-        [ContextMenu("Testing Primary, Select")]
-        public void PrimaryControllerButtonDown()
+
+        #region Public Accessors for events
+        /// <summary>
+        /// This will register the interface/listener for all of the events on this feedback
+        /// </summary>
+        /// <param name="theListener"></param>
+        public virtual void SetupItemForListeningAllEvents(IFPXRButtonListener theListener)
         {
-            SetButtonState(XRButton.PrimaryButton, XRInteractionStatus.Select);
+            theListener.SetupButtonListener(this);
+            PrimaryButtonDown += theListener.PrimaryButtonDown;
+            PrimaryButtonUp += theListener.PrimaryButtonUp;
+            PrimaryButtonLocked += theListener.PrimaryButtonUnlocked;
+            PrimaryButtonUnlocked += theListener.PrimaryButtonUnlocked;
+
+            SecondaryButtonDown += theListener.SecondaryButtonDown;
+            SecondaryButtonUp += theListener.SecondaryButtonUp;
+            SecondaryButtonLocked += theListener.SecondaryButtonLocked;
+            SecondaryButtonUnlocked += theListener.SecondaryButtonUnlocked;
+
+            TriggerButtonDown += theListener.TriggerButtonDown;
+            TriggerButtonUp += theListener.TriggerButtonUp;
+            TriggerButtonLocked += theListener.TriggerButtonLocked;
+            TriggerButtonUnlocked += theListener.TriggerButtonUnlocked;
+
+            GripButtonDown += theListener.GripButtonDown;
+            GripButtonUp += theListener.GripButtonUp;
+            GripButtonLocked += theListener.GripButtonLocked;
+            GripButtonUnlocked += theListener.GripButtonUnlocked;
+            
         }
-        [ContextMenu("Testing Primary A, Unselect")]
-        public void PrimaryControllerButtonUp()
+        public virtual void RemoveItemForListeningAllEvents(IFPXRButtonListener theListener)
         {
-            SetButtonState(XRButton.PrimaryButton, XRInteractionStatus.Unselect);
+            PrimaryButtonDown -= theListener.PrimaryButtonDown;
+            PrimaryButtonUp -= theListener.PrimaryButtonUp;
+            PrimaryButtonLocked -= theListener.PrimaryButtonUnlocked;
+            PrimaryButtonUnlocked -= theListener.PrimaryButtonUnlocked;
+
+            SecondaryButtonDown -= theListener.SecondaryButtonDown;
+            SecondaryButtonUp -= theListener.SecondaryButtonUp;
+            SecondaryButtonLocked -= theListener.SecondaryButtonLocked;
+            SecondaryButtonUnlocked -= theListener.SecondaryButtonUnlocked;
+
+            TriggerButtonDown -= theListener.TriggerButtonDown;
+            TriggerButtonUp -= theListener.TriggerButtonUp;
+            TriggerButtonLocked -= theListener.TriggerButtonLocked;
+            TriggerButtonUnlocked -= theListener.TriggerButtonUnlocked;
+
+            GripButtonDown -= theListener.GripButtonDown;
+            GripButtonUp -= theListener.GripButtonUp;
+            GripButtonLocked -= theListener.GripButtonLocked;
+            GripButtonUnlocked -= theListener.GripButtonUnlocked;
         }
-        [ContextMenu("Testing Secondary, Select")]
-        public void SecondaryControllerButtonDown()
+        public void RemoveAllListeners()
         {
-            SetButtonState(XRButton.SecondaryButton, XRInteractionStatus.Select);
-        }
-        [ContextMenu("Testing Secondary, Unselect")]
-        public void SecondaryControllerButtonUp()
-        {
-            SetButtonState(XRButton.SecondaryButton, XRInteractionStatus.Unselect);
-        }
-        [ContextMenu("Testing Locking Primary")]
-        public void PrimaryControllerLock()
-        {
-            SetButtonState(XRButton.PrimaryButton, XRInteractionStatus.Locked);
-        }
-        [ContextMenu("Unlocking Primary")]
-        public void UnlockPrimaryController()
-        {
-            //have to unlock first
-            UnlockControllerButton(XRButton.PrimaryButton);
-            SetButtonState(XRButton.PrimaryButton, XRInteractionStatus.None);
-        }
-        [ContextMenu("Testing - error state")]
-        public void PrimaryControllerError()
-        {
-            SetButtonState(XRButton.PrimaryButton, XRInteractionStatus.Hover);
+            foreach(var handler in buttonDelegates)
+            {
+                primeButtonDown -= handler;
+                primeButtonUp -= handler;
+                primeButtonLocked -= handler;
+                primeButtonUnlocked -= handler;
+                secondButtonDown -= handler;
+                secondButtonUp -= handler;
+                secondButtonLocked -= handler;
+                secondButtonUnlocked -= handler;
+                gripButtonDown -= handler;
+                gripButtonUp -= handler;
+                gripButtonLocked -= handler;
+                gripButtonUnlocked += handler;
+                triggerButtonDown -= handler;
+                triggerButtonUp -= handler;
+                triggerButtonLocked -= handler;
+                triggerButtonUnlocked -= handler;
+            }
+            //clear the list
+            buttonDelegates.Clear();
         }
         #endregion
-        */
-        #region Public Accessors for events/Updates
+        #region Public Methods for Data and Buttons
+        /// <summary>
+        /// Reset the controller with new data
+        /// </summary>
+        /// <param name="newData"></param>
+        public virtual void ResetUpdateControllerData(FPXRControllerFeedbackConfig newData)
+        {
+            ResetController();
+            feedbackConfig = newData;
+            SpawnControllerItems();
+        }
         public bool ReturnButtonLockState(XRButton button)
         {
             if (controllerButtonsLocked.ContainsKey(button))
@@ -205,6 +504,7 @@ namespace FuzzPhyte.XR
             { 
                 controllerButtonsLocked[button] = true;
                 SetButtonState(button, XRInteractionStatus.Locked);
+                ActivateEventsByButtonByState(button, XRInteractionStatus.Locked);
             }
         }
         /// <summary>
@@ -217,6 +517,7 @@ namespace FuzzPhyte.XR
             {
                 controllerButtonsLocked[button] = false;
                 SetButtonState(button, XRInteractionStatus.None);
+                ActivateEventsByButtonByState(button, XRInteractionStatus.None);
             }
         }
         /// <summary>
@@ -295,7 +596,7 @@ namespace FuzzPhyte.XR
         /// </summary>
         /// <param name="button"></param>
         /// <param name="currentButtonStatus"></param>
-        public void SetButtonState(XRButton button, XRInteractionStatus currentButtonStatus)
+        public void SetButtonState(XRButton button, XRInteractionStatus currentButtonStatus,float vectorValue=1f)
         {
             //if state is locked we need to set it and then not visually update anything until unlocked, keep firing locked events 
             //this finds feedback based on original data files
@@ -320,14 +621,25 @@ namespace FuzzPhyte.XR
                         }
                         else
                         {
+                            
                             bool useDownOffset = false;
                             switch (currentButtonStatus)
                             {
                                 case XRInteractionStatus.Select:
                                     useDownOffset = true;
+                                    
                                     break;
                             }
-                            cachedItem.ApplyUIChanges(label.Icon, label.LabelText, label.LabelFontSetting, label.ButtonSound, UseCanvas, useDownOffset);
+                            if (button == XRButton.Trigger)
+                            {
+                                cachedItem.ApplyUIChanges(label.Icon, label.LabelText, label.LabelFontSetting, label.ButtonSound, UseCanvas, useDownOffset, vectorValue);
+                            }
+                            else
+                            {
+                                cachedItem.ApplyUIChanges(label.Icon, label.LabelText, label.LabelFontSetting, label.ButtonSound, UseCanvas, useDownOffset);
+                            }
+                                
+
                             /// these conditions manage additional state via lock/hint/information
                             /// this is a catch area as we should be setting these states by function references above
                             /// In cases where we pass this into the SetButtonState we still want the action to be invoked
@@ -336,6 +648,8 @@ namespace FuzzPhyte.XR
                                 //lock us up
                                 LockControllerButton(button);
                             }
+                            /// activate state
+                            ActivateEventsByButtonByState(button, currentButtonStatus);
                             if (currentButtonStatus == XRInteractionStatus.Hint)
                             {
                                 //add to hint
@@ -470,7 +784,87 @@ namespace FuzzPhyte.XR
             return false;
         }
         #endregion
+        #region Internal Functions
+        /// <summary>
+        /// Will manage events associated with delegate
+        /// </summary>
+        /// <param name="button">The button?</param>
+        /// <param name="buttonState">The button state?</param>
+        protected void ActivateEventsByButtonByState(XRButton button, XRInteractionStatus buttonState)
+        {
+            switch (button)
+            {
+                case XRButton.PrimaryButton:
+                    switch (buttonState)
+                    {
+                        case XRInteractionStatus.None:
+                            primeButtonUnlocked?.Invoke(button,buttonState);
+                            break;
+                        case XRInteractionStatus.Select:
+                            primeButtonDown?.Invoke(button, buttonState);
+                            break;
+                        case XRInteractionStatus.Unselect:
+                            primeButtonUp?.Invoke(button, buttonState);
+                            break;
+                        case XRInteractionStatus.Locked:
+                            primeButtonLocked?.Invoke(button, buttonState);
+                            break;
+                    }
+                    break;
+                case XRButton.SecondaryButton:
+                    switch (buttonState)
+                    {
+                        case XRInteractionStatus.None:
+                            secondButtonUnlocked?.Invoke(button, buttonState);
+                            break;
+                        case XRInteractionStatus.Select:
+                            secondButtonDown?.Invoke(button, buttonState);
+                            break;
+                        case XRInteractionStatus.Unselect:
+                            secondButtonUp?.Invoke(button, buttonState);
+                            break;
+                        case XRInteractionStatus.Locked:
+                            secondButtonLocked?.Invoke(button, buttonState);
+                            break;
+                    }
+                    break;
+                case XRButton.Trigger:
+                    switch (buttonState)
+                    {
+                        case XRInteractionStatus.None:
+                            triggerButtonUnlocked?.Invoke(button, buttonState);
+                            break;
+                        case XRInteractionStatus.Select:
+                            triggerButtonDown?.Invoke(button, buttonState);
+                            break;
+                        case XRInteractionStatus.Unselect:
+                            triggerButtonUp?.Invoke(button, buttonState);
+                            break;
+                        case XRInteractionStatus.Locked:
+                            triggerButtonLocked?.Invoke(button, buttonState);
+                            break;
+                    }
+                    break;
+                case XRButton.Grip:
+                    switch (buttonState)
+                    {
+                        case XRInteractionStatus.None:
+                            gripButtonUnlocked?.Invoke(button, buttonState);
+                            break;
+                        case XRInteractionStatus.Select:
+                            gripButtonDown?.Invoke(button, buttonState);
+                            break;
+                        case XRInteractionStatus.Unselect:
+                            gripButtonUp?.Invoke(button, buttonState);
+                            break;
+                        case XRInteractionStatus.Locked:
+                            gripButtonLocked?.Invoke(button, buttonState);
+                            break;
+                    }
+                    break;
 
+            }
+        }
         /// <summary>
         /// Internal function to inspect and return needed data by button and state
         /// </summary>
@@ -528,5 +922,6 @@ namespace FuzzPhyte.XR
                 controllerButtonsInformation[button] = activeInfo;
             }
         }
+        #endregion
     }
 }

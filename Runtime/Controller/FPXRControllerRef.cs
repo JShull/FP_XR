@@ -7,6 +7,8 @@ namespace FuzzPhyte.XR
     
     /// <summary>
     /// Mono class to hold references for UI item associated with controller overlay UI/audio data
+    /// Should be used in tandem with a prefab for the controller button
+    /// References for the TEXT and Icons are required for this to function correctly
     /// </summary>
     public class FPXRControllerRef : MonoBehaviour
     {
@@ -18,14 +20,19 @@ namespace FuzzPhyte.XR
         [SerializeField] protected Transform buttonRootParent;
         [Tooltip("Local Root ref - probably the first child")]
         [SerializeField] protected Transform localButtonRootParent;
+        [Tooltip("Main icon ref - if Canvas")]
         [SerializeField] protected Image buttonCanvasImage;
+        [Tooltip("Where is the main icon ref?")]
         [SerializeField] protected SpriteRenderer buttonIconImage;
+        [Tooltip("Where is the main label ref?")]
         [SerializeField] protected TMP_Text buttonLabelText;
         [SerializeField] protected AudioSource worldAudioRef;
         [SerializeField] protected bool setupComplete;
         [Space]
         [Header("Additional Visual Item")]
+        [Tooltip("Any hint/information secondary icon ref?")]
         [SerializeField] protected SpriteRenderer buttonAdditionalImage;
+        [Tooltip("Seconday icon ref - if Canvas")]
         [SerializeField] protected Image buttonAdditionalCanvasImage;
 
         #region Main Utility Functions for UI Updates
@@ -78,7 +85,8 @@ namespace FuzzPhyte.XR
         /// <param name="fontRef"></param>
         /// <param name="audioRef"></param>
         /// <param name="UseCanvas"></param>
-        public bool ApplyUIChanges(Sprite iconRef, string textRef, FontSetting fontRef, AudioClip audioRef=null, bool UseCanvas = false, bool useOffset = false)
+        public bool ApplyUIChanges(Sprite iconRef, string textRef, FontSetting fontRef, 
+            AudioClip audioRef=null, bool UseCanvas = false, bool useOffset = false, float vectorData= 1.0f)
         {
             if (!setupComplete)
             {

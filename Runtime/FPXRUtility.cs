@@ -7,6 +7,8 @@ namespace FuzzPhyte.XR
     using UnityEngine;
     using UnityEngine.Events;
     using System.Collections.Generic;
+    using static FuzzPhyte.XR.FPXRControllerFeedback;
+
     public static class FPXRUtility
     {
         //XR static class for various needs
@@ -41,7 +43,8 @@ namespace FuzzPhyte.XR
         PrimaryButton = 3,
         SecondaryButton = 4,
         Thumbstick = 5,
-        ExtraButton = 6
+        MenuButton =6,
+        ExtraButton = 9
     }
     [Serializable]
     public enum XRInteractionStatus
@@ -169,43 +172,62 @@ namespace FuzzPhyte.XR
         string DisplayVocabTranslation(FP_Language language=FP_Language.USEnglish);
         void ShowAllRenderers(bool status);
     }
-    /*
-         *public class OVREventBinder : IEventBinder
-        {
-            private readonly InteractableUnityEventWrapper _eventWrapper;
+    /// <summary>
+    /// Help manage delegate/event requirements for Controllers and Button Events
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface IFPXRControllerSetup<T>
+    {
+        void RemoveAllListeners();
+        void SetupItemForListeningAllEvents(T item);
+        void RemoveItemForListeningAllEvents(T item);
+    }
+    /// <summary>
+    /// Functions required to be a full blown controller listener for various actions/events as part of FPXRControllerEventManager
+    /// </summary>
+    public interface IFPXRControllerListener
+    {
+        void SetupControllerListener(FPXRControllerFeedback leftControllerRef, FPXRControllerFeedback rightControllerRef);
+        void AnyControllerButtonPressed(XRHandedness hand, XRButton button);
+        void AnyControllerButtonReleased(XRHandedness hand, XRButton button);
+        void AnyControllerHintActive(XRHandedness hand, XRButton button);
+        void AnyControllerHintDeactive(XRHandedness hand, XRButton button);
+        void AnyControllerInfoActive(XRHandedness hand, XRButton button);
+        void AnyControllerInfoDeactive(XRHandedness hand, XRButton button);
+        void AnyControllerButtonLocked(XRHandedness hand, XRButton button);
+        void AnyControllerButtonUnlocked(XRHandedness hand, XRButton button);
+        void AnyControllerLocked(XRHandedness hand, XRButton button);
+        void AnyControllerUnlocked(XRHandedness hand, XRButton button);
+        void RightControllerReset(XRHandedness hand, XRButton button);
+        void LeftControllerReset(XRHandedness hand, XRButton button);
 
-            public OVREventBinder(InteractableUnityEventWrapper eventWrapper)
-            {
-                _eventWrapper = eventWrapper;
-            }
-            //public UnityEvent WhenHover 
-            //public UnityEvent WhenUnhover 
-            //public UnityEvent WhenSelect
-            //public UnityEvent WhenUnselect 
-            //public UnityEvent WhenInteractorViewAdded 
-            //public UnityEvent WhenInteractorViewRemoved 
-            //public UnityEvent WhenSelectingInteractorViewAdded 
-            //public UnityEvent WhenSelectingInteractorViewRemoved 
+    }
+    /// <summary>
+    /// Functions required to be a full blown button listener for various VR controllers as part of the FPXRControllerFeedback
+    /// </summary>
+    public interface IFPXRButtonListener
+    {
+        void SetupButtonListener(FPXRControllerFeedback controllerRef);
+        void PrimaryButtonDown(XRButton button, XRInteractionStatus buttonState);
+        void PrimaryButtonUp(XRButton button, XRInteractionStatus buttonState);
+        void PrimaryButtonLocked(XRButton button, XRInteractionStatus buttonState);
+        void PrimaryButtonUnlocked(XRButton button, XRInteractionStatus buttonState);
 
-            public void BindHover(UnityAction action) => _eventWrapper.WhenHover.AddListener(action);
-            public void BindUnhover(UnityAction action) => _eventWrapper.WhenUnhover.AddListener(action);
-            public void BindSelect(UnityAction action) => _eventWrapper.WhenSelect.AddListener(action);
-            public void BindUnselect(UnityAction action) => _eventWrapper.WhenUnselect.AddListener(action);
-            public void BindInteractorViewAdded(UnityAction action) => _eventWrapper.WhenInteractorViewAdded.AddListener(action);
-            public void BindInteractorViewRemoved(UnityAction action) => _eventWrapper.WhenInteractorViewRemoved.AddListener(action);
-            public void BindSelectingInteractorViewAdded(UnityAction action) => _eventWrapper.WhenSelectingInteractorViewAdded.AddListener(action);
-            public void BindSelectingInteractorViewRemoved(UnityAction action) => _eventWrapper.WhenSelectingInteractorViewRemoved.AddListener(action);
+        void SecondaryButtonDown(XRButton button, XRInteractionStatus buttonState);
+        void SecondaryButtonUp(XRButton button, XRInteractionStatus buttonState);
+        void SecondaryButtonLocked(XRButton button, XRInteractionStatus buttonState);
+        void SecondaryButtonUnlocked(XRButton button, XRInteractionStatus buttonState);
 
-            public void UnbindWhenHover(UnityAction action) => _eventWrapper.WhenHover.RemoveListener(action);
-            public void UnbindWhenUnhover(UnityAction action) => _eventWrapper.WhenUnhover.RemoveListener(action);
-            public void UnbindWhenSelect(UnityAction action) => _eventWrapper.WhenSelect.RemoveListener(action);
-            public void UnbindWhenUnselect(UnityAction action) => _eventWrapper.WhenUnselect.RemoveListener(action);
-            public void UnbindWhenInteractorViewAdded(UnityAction action) => _eventWrapper.WhenInteractorViewAdded.RemoveListener(action);
-            public void UnbindWhenInteractorViewRemoved(UnityAction action) => _eventWrapper.WhenInteractorViewRemoved.RemoveListener(action);
-            public void UnbindWhenSelectingInteractorViewAdded(UnityAction action) => _eventWrapper.WhenSelectingInteractorViewAdded.RemoveListener(action);
-            public void UnbindWhenSelectingInteractorViewRemoved(UnityAction action) => _eventWrapper.WhenSelectingInteractorViewRemoved.RemoveListener(action);
-        }
-         */
+        void TriggerButtonDown(XRButton button, XRInteractionStatus buttonState);
+        void TriggerButtonUp(XRButton button, XRInteractionStatus buttonState);
+        void TriggerButtonLocked(XRButton button, XRInteractionStatus buttonState);
+        void TriggerButtonUnlocked(XRButton button, XRInteractionStatus buttonState);
+
+        void GripButtonDown(XRButton button, XRInteractionStatus buttonState);
+        void GripButtonUp(XRButton button, XRInteractionStatus buttonState);
+        void GripButtonLocked(XRButton button, XRInteractionStatus buttonState);
+        void GripButtonUnlocked(XRButton button, XRInteractionStatus buttonState);
+    }
     public interface IFPXREventWrapper
     {
         void Initialize(IFPXREventBinder eventBinder);

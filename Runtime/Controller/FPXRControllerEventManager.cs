@@ -1,26 +1,203 @@
 namespace FuzzPhyte.XR
 {
+    using System.Collections.Generic;
     using UnityEngine;
-    public class FPXRControllerEventManager : MonoBehaviour
+    /// <summary>
+    /// Manage Controller data coming in from various XR/VR platforms/SDKs/APIs
+    /// Allows direct communication with all of the FPXRController settings
+    /// Driven by the FPXRControllerFeedback data files
+    /// Should be used to communicate to the internal system
+    /// Register a listener with 'SetupItemForListeningAllEvents' and utilize the IFPXRControllerListener interface
+    /// The listener is at a controller level and you will be able to parse what you want 
+    /// e.g. if you want to listen at a higher level for all general controller logic events to be parsed by the events/functions
+    /// tied to the IFPXControllerListener interface
+    /// </summary>
+    public class FPXRControllerEventManager : MonoBehaviour, IFPXRControllerSetup<IFPXRControllerListener>
     {
         public static FPXRControllerEventManager Instance { get; private set; }
         [Tooltip("This component is probably already on another object that's not destroyed")]
         public bool DontDestroy = false;
-
+        #region Delegates and Events
+        protected List<XRControllerEvent> controllerDelegates = new List<XRControllerEvent>();
+        /// <summary>
+        /// Controller Level Delegate - based on the hand and the button
+        /// </summary>
+        /// <param name="hand">Hand</param>
+        /// <param name="button">Button</param>
         public delegate void XRControllerEvent(XRHandedness hand, XRButton button);
-        public event XRControllerEvent ButtonPressed;
-        public event XRControllerEvent ButtonReleased;
-        public event XRControllerEvent ButtonLocked;
-        public event XRControllerEvent ButtonUnlocked;
-        public event XRControllerEvent ControllerLocked;
-        public event XRControllerEvent ControllerUnlocked;
-        public event XRControllerEvent HintButtonActive;
-        public event XRControllerEvent InformationButtonActive;
-        public event XRControllerEvent HintButtonDeactivated;
-        public event XRControllerEvent InformationButtonDeactivated;
-        //
-        //protected Dictionary<(XRHandedness, XRButton), bool> buttonStates = new Dictionary<(XRHandedness, XRButton), bool>();
-        //protected HashSet<XRButton> lockedButtons = new HashSet<XRButton>();
+        private event XRControllerEvent buttonPressed;
+        private event XRControllerEvent buttonReleased;
+        private event XRControllerEvent buttonLocked;
+        private event XRControllerEvent buttonUnlocked;
+        public event XRControllerEvent ButtonPressed
+        {
+            add
+            {
+                buttonPressed += value;
+                controllerDelegates.Add(value);
+            }
+            remove
+            {
+                buttonPressed -= value;
+                controllerDelegates.Remove(value);
+            }
+        }
+        public event XRControllerEvent ButtonReleased
+        {
+            add
+            {
+                buttonReleased += value;
+                controllerDelegates.Add(value);
+            }
+            remove
+            {
+                buttonReleased -= value;
+                controllerDelegates.Remove(value);
+            }
+        }
+        public event XRControllerEvent ButtonLocked
+        {
+            add
+            {
+                buttonLocked += value;
+                controllerDelegates.Add(value);
+            }
+            remove
+            {
+                buttonLocked -= value;
+                controllerDelegates.Remove(value);
+            }
+        }
+        public event XRControllerEvent ButtonUnlocked
+        {
+            add
+            {
+                buttonUnlocked += value;
+                controllerDelegates.Add(value);
+            }
+            remove
+            {
+                buttonUnlocked -= value;
+                controllerDelegates.Remove(value);
+            }
+        }
+
+        private event XRControllerEvent controllerLocked;
+        private event XRControllerEvent controllerUnlocked;
+        public event XRControllerEvent ControllerLocked
+        {
+            add
+            {
+                controllerLocked += value;
+                controllerDelegates.Add(value);
+            }
+            remove
+            {
+                controllerLocked -= value;
+                controllerDelegates.Remove(value);
+            }
+        }
+        public event XRControllerEvent ControllerUnlocked
+        {
+            add
+            {
+                controllerUnlocked += value;
+                controllerDelegates.Add(value);
+            }
+            remove
+            {
+                controllerUnlocked -= value;
+                controllerDelegates.Remove(value);
+            }
+        }
+
+        private event XRControllerEvent hintButtonActive;
+        private event XRControllerEvent hintButtonDeactivated;
+        public event XRControllerEvent HintButtonActive
+        {
+            add
+            {
+                hintButtonActive += value;
+                controllerDelegates.Add(value);
+            }
+            remove
+            {
+                hintButtonActive -= value;
+                controllerDelegates.Remove(value);
+            }
+        }
+        public event XRControllerEvent HintButtonDeactivated
+        {
+            add
+            {
+                hintButtonDeactivated += value;
+                controllerDelegates.Add(value);
+            }
+            remove
+            {
+                hintButtonDeactivated -= value;
+                controllerDelegates.Remove(value);
+            }
+        }
+
+        private event XRControllerEvent informationButtonActive;
+        private event XRControllerEvent informationButtonDeactivated;
+        public event XRControllerEvent InformationButtonDeactivated
+        {
+            add
+            {
+                informationButtonDeactivated += value;
+                controllerDelegates.Add(value);
+            }
+            remove
+            {
+                informationButtonDeactivated -= value;
+                controllerDelegates.Remove(value);
+            }
+        }
+        public event XRControllerEvent InformationButtonActive
+        {
+            add
+            {
+                informationButtonActive += value;
+                controllerDelegates.Add(value);
+            }
+            remove
+            {
+                informationButtonActive -= value;
+                controllerDelegates.Remove(value);
+            }
+        }
+
+        private event XRControllerEvent controllerResetLeft;
+        private event XRControllerEvent controllerResetRight;
+        public event XRControllerEvent ControllerResetLeft
+        {
+            add
+            {
+                controllerResetLeft += value;
+                controllerDelegates.Add(value);
+            }
+            remove
+            {
+                controllerResetLeft -= value;
+                controllerDelegates.Remove(value);
+            }
+        }
+        public event XRControllerEvent ControllerResetRight
+        {
+            add
+            {
+                controllerResetRight += value;
+                controllerDelegates.Add(value);
+            }
+            remove
+            {
+                controllerResetRight -= value;
+                controllerDelegates.Remove(value);
+            }
+        }
+        #endregion
         [Space]
         [Header("Controller Feedback")] 
         [SerializeField] protected FPXRControllerFeedback leftControllerFeedback;
@@ -121,11 +298,115 @@ namespace FuzzPhyte.XR
             InformationButtonActiveSecondary();
         }
         #endregion
+        #region Public Event Listener Registration
+        /// <summary>
+        /// Easy way to add all events/listeners to our interface referenced item
+        /// </summary>
+        /// <param name="listener">The listener</param>
+        public void SetupItemForListeningAllEvents(IFPXRControllerListener listener)
+        {
+            listener.SetupControllerListener(leftControllerFeedback, rightControllerFeedback);
+            ButtonPressed += listener.AnyControllerButtonPressed;
+            ButtonReleased += listener.AnyControllerButtonReleased;
+            ButtonLocked += listener.AnyControllerButtonLocked;
+            ButtonUnlocked += listener.AnyControllerButtonUnlocked;
+            ControllerLocked += listener.AnyControllerLocked;
+            ControllerUnlocked += listener.AnyControllerUnlocked;
+            HintButtonActive += listener.AnyControllerHintActive;
+            HintButtonDeactivated += listener.AnyControllerHintDeactive;
+            InformationButtonActive += listener.AnyControllerInfoActive;
+            InformationButtonDeactivated += listener.AnyControllerInfoDeactive;
+            ControllerResetLeft += listener.LeftControllerReset;
+            ControllerResetRight += listener.RightControllerReset;
+        }
+        /// <summary>
+        /// Easy way to remove all events from the listener interface item passed in
+        /// </summary>
+        /// <param name="listener">the listener</param>
+        public void RemoveItemForListeningAllEvents(IFPXRControllerListener listener)
+        {
+            ButtonPressed -= listener.AnyControllerButtonPressed;
+            ButtonReleased -= listener.AnyControllerButtonReleased;
+            ButtonLocked -= listener.AnyControllerButtonLocked;
+            ButtonUnlocked -= listener.AnyControllerButtonUnlocked;
+            ControllerLocked -= listener.AnyControllerLocked;
+            ControllerUnlocked -= listener.AnyControllerUnlocked;
+            HintButtonActive -= listener.AnyControllerHintActive;
+            HintButtonDeactivated -= listener.AnyControllerHintDeactive;
+            InformationButtonActive -= listener.AnyControllerInfoActive;
+            InformationButtonDeactivated -= listener.AnyControllerInfoDeactive;
+            ControllerResetLeft -= listener.LeftControllerReset;
+            ControllerResetRight -= listener.RightControllerReset;
+        }
+        /// <summary>
+        /// Removes all delegates/listeners as we've been monitoring them
+        /// </summary>
+        public void RemoveAllListeners()
+        {
+            foreach (var handler in controllerDelegates)
+            {
+                ButtonPressed -= handler;
+                ButtonReleased -= handler;
+                ButtonLocked -= handler;
+                ButtonUnlocked -= handler;
+                ControllerLocked -= handler;
+                ControllerUnlocked -= handler;
+                HintButtonActive -= handler;
+                HintButtonDeactivated -= handler;
+                InformationButtonActive -= handler;
+                InformationButtonDeactivated -= handler;
+                ControllerResetLeft -= handler;
+                ControllerResetRight -= handler;
+            }
+            //clear the list
+            controllerDelegates.Clear();
+        }
+        #endregion
+        #region Public Methods & Functions for Button States, Locking, Info/Hints
+        /// <summary>
+        /// Reset and load both controllers
+        /// </summary>
+        /// <param name="leftControllerData">left controller data?</param>
+        /// <param name="rightControllerData">right controller data?</param>
+        public virtual void ResetDataControllers(FPXRControllerFeedbackConfig leftControllerData, FPXRControllerFeedbackConfig rightControllerData)
+        {
+            if (leftControllerFeedback != null && rightControllerFeedback != null)
+            {
+                leftControllerFeedback.ResetUpdateControllerData(leftControllerData);
+                controllerResetLeft?.Invoke(XRHandedness.Left, XRButton.NA);
+                rightControllerFeedback.ResetUpdateControllerData(rightControllerData);
+                controllerResetRight?.Invoke(XRHandedness.Right, XRButton.NA);
+            }
+        }
+        /// <summary>
+        /// Reset and load LEFT Controller
+        /// </summary>
+        /// <param name="leftControllerData">left controller data?</param>
+        public virtual void ResetDataLeftController(FPXRControllerFeedbackConfig leftControllerData)
+        {
+            if (leftControllerFeedback != null)
+            {
+                leftControllerFeedback.ResetUpdateControllerData(leftControllerData);
+                controllerResetLeft?.Invoke(XRHandedness.Left, XRButton.NA);
+            }
+        }
+        /// <summary>
+        /// Reset and load RIGHT controller
+        /// </summary>
+        /// <param name="rightControllerData">right controller data?</param>
+        public virtual void ResetDataRightController(FPXRControllerFeedbackConfig rightControllerData)
+        {
+            if(rightControllerFeedback != null)
+            {
+                rightControllerFeedback.ResetUpdateControllerData(rightControllerData);
+                controllerResetRight?.Invoke(XRHandedness.Right, XRButton.NA);
+            }
+        }
         /// <summary>
         /// External SDKs (e.g., Oculus, Unity XR Toolkit) invoke this to report button states.
         /// Make sure to pass Select/Unselect only here anything else will be ignored
         /// </summary>
-        public virtual void UpdateButtonState(XRHandedness hand, XRButton button, XRInteractionStatus buttonState)
+        public virtual void UpdateButtonState(XRHandedness hand, XRButton button, XRInteractionStatus buttonState, float controllerData=1f)
         {
             if(buttonState== XRInteractionStatus.Locked)
             {
@@ -134,14 +415,14 @@ namespace FuzzPhyte.XR
             }
             FPXRControllerFeedback feedback = GetFeedbackForHand(hand);
             //drives visuals and audio
-            feedback?.SetButtonState(button, buttonState);
+            feedback?.SetButtonState(button, buttonState, controllerData);
             switch(buttonState)
             {
                 case XRInteractionStatus.Select:
-                    ButtonPressed?.Invoke(hand, button);
+                    buttonPressed?.Invoke(hand, button);
                     break;
                 case XRInteractionStatus.Unselect:
-                    ButtonReleased?.Invoke(hand, button);
+                    buttonReleased?.Invoke(hand, button);
                     break;
             }
         }
@@ -158,7 +439,7 @@ namespace FuzzPhyte.XR
             {
                 feedback?.LockControllerButton(button);
                 feedback?.SetButtonState(button,XRInteractionStatus.Select);
-                ButtonLocked?.Invoke(hand, button);
+                buttonLocked?.Invoke(hand, button);
             }
         }
         /// <summary>
@@ -173,28 +454,35 @@ namespace FuzzPhyte.XR
             if (feedback != null)
             {
                 feedback?.UnlockControllerButton(button);
-                ButtonUnlocked?.Invoke(hand, button);
+                buttonUnlocked?.Invoke(hand, button);
             }
         }
+        /// <summary>
+        /// External request to lock Singular Controller by hand
+        /// </summary>
+        /// <param name="hand">The hand?</param>
         public virtual void LockController(XRHandedness hand)
         {
             FPXRControllerFeedback feedback = GetFeedbackForHand(hand);
             if (feedback != null)
             {
                 feedback?.LockAllButtons();
-                ControllerLocked?.Invoke(hand, XRButton.NA);
+                controllerLocked?.Invoke(hand, XRButton.NA);
             }
         }
+        /// <summary>
+        /// External request to Unlock Singular Controller by hand
+        /// </summary>
+        /// <param name="hand">The hand?</param>
         public virtual void UnlockController(XRHandedness hand)
         {
             FPXRControllerFeedback feedback = GetFeedbackForHand(hand);
             if (feedback != null)
             {
                 feedback?.UnlockAllButtons();
-                ControllerUnlocked?.Invoke(hand, XRButton.NA);
+                controllerUnlocked?.Invoke(hand, XRButton.NA);
             }
-        }
-        
+        }  
         /// <summary>
         /// Method to deactivate/activate hint
         /// </summary>
@@ -210,11 +498,11 @@ namespace FuzzPhyte.XR
                 feedback?.HintControllerButton(button, buttonState,hintActive);
                 if (hintActive)
                 {
-                    HintButtonActive?.Invoke(hand, button);
+                    hintButtonActive?.Invoke(hand, button);
                 }
                 else
                 {
-                    HintButtonDeactivated?.Invoke(hand, button);
+                    hintButtonDeactivated?.Invoke(hand, button);
                 }
             }
         }
@@ -233,11 +521,11 @@ namespace FuzzPhyte.XR
                 feedback?.InformationControllerButton(button, buttonState,informationActive);
                 if (informationActive)
                 {
-                    InformationButtonActive?.Invoke(hand, button);
+                    informationButtonActive?.Invoke(hand, button);
                 }
                 else
                 {
-                    InformationButtonDeactivated?.Invoke(hand, button);
+                    informationButtonDeactivated?.Invoke(hand, button);
                 }
             }
         }
@@ -313,10 +601,10 @@ namespace FuzzPhyte.XR
             FPXRControllerFeedback feedback = GetFeedbackForHand(XRHandedness.Right);
             return feedback.ReturnButtonLockState(button);
         }
+        #endregion
         protected virtual FPXRControllerFeedback GetFeedbackForHand(XRHandedness hand)
         {
             return hand == XRHandedness.Left ? leftControllerFeedback : rightControllerFeedback;
         }
-        
     }
 }

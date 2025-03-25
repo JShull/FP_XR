@@ -1,6 +1,6 @@
 {
     "name": "com.fuzzphyte.xr",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "displayName": "FP XR",
     "description": "FP XR is a generic collection of useful resources/scripts to do basic things without hooks to specific XR dependencies.",
     "unity": "2022.3",
@@ -24,7 +24,7 @@
     "samples": [
       {
         "displayName": "XR Samples",
-        "description": "Includes basic examples of XR features like surface locking.",
+        "description": "Includes basic examples of XR features like surface locking, moving objects, and controller ui-ux events and interactions",
         "path": "Samples~/SamplesURP"
       }
     ],

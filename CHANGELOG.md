@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2025-03-25
+
+### 0.4.0 Added
+
+- [@JShull](https://github.com/jshull).
+  - FPXRControllerRef: mono script that points to references at the UI level for images/text etc
+
+### 0.4.0 Changed
+
+- [@JShull](https://github.com/jshull).
+  - FPXRControllerEventManager updated all delegates/events tied to an interface setup
+  - FPXRControllerFeedback updated all delegates/events tied to an interface setup
+  - FPXRControllerRef: all sorts of public methods/functions to modify/access UI items
+  - FPXRUtility: removed some references to the ButtonFeedback struct that weren't needed
+
 ## [0.3.0] - 2025-03-20
 
 ### 0.3.0 Added
