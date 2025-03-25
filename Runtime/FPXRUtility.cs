@@ -55,7 +55,9 @@ namespace FuzzPhyte.XR
         SelectingInteractorViewAdded = 6,
         SelectingInteractorViewRemoved = 7,
         UnHover = 8,
-        Locked =9,
+        Locked = 9,
+        Information = 10,
+        Hint = 11,
     }
     [Serializable]
     public enum XRAxis
@@ -113,10 +115,8 @@ namespace FuzzPhyte.XR
     public struct ButtonFeedback
     {
         public XRButton Button;
+        [Tooltip("Always make sure to have 'None' & 'Locked'")]
         public List<ButtonLabelState> ButtonInteractionStates;
-        [Tooltip("Used as a backup")]
-        public Sprite ActionIcon;
-        public Sprite AnimationSpriteSheet;
     }
     [Serializable]
     public struct ButtonLabelState
@@ -126,8 +126,13 @@ namespace FuzzPhyte.XR
         [TextArea(2,3)]
         public string LabelText;
         [Space]
+        [Header("Primary UI")]
         public Sprite Icon;
         public FontSetting LabelFontSetting;
+        [Header("Secondary UI")]
+        [Tooltip("Overall Additional Icons if Needed")]
+        public Sprite HintIcon;
+        public Sprite InformationIcon;
     }
     public interface IFPXREventBinder
     {

@@ -24,11 +24,11 @@ namespace FuzzPhyte.XR
         [SerializeField] protected AudioSource worldAudioRef;
         [SerializeField] protected bool setupComplete;
         [Space]
-        [Header("Not being Used Yet")]
-        [Tooltip("This isn't being used yet")]
-        [SerializeField] protected SpriteRenderer buttonBackgroundImage;
-        [SerializeField] protected Image buttonCanvasBackgroundImage;
-       
+        [Header("Additional Visual Item")]
+        [SerializeField] protected SpriteRenderer buttonAdditionalImage;
+        [SerializeField] protected Image buttonAdditionalCanvasImage;
+
+        #region Main Utility Functions for UI Updates
         /// <summary>
         /// Setup UI item
         /// </summary>
@@ -120,6 +120,181 @@ namespace FuzzPhyte.XR
             }
                 return true;
         }
+        
+        /// <summary>
+        /// Apply UI changes for secondary visual
+        /// </summary>
+        /// <param name="iconRef">sprite icon we want to utilize</param>
+        /// <returns></returns>
+        public bool ApplyUISecondaryVisual(Sprite iconRef)
+        {
+            if (!setupComplete)
+            {
+                Debug.LogError($"Have you called setup yet?");
+                return false;
+            }
+            if (useCanvas)
+            {
+                if (buttonAdditionalCanvasImage != null)
+                {
+                    buttonAdditionalCanvasImage.sprite = iconRef;
+                }
+            }
+            else
+            {
+                if (buttonAdditionalImage != null)
+                {
+                    buttonAdditionalImage.sprite = iconRef;
+                }
+            }
+            return true;
+        }
+        #endregion
+        #region Show Hide Public Functions
+        /// <summary>
+        /// Will hide/show visuals based on parameter
+        /// </summary>
+        /// <param name="visualsActive">Show visuals?</param>
+        public void ShowORHideVisuals(bool visualsActive)
+        {
+            if (!setupComplete)
+            {
+                return;
+            }
+            if (useCanvas)
+            {
+                if (buttonCanvasImage != null)
+                {
+                    buttonCanvasImage.enabled = visualsActive;
+                }
+            }
+            else
+            {
+                //update the sprite
+                if (buttonIconImage != null)
+                {
+                    buttonIconImage.enabled = visualsActive;
+                }
+            }
+        }
+        /// <summary>
+        /// Show or hide secondary visual
+        /// </summary>
+        /// <param name="visualsActive"></param>
+        public void ShowORHideSecondaryVisual(bool visualsActive)
+        {
+            if (!setupComplete)
+            {
+                return;
+            }
+            if (useCanvas)
+            {
+                if (buttonAdditionalCanvasImage != null)
+                {
+                    buttonAdditionalCanvasImage.enabled = visualsActive;
+                }
+            }
+            else
+            {
+                if (buttonAdditionalImage != null)
+                {
+                    buttonAdditionalImage.enabled = visualsActive;
+                }
+            }
+        }
+        /// <summary>
+        /// Show or hide text based on the parameter passed
+        /// </summary>
+        /// <param name="textActive">Show Text?</param>
+        public void ShowORHideText(bool textActive)
+        {
+            if (!setupComplete)
+            {
+                return;
+            }
+            if (buttonLabelText != null)
+            {
+                buttonLabelText.enabled = textActive;
+            }   
+        }
+        /// <summary>
+        /// Changes the value of the text draw order on the renderer component for the text
+        /// </summary>
+        /// <param name="passedDrawOrder">Order?</param>
+        public void ChangeTextDrawOrder(int passedDrawOrder)
+        {
+            if (buttonLabelText != null)
+            {
+                var renderer = buttonLabelText.gameObject.GetComponent<Renderer>();
+                if (renderer != null)
+                {
+                    renderer.sortingOrder = passedDrawOrder;
+                }
+            }
+        }
+        /// <summary>
+        /// Changes the value of the sprite draw order on the renderer component
+        /// </summary>
+        /// <param name="passedDrawOrder">Order?</param>
+        public void ChangeVisualDrawOrder(int passedDrawOrder)
+        {
+            
+            if (useCanvas)
+            {
+                if (buttonCanvasImage != null)
+                {
+                    var renderer = buttonCanvasImage.gameObject.GetComponent<Renderer>();
+                    if(renderer != null)
+                    {
+                        renderer.sortingOrder = passedDrawOrder;
+                    }
+                }
+            }
+            else
+            {
+                //update the sprite
+                if (buttonIconImage != null)
+                {
+                    var renderer = buttonIconImage.gameObject.GetComponent<Renderer>();
+                    if (renderer != null)
+                    {
+                        renderer.sortingOrder = passedDrawOrder;
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// Changes the value of the sprite draw order on the secondary renderer component
+        /// </summary>
+        /// <param name="passedDrawOrder">Order?</param>
+        public void ChangeSecondaryVisualDrawOrder(int passedDrawOrder)
+        {
+
+            if (useCanvas)
+            {
+                if (buttonAdditionalCanvasImage != null)
+                {
+                    var renderer = buttonAdditionalCanvasImage.gameObject.GetComponent<Renderer>();
+                    if (renderer != null)
+                    {
+                        renderer.sortingOrder = passedDrawOrder;
+                    }
+                }
+            }
+            else
+            {
+                //update the sprite
+                if (buttonAdditionalImage != null)
+                {
+                    var renderer = buttonAdditionalImage.gameObject.GetComponent<Renderer>();
+                    if (renderer != null)
+                    {
+                        renderer.sortingOrder = passedDrawOrder;
+                    }
+                }
+            }
+        }
+        #endregion
         protected void AdjustDownLocation()
         {
             localButtonRootParent.localPosition = new Vector3(OffsetAmount.x* storedLocalScaleAdj.x,OffsetAmount.y*storedLocalScaleAdj.y,OffsetAmount.z*storedLocalScaleAdj.z);

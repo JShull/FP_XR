@@ -22,23 +22,29 @@ MonoBehaviour:
       LabelText: X None
       Icon: {fileID: 21300000, guid: d05f9407705d9824491c144edb3b47e3, type: 3}
       LabelFontSetting: {fileID: 11400000, guid: 6934f73a6a8888b4b8e550cd16d57a9f, type: 2}
+      HintIcon: {fileID: 0}
+      InformationIcon: {fileID: 0}
     - XRState: 2
       ButtonSound: {fileID: 8300000, guid: 27a310d3f1be13c41b390a2e9d6091c9, type: 3}
       LabelText: X Down
       Icon: {fileID: 21300000, guid: d05f9407705d9824491c144edb3b47e3, type: 3}
       LabelFontSetting: {fileID: 11400000, guid: af6988184d3162f4087650fb0eb40107, type: 2}
+      HintIcon: {fileID: 21300000, guid: 9666410d2146d8442ac2bad37084f97d, type: 3}
+      InformationIcon: {fileID: 21300000, guid: f958a7f3c9818584790440289614444d, type: 3}
     - XRState: 3
       ButtonSound: {fileID: 8300000, guid: c1b3e364fde8f9e4db0eac765ba33f45, type: 3}
       LabelText: X Up
       Icon: {fileID: 21300000, guid: d05f9407705d9824491c144edb3b47e3, type: 3}
       LabelFontSetting: {fileID: 11400000, guid: 6934f73a6a8888b4b8e550cd16d57a9f, type: 2}
+      HintIcon: {fileID: 0}
+      InformationIcon: {fileID: 0}
     - XRState: 9
       ButtonSound: {fileID: 8300000, guid: e35dec95a2ec886459609ae01d6570e8, type: 3}
       LabelText: X Locked
       Icon: {fileID: 21300000, guid: 9d3d7d9b63899824ca39555a6fa90241, type: 3}
       LabelFontSetting: {fileID: 11400000, guid: 98d2512a3dea9df49b5026cf1966301d, type: 2}
-    ActionIcon: {fileID: 0}
-    AnimationSpriteSheet: {fileID: 0}
+      HintIcon: {fileID: 0}
+      InformationIcon: {fileID: 0}
   - Button: 4
     ButtonInteractionStates:
     - XRState: 0
@@ -46,21 +52,27 @@ MonoBehaviour:
       LabelText: Y None
       Icon: {fileID: 21300000, guid: d05f9407705d9824491c144edb3b47e3, type: 3}
       LabelFontSetting: {fileID: 11400000, guid: 6934f73a6a8888b4b8e550cd16d57a9f, type: 2}
+      HintIcon: {fileID: 0}
+      InformationIcon: {fileID: 0}
     - XRState: 2
       ButtonSound: {fileID: 8300000, guid: 27a310d3f1be13c41b390a2e9d6091c9, type: 3}
       LabelText: Y Down
       Icon: {fileID: 21300000, guid: d05f9407705d9824491c144edb3b47e3, type: 3}
       LabelFontSetting: {fileID: 11400000, guid: 6934f73a6a8888b4b8e550cd16d57a9f, type: 2}
+      HintIcon: {fileID: 21300000, guid: 9666410d2146d8442ac2bad37084f97d, type: 3}
+      InformationIcon: {fileID: 21300000, guid: f958a7f3c9818584790440289614444d, type: 3}
     - XRState: 3
       ButtonSound: {fileID: 8300000, guid: c1b3e364fde8f9e4db0eac765ba33f45, type: 3}
       LabelText: Y Up
       Icon: {fileID: 21300000, guid: d05f9407705d9824491c144edb3b47e3, type: 3}
       LabelFontSetting: {fileID: 11400000, guid: 6934f73a6a8888b4b8e550cd16d57a9f, type: 2}
+      HintIcon: {fileID: 0}
+      InformationIcon: {fileID: 0}
     - XRState: 9
       ButtonSound: {fileID: 8300000, guid: e35dec95a2ec886459609ae01d6570e8, type: 3}
       LabelText: Y Locked
       Icon: {fileID: 21300000, guid: 9d3d7d9b63899824ca39555a6fa90241, type: 3}
       LabelFontSetting: {fileID: 11400000, guid: 98d2512a3dea9df49b5026cf1966301d, type: 2}
-    ActionIcon: {fileID: 0}
-    AnimationSpriteSheet: {fileID: 0}
+      HintIcon: {fileID: 0}
+      InformationIcon: {fileID: 0}
   DescriptionNotes: 'Left Controller Config: None / Select / UnSelect / Locked'

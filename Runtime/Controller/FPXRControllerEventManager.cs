@@ -4,7 +4,8 @@ namespace FuzzPhyte.XR
     public class FPXRControllerEventManager : MonoBehaviour
     {
         public static FPXRControllerEventManager Instance { get; private set; }
-        
+        [Tooltip("This component is probably already on another object that's not destroyed")]
+        public bool DontDestroy = false;
 
         public delegate void XRControllerEvent(XRHandedness hand, XRButton button);
         public event XRControllerEvent ButtonPressed;
@@ -13,6 +14,10 @@ namespace FuzzPhyte.XR
         public event XRControllerEvent ButtonUnlocked;
         public event XRControllerEvent ControllerLocked;
         public event XRControllerEvent ControllerUnlocked;
+        public event XRControllerEvent HintButtonActive;
+        public event XRControllerEvent InformationButtonActive;
+        public event XRControllerEvent HintButtonDeactivated;
+        public event XRControllerEvent InformationButtonDeactivated;
         //
         //protected Dictionary<(XRHandedness, XRButton), bool> buttonStates = new Dictionary<(XRHandedness, XRButton), bool>();
         //protected HashSet<XRButton> lockedButtons = new HashSet<XRButton>();
@@ -28,7 +33,11 @@ namespace FuzzPhyte.XR
                 return;
             }
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            if (DontDestroy)
+            {
+                DontDestroyOnLoad(gameObject);
+            }
+            
         }
         #region Testing
         [ContextMenu("Testing ControllerManager, Left Hand, Primary Button, Select")]
@@ -60,6 +69,56 @@ namespace FuzzPhyte.XR
         public void UnlockLeftController()
         {
             UnlockController(XRHandedness.Left);
+        }
+        [ContextMenu("Testing ControllerManager, Left Hand, Select Primary, Hint: ON")]
+        public void HintButtonActivePrimary()
+        {
+            //activate Hint
+            ShowHideHintControllerButton(XRHandedness.Left, XRButton.PrimaryButton,XRInteractionStatus.Select, true);
+            UpdateButtonState(XRHandedness.Left, XRButton.PrimaryButton, XRInteractionStatus.Select);
+        }
+        [ContextMenu("Testing ControllerManager, Left Hand, Select Primary, Hint: OFF")]
+        public void HintButtonDeactivePrimary()
+        {
+            //activate Hint
+            ShowHideHintControllerButton(XRHandedness.Left, XRButton.PrimaryButton, XRInteractionStatus.Select, false);
+            UpdateButtonState(XRHandedness.Left, XRButton.PrimaryButton, XRInteractionStatus.Select);
+        }
+        [ContextMenu("Testing ControllerManager, Left Hand, Select Primary, Information: ON")]
+        public void InformationButtonActivePrimary()
+        {
+            ShowHideInformationControllerButton(XRHandedness.Left, XRButton.PrimaryButton, XRInteractionStatus.Select, true);
+            UpdateButtonState(XRHandedness.Left, XRButton.PrimaryButton, XRInteractionStatus.Select);
+        }
+        [ContextMenu("Testing ControllerManager, Left Hand, Select Primary, Information: OFF")]
+        public void InformationButtonDeactivePrimary()
+        {
+            ShowHideInformationControllerButton(XRHandedness.Left, XRButton.PrimaryButton, XRInteractionStatus.Select, false);
+            UpdateButtonState(XRHandedness.Left, XRButton.PrimaryButton, XRInteractionStatus.Select);
+        }
+        [ContextMenu("Testing ControllerManager, Left Hand, Select Secondary, Information: ON")]
+        public void InformationButtonActiveSecondary()
+        {
+            ShowHideInformationControllerButton(XRHandedness.Left, XRButton.SecondaryButton, XRInteractionStatus.Select, true);
+            UpdateButtonState(XRHandedness.Left, XRButton.SecondaryButton, XRInteractionStatus.Select);
+        }
+        [ContextMenu("Testing ControllerManager, Left Hand, Select Secondary, Information: OFF")]
+        public void InformationButtonDeactiveSecondary()
+        {
+            ShowHideInformationControllerButton(XRHandedness.Left, XRButton.SecondaryButton, XRInteractionStatus.Select, false);
+            UpdateButtonState(XRHandedness.Left, XRButton.SecondaryButton, XRInteractionStatus.Select);
+        }
+        [ContextMenu("Set Primary Button Render Above Secondary")]
+        public void SetRenderTextIconOrderPrimaryOverSecondary()
+        {
+            SetTextRenderOrder(XRHandedness.Left, XRButton.PrimaryButton, 10);
+            SetPrimaryIconRenderOrder(XRHandedness.Left, XRButton.PrimaryButton, 9);
+            SetSecondaryIconRenderOrder(XRHandedness.Left, XRButton.PrimaryButton, 8);
+            SetTextRenderOrder(XRHandedness.Left, XRButton.SecondaryButton, 7);
+            SetPrimaryIconRenderOrder(XRHandedness.Left, XRButton.SecondaryButton, 6);
+            SetSecondaryIconRenderOrder(XRHandedness.Left, XRButton.SecondaryButton, 5);
+            InformationButtonActivePrimary();
+            InformationButtonActiveSecondary();
         }
         #endregion
         /// <summary>
@@ -110,7 +169,7 @@ namespace FuzzPhyte.XR
         public virtual void UnlockControllerButton(XRHandedness hand, XRButton button)
         {
             FPXRControllerFeedback feedback = GetFeedbackForHand(hand);
-            //drive lock
+            //drive unlock
             if (feedback != null)
             {
                 feedback?.UnlockControllerButton(button);
@@ -133,6 +192,95 @@ namespace FuzzPhyte.XR
             {
                 feedback?.UnlockAllButtons();
                 ControllerUnlocked?.Invoke(hand, XRButton.NA);
+            }
+        }
+        
+        /// <summary>
+        /// Method to deactivate/activate hint
+        /// </summary>
+        /// <param name="hand">Current hand?</param>
+        /// <param name="button">Button?</param>
+        /// <param name="hintActive">Hint On?</param>
+        public virtual void ShowHideHintControllerButton(XRHandedness hand, XRButton button, XRInteractionStatus buttonState,bool hintActive)
+        {
+            FPXRControllerFeedback feedback = GetFeedbackForHand(hand);
+            //drive hint
+            if (feedback != null)
+            {
+                feedback?.HintControllerButton(button, buttonState,hintActive);
+                if (hintActive)
+                {
+                    HintButtonActive?.Invoke(hand, button);
+                }
+                else
+                {
+                    HintButtonDeactivated?.Invoke(hand, button);
+                }
+            }
+        }
+        /// <summary>
+        /// Method to deactivate/activate information
+        /// </summary>
+        /// <param name="hand">Current hand?</param>
+        /// <param name="button">Button?</param>
+        /// <param name="informationActive">Information on?</param>
+        public virtual void ShowHideInformationControllerButton(XRHandedness hand, XRButton button, XRInteractionStatus buttonState,bool informationActive)
+        {
+            FPXRControllerFeedback feedback = GetFeedbackForHand(hand);
+            //drive hint
+            if (feedback != null)
+            {
+                feedback?.InformationControllerButton(button, buttonState,informationActive);
+                if (informationActive)
+                {
+                    InformationButtonActive?.Invoke(hand, button);
+                }
+                else
+                {
+                    InformationButtonDeactivated?.Invoke(hand, button);
+                }
+            }
+        }
+        /// <summary>
+        /// Sets Render Order of our Text
+        /// </summary>
+        /// <param name="hand">Hand?</param>
+        /// <param name="button">Button?</param>
+        /// <param name="renderOrder">Render Order?</param>
+        public virtual void SetTextRenderOrder(XRHandedness hand, XRButton button, int renderOrder)
+        {
+            FPXRControllerFeedback feedback = GetFeedbackForHand(hand);
+            if (feedback != null) 
+            { 
+                feedback.SetButtonTextRenderOrder(button, renderOrder);
+            }
+        }
+        /// <summary>
+        /// Sets Render Order of our Primary Icon
+        /// </summary>
+        /// <param name="hand">Hand?</param>
+        /// <param name="button">Button?</param>
+        /// <param name="renderOrder">Render order for icon?</param>
+        public virtual void SetPrimaryIconRenderOrder(XRHandedness hand, XRButton button, int renderOrder)
+        {
+            FPXRControllerFeedback feedback = GetFeedbackForHand(hand);
+            if (feedback != null)
+            {
+                feedback.SetButtonIconRenderOrder(button, renderOrder);
+            }
+        }
+        /// <summary>
+        /// Sets Render Order of our Secondary Icon
+        /// </summary>
+        /// <param name="hand">Hand?</param>
+        /// <param name="button">Button?</param>
+        /// <param name="renderOrder">Render order for secondary icon?</param>
+        public virtual void SetSecondaryIconRenderOrder(XRHandedness hand, XRButton button, int renderOrder)
+        {
+            FPXRControllerFeedback feedback = GetFeedbackForHand(hand);
+            if (feedback != null)
+            {
+                feedback.SetButtonSecondaryIconRenderOrder(button, renderOrder);
             }
         }
         /// <summary>
