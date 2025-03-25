@@ -131,11 +131,14 @@ namespace FuzzPhyte.XR
         [Space]
         [Header("Primary UI")]
         public Sprite Icon;
+        public Color IconColor;
         public FontSetting LabelFontSetting;
         [Header("Secondary UI")]
         [Tooltip("Overall Additional Icons if Needed")]
         public Sprite HintIcon;
+        public Color HintIconColor;
         public Sprite InformationIcon;
+        public Color InformationIconColor;
     }
     public interface IFPXREventBinder
     {

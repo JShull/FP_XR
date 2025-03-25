@@ -45,7 +45,7 @@ namespace FuzzPhyte.XR
         /// <param name="audioRef"></param>
         /// <param name="audioSourceRef"></param>
         /// <param name="UseCanvas"></param>
-        public void SetupUI(Vector3 localScale,Sprite iconRef, string textRef, FontSetting fontRef, AudioClip audioRef=null,AudioSource audioSourceRef=null,bool UseCanvas = false)
+        public void SetupUI(Vector3 localScale,Sprite iconRef, Color iconColor,string textRef, FontSetting fontRef, AudioClip audioRef=null,AudioSource audioSourceRef=null,bool UseCanvas = false)
         {
             //scale accordingly
             buttonRootParent.transform.localScale = localScale;
@@ -53,14 +53,20 @@ namespace FuzzPhyte.XR
             if (useCanvas)
             {
                 if (buttonCanvasImage != null)
+                {
                     buttonCanvasImage.sprite = iconRef;
+                    buttonCanvasImage.color = iconColor;
+                }
+                    
             }
             else
             {
                 //update the sprite
                 if (buttonIconImage != null)
+                {
                     buttonIconImage.sprite = iconRef;
-
+                    buttonIconImage.color = iconColor;
+                }
             }
 
             // Update Label Text
@@ -85,7 +91,7 @@ namespace FuzzPhyte.XR
         /// <param name="fontRef"></param>
         /// <param name="audioRef"></param>
         /// <param name="UseCanvas"></param>
-        public bool ApplyUIChanges(Sprite iconRef, string textRef, FontSetting fontRef, 
+        public bool ApplyUIChanges(Sprite iconRef, Color iconColor,string textRef, FontSetting fontRef, 
             AudioClip audioRef=null, bool UseCanvas = false, bool useOffset = false, float vectorData= 1.0f)
         {
             if (!setupComplete)
@@ -96,14 +102,20 @@ namespace FuzzPhyte.XR
             if (useCanvas)
             {
                 if (buttonCanvasImage != null)
+                {
                     buttonCanvasImage.sprite = iconRef;
+                    buttonCanvasImage.color = iconColor;
+                }
+                    
             }
             else
             {
                 //update the sprite
                 if (buttonIconImage != null)
+                {
                     buttonIconImage.sprite = iconRef;
-
+                    buttonIconImage.color = iconColor;
+                }
             }
 
             // Update Label Text
@@ -134,7 +146,7 @@ namespace FuzzPhyte.XR
         /// </summary>
         /// <param name="iconRef">sprite icon we want to utilize</param>
         /// <returns></returns>
-        public bool ApplyUISecondaryVisual(Sprite iconRef)
+        public bool ApplyUISecondaryVisual(Sprite iconRef, Color iconColor)
         {
             if (!setupComplete)
             {
@@ -146,6 +158,7 @@ namespace FuzzPhyte.XR
                 if (buttonAdditionalCanvasImage != null)
                 {
                     buttonAdditionalCanvasImage.sprite = iconRef;
+                    buttonAdditionalCanvasImage.color = iconColor;
                 }
             }
             else
@@ -153,6 +166,7 @@ namespace FuzzPhyte.XR
                 if (buttonAdditionalImage != null)
                 {
                     buttonAdditionalImage.sprite = iconRef;
+                    buttonAdditionalImage.color = iconColor;
                 }
             }
             return true;

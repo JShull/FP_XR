@@ -345,7 +345,7 @@ namespace FuzzPhyte.XR
                                 //update UI to this
                                 if (controllerRefData != null)
                                 {
-                                    controllerRefData.SetupUI(curButton.ScaleAdjustment,aState.Icon, aState.LabelText, aState.LabelFontSetting, aState.ButtonSound, WorldControllerAudioSource);
+                                    controllerRefData.SetupUI(curButton.ScaleAdjustment,aState.Icon, aState.IconColor,aState.LabelText, aState.LabelFontSetting, aState.ButtonSound, WorldControllerAudioSource);
                                     //turn off secondary icon if there is one
                                     controllerRefData.ShowORHideSecondaryVisual(false);
                                 }
@@ -537,7 +537,7 @@ namespace FuzzPhyte.XR
                     //add to hint
                     SetHintModeActive(button, activateHint);
                     //reup UI
-                    cachedItem.ApplyUISecondaryVisual(label.HintIcon);
+                    cachedItem.ApplyUISecondaryVisual(label.HintIcon,label.HintIconColor);
                     cachedItem.ShowORHideSecondaryVisual(activateHint);
                 }
                 else
@@ -580,7 +580,7 @@ namespace FuzzPhyte.XR
                     //add to hint
                     SetInformationModeActive(button, activateInformation);
                     //reup UI
-                    cachedItem.ApplyUISecondaryVisual(label.InformationIcon);
+                    cachedItem.ApplyUISecondaryVisual(label.InformationIcon,label.InformationIconColor);
                     cachedItem.ShowORHideSecondaryVisual(activateInformation);
                 }
                 else
@@ -632,11 +632,11 @@ namespace FuzzPhyte.XR
                             }
                             if (button == XRButton.Trigger)
                             {
-                                cachedItem.ApplyUIChanges(label.Icon, label.LabelText, label.LabelFontSetting, label.ButtonSound, UseCanvas, useDownOffset, vectorValue);
+                                cachedItem.ApplyUIChanges(label.Icon, label.IconColor, label.LabelText, label.LabelFontSetting, label.ButtonSound, UseCanvas, useDownOffset, vectorValue);
                             }
                             else
                             {
-                                cachedItem.ApplyUIChanges(label.Icon, label.LabelText, label.LabelFontSetting, label.ButtonSound, UseCanvas, useDownOffset);
+                                cachedItem.ApplyUIChanges(label.Icon, label.IconColor,label.LabelText, label.LabelFontSetting, label.ButtonSound, UseCanvas, useDownOffset);
                             }
                                 
 
@@ -655,7 +655,7 @@ namespace FuzzPhyte.XR
                                 //add to hint
                                 SetHintModeActive(button, true);
                                 //reup UI
-                                cachedItem.ApplyUISecondaryVisual(label.HintIcon);
+                                cachedItem.ApplyUISecondaryVisual(label.HintIcon, label.HintIconColor);
                                 cachedItem.ShowORHideSecondaryVisual(true);
 
                             }
@@ -663,7 +663,7 @@ namespace FuzzPhyte.XR
                             {
                                 //add to information
                                 SetInformationModeActive(button, true);
-                                cachedItem.ApplyUISecondaryVisual(label.InformationIcon);
+                                cachedItem.ApplyUISecondaryVisual(label.InformationIcon, label.InformationIconColor);
                                 cachedItem.ShowORHideSecondaryVisual(true);
                                 //reup UI
                             }
@@ -898,7 +898,7 @@ namespace FuzzPhyte.XR
         /// <param name="lockState"></param>
         protected virtual void ButtonStateLock(FPXRControllerRef cachedItem)
         {
-            cachedItem.ApplyUIChanges(lockStateDetails.Icon, lockStateDetails.LabelText, lockStateDetails.LabelFontSetting, lockStateDetails.ButtonSound, UseCanvas);
+            cachedItem.ApplyUIChanges(lockStateDetails.Icon, lockStateDetails.IconColor,lockStateDetails.LabelText, lockStateDetails.LabelFontSetting, lockStateDetails.ButtonSound, UseCanvas);
         }
         /// <summary>
         /// Will update the dictionary to make our button state be in a dual state of Hint
