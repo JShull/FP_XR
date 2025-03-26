@@ -328,6 +328,9 @@ namespace FuzzPhyte.XR
                                 break;
                             case XRButton.PrimaryButton:
                             case XRButton.SecondaryButton:
+                            case XRButton.MenuButton:
+                            case XRButton.ExtraButton:
+                            case XRButton.Thumbstick:
                                 spawnedButtonRef = GameObject.Instantiate(ControllerButtonPrefab, curButton.ButtonLocation);
                                 break;
                         }
