@@ -348,7 +348,7 @@ namespace FuzzPhyte.XR
                                 //update UI to this
                                 if (controllerRefData != null)
                                 {
-                                    controllerRefData.SetupUI(curButton.ScaleAdjustment,aState.Icon, aState.IconColor,aState.LabelText, aState.LabelFontSetting, aState.ButtonSound, WorldControllerAudioSource);
+                                    controllerRefData.SetupUI(curButton.ScaleAdjustment,aState.ScaleAdjust,aState.Icon, aState.IconColor,aState.LabelText, aState.LabelFontSetting, aState.ButtonSound, WorldControllerAudioSource);
                                     //turn off secondary icon if there is one
                                     controllerRefData.ShowORHideSecondaryVisual(false);
                                 }
@@ -548,23 +548,6 @@ namespace FuzzPhyte.XR
                     Debug.LogError($"No Hint state for {button}");
                 }
             }
-            /*
-            FPXRControllerRef cachedItem = spawnedItems[button];
-            ButtonFeedback cachedFeedback = spawnedData[button];
-            ButtonLabelState? cachedLabelDetails = cachedFeedback.ButtonInteractionStates.Find(l => l.XRState == XRInteractionStatus.Hint);
-            if (cachedLabelDetails.HasValue)
-            {
-                var label = cachedLabelDetails.Value;
-                if(label.XRState == XRInteractionStatus.Hint)
-                {
-                    //add to hint
-                    SetHintModeActive(button, activateHint);
-                    //reup UI
-                    cachedItem.ApplyUISecondaryVisual(label.HintIcon);
-                    cachedItem.ShowORHideSecondaryVisual(activateHint);
-                }
-            }
-            */
         }
         /// <summary>
         /// Activate/deactivate Additional Information Icons
@@ -599,7 +582,7 @@ namespace FuzzPhyte.XR
         /// </summary>
         /// <param name="button"></param>
         /// <param name="currentButtonStatus"></param>
-        public void SetButtonState(XRButton button, XRInteractionStatus currentButtonStatus,float vectorValue=1f)
+        public void SetButtonState(XRButton button, XRInteractionStatus currentButtonStatus,bool touching=false,float vectorValue=1f)
         {
             //if state is locked we need to set it and then not visually update anything until unlocked, keep firing locked events 
             //this finds feedback based on original data files
@@ -635,11 +618,11 @@ namespace FuzzPhyte.XR
                             }
                             if (button == XRButton.Trigger)
                             {
-                                cachedItem.ApplyUIChanges(label.Icon, label.IconColor, label.LabelText, label.LabelFontSetting, label.ButtonSound, UseCanvas, useDownOffset, vectorValue);
+                                cachedItem.ApplyUIChanges(label.Icon, label.IconColor, label.LabelText, label.LabelFontSetting, label.ButtonSound, UseCanvas, useDownOffset, touching,vectorValue);
                             }
                             else
                             {
-                                cachedItem.ApplyUIChanges(label.Icon, label.IconColor,label.LabelText, label.LabelFontSetting, label.ButtonSound, UseCanvas, useDownOffset);
+                                cachedItem.ApplyUIChanges(label.Icon, label.IconColor,label.LabelText, label.LabelFontSetting, label.ButtonSound, UseCanvas, useDownOffset,touching);
                             }
                                 
 

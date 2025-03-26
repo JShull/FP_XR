@@ -133,6 +133,7 @@ namespace FuzzPhyte.XR
         public Sprite Icon;
         public Color IconColor;
         public FontSetting LabelFontSetting;
+        public float ScaleAdjust;
         [Header("Secondary UI")]
         [Tooltip("Overall Additional Icons if Needed")]
         public Sprite HintIcon;
