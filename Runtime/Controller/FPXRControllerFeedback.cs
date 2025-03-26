@@ -348,7 +348,7 @@ namespace FuzzPhyte.XR
                                 //update UI to this
                                 if (controllerRefData != null)
                                 {
-                                    controllerRefData.SetupUI(curButton.ScaleAdjustment,aState.ScaleAdjust,aState.Icon, aState.IconColor,aState.LabelText, aState.LabelFontSetting, aState.ButtonSound, WorldControllerAudioSource);
+                                    controllerRefData.SetupUI(curButton.ScaleAdjustment,aState.Icon, aState.IconColor,aState.LabelText, aState.LabelFontSetting, aState.ButtonSound, WorldControllerAudioSource);
                                     //turn off secondary icon if there is one
                                     controllerRefData.ShowORHideSecondaryVisual(false);
                                 }
@@ -582,7 +582,7 @@ namespace FuzzPhyte.XR
         /// </summary>
         /// <param name="button"></param>
         /// <param name="currentButtonStatus"></param>
-        public void SetButtonState(XRButton button, XRInteractionStatus currentButtonStatus,bool touching=false,float vectorValue=1f)
+        public void SetButtonState(XRButton button, XRInteractionStatus currentButtonStatus,float vectorValue=1f)
         {
             //if state is locked we need to set it and then not visually update anything until unlocked, keep firing locked events 
             //this finds feedback based on original data files
@@ -613,16 +613,15 @@ namespace FuzzPhyte.XR
                             {
                                 case XRInteractionStatus.Select:
                                     useDownOffset = true;
-                                    
                                     break;
                             }
-                            if (button == XRButton.Trigger)
+                            if (button == XRButton.Trigger || button ==XRButton.Grip)
                             {
-                                cachedItem.ApplyUIChanges(label.Icon, label.IconColor, label.LabelText, label.LabelFontSetting, label.ButtonSound, UseCanvas, useDownOffset, touching,vectorValue);
+                                cachedItem.ApplyUIChanges(label.Icon, label.IconColor, label.LabelText, label.LabelFontSetting, label.ButtonSound, UseCanvas, useDownOffset, label.ScaleAdjust,vectorValue);
                             }
                             else
                             {
-                                cachedItem.ApplyUIChanges(label.Icon, label.IconColor,label.LabelText, label.LabelFontSetting, label.ButtonSound, UseCanvas, useDownOffset,touching);
+                                cachedItem.ApplyUIChanges(label.Icon, label.IconColor,label.LabelText, label.LabelFontSetting, label.ButtonSound, UseCanvas, useDownOffset,label.ScaleAdjust);
                             }
                                 
 

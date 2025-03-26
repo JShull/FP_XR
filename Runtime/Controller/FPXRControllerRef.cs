@@ -15,7 +15,7 @@ namespace FuzzPhyte.XR
         protected bool useCanvas = false;
         public Vector3 OffsetAmount;
         protected Vector3 storedLocalScaleAdj = Vector3.one;
-        protected float storedHoverScale = 1;
+        
         [Header("Setup")]
         [Tooltip("Root Item Ref Locally on Prefab - itself probably")]
         [SerializeField] protected Transform buttonRootParent;
@@ -46,20 +46,18 @@ namespace FuzzPhyte.XR
         /// <param name="audioRef"></param>
         /// <param name="audioSourceRef"></param>
         /// <param name="UseCanvas"></param>
-        public void SetupUI(Vector3 localScale, float adjScale,Sprite iconRef, Color iconColor,string textRef, FontSetting fontRef, AudioClip audioRef=null,AudioSource audioSourceRef=null,bool UseCanvas = false)
+        public void SetupUI(Vector3 localScale,Sprite iconRef, Color iconColor,string textRef, FontSetting fontRef, AudioClip audioRef=null,AudioSource audioSourceRef=null,bool UseCanvas = false)
         {
             //scale accordingly
             buttonRootParent.transform.localScale = localScale;
             storedLocalScaleAdj=localScale;
-            storedHoverScale = adjScale;
             if (useCanvas)
             {
                 if (buttonCanvasImage != null)
                 {
                     buttonCanvasImage.sprite = iconRef;
                     buttonCanvasImage.color = iconColor;
-                }
-                    
+                } 
             }
             else
             {
@@ -94,7 +92,7 @@ namespace FuzzPhyte.XR
         /// <param name="audioRef"></param>
         /// <param name="UseCanvas"></param>
         public bool ApplyUIChanges(Sprite iconRef, Color iconColor,string textRef, FontSetting fontRef, 
-            AudioClip audioRef=null, bool UseCanvas = false, bool useOffset = false, bool useScale = false,float vectorData= 1.0f)
+            AudioClip audioRef=null, bool UseCanvas = false, bool useOffset = false, float useScale = 1,float vectorData= 1.0f)
         {
             if (!setupComplete)
             {
@@ -107,14 +105,6 @@ namespace FuzzPhyte.XR
                 {
                     buttonCanvasImage.sprite = iconRef;
                     buttonCanvasImage.color = iconColor;
-                    if (useScale)
-                    {
-                        buttonRootParent.transform.localScale = storedLocalScaleAdj*storedHoverScale;
-                    }
-                    else
-                    {
-                        buttonRootParent.transform.localScale = storedLocalScaleAdj;
-                    }
                 }    
             }
             else
@@ -126,7 +116,7 @@ namespace FuzzPhyte.XR
                     buttonIconImage.color = iconColor;
                 }
             }
-
+            buttonRootParent.transform.localScale = storedLocalScaleAdj * useScale;
             // Update Label Text
             if (buttonLabelText != null)
             {

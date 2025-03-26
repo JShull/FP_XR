@@ -297,6 +297,11 @@ namespace FuzzPhyte.XR
             InformationButtonActivePrimary();
             InformationButtonActiveSecondary();
         }
+        [ContextMenu("Hover check scale")]
+        public void SetHoverTextPrimaryButtonTest()
+        {
+            UpdateButtonState(XRHandedness.Left, XRButton.PrimaryButton, XRInteractionStatus.Hover);
+        }
         #endregion
         #region Public Event Listener Registration
         /// <summary>
@@ -406,7 +411,7 @@ namespace FuzzPhyte.XR
         /// External SDKs (e.g., Oculus, Unity XR Toolkit) invoke this to report button states.
         /// Make sure to pass Select/Unselect only here anything else will be ignored
         /// </summary>
-        public virtual void UpdateButtonState(XRHandedness hand, XRButton button, XRInteractionStatus buttonState,bool touching=false, float controllerData=1f)
+        public virtual void UpdateButtonState(XRHandedness hand, XRButton button, XRInteractionStatus buttonState, float controllerData=1f)
         {
             if(buttonState== XRInteractionStatus.Locked)
             {
@@ -415,7 +420,7 @@ namespace FuzzPhyte.XR
             }
             FPXRControllerFeedback feedback = GetFeedbackForHand(hand);
             //drives visuals and audio
-            feedback?.SetButtonState(button, buttonState, touching,controllerData);
+            feedback?.SetButtonState(button, buttonState,controllerData);
             switch(buttonState)
             {
                 case XRInteractionStatus.Select:

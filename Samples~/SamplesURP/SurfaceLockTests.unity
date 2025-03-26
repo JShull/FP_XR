@@ -1223,6 +1223,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74a3d081384f8eb4b841dfcde8bc1408, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DontDestroy: 0
   leftControllerFeedback: {fileID: 1432925421}
   rightControllerFeedback: {fileID: 0}
 --- !u!4 &888262513
@@ -2009,14 +2010,17 @@ MonoBehaviour:
   feedbackConfig: {fileID: 11400000, guid: 34e44346ba139c94bb14fbcc24441ee9, type: 2}
   UseCanvas: 0
   ControllerButtonPrefab: {fileID: 8251714662972797287, guid: 763d302f6d94ba14895cf2d784435542, type: 3}
+  GripButtonPrefab: {fileID: 0}
+  TriggerButtonPrefab: {fileID: 0}
   WorldControllerAudioSource: {fileID: 1210575106}
+  SetupOnAwake: 1
   XRWorldButtons:
   - ButtonType: 3
     ButtonLocation: {fileID: 857892714}
-    ScaleAdjustment: {x: 0.009, y: 0.009, z: 0.009}
+    ScaleAdjustment: {x: 0.003, y: 0.003, z: 0.003}
   - ButtonType: 4
     ButtonLocation: {fileID: 1790967280}
-    ScaleAdjustment: {x: 0.009, y: 0.009, z: 0.009}
+    ScaleAdjustment: {x: 0.003, y: 0.003, z: 0.003}
 --- !u!1 &1634127257
 GameObject:
   m_ObjectHideFlags: 0
@@ -2218,7 +2222,7 @@ Transform:
   m_GameObject: {fileID: 1790967279}
   serializedVersion: 2
   m_LocalRotation: {x: 0.063118346, y: -0, z: -0, w: 0.99800605}
-  m_LocalPosition: {x: 0.024800027, y: 0.0167, z: 0.110700004}
+  m_LocalPosition: {x: 0.024800027, y: 0.0191, z: 0.111}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
