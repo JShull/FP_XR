@@ -28,4 +28,61 @@ MonoBehaviour:
       HintIconColor: {r: 0, g: 0, b: 0, a: 0}
       InformationIcon: {fileID: 0}
       InformationIconColor: {r: 0, g: 0, b: 0, a: 0}
+    - XRState: 0
+      ButtonSound: {fileID: 0}
+      LabelText: 
+      Icon: {fileID: 0}
+      IconColor: {r: 0, g: 0, b: 0, a: 0}
+      LabelFontSetting: {fileID: 0}
+      ScaleAdjust: 0
+      HintIcon: {fileID: 0}
+      HintIconColor: {r: 0, g: 0, b: 0, a: 0}
+      InformationIcon: {fileID: 0}
+      InformationIconColor: {r: 0, g: 0, b: 0, a: 0}
+    - XRState: 0
+      ButtonSound: {fileID: 0}
+      LabelText: 
+      Icon: {fileID: 0}
+      IconColor: {r: 0, g: 0, b: 0, a: 0}
+      LabelFontSetting: {fileID: 0}
+      ScaleAdjust: 0
+      HintIcon: {fileID: 0}
+      HintIconColor: {r: 0, g: 0, b: 0, a: 0}
+      InformationIcon: {fileID: 0}
+      InformationIconColor: {r: 0, g: 0, b: 0, a: 0}
+  - Button: 4
+    ButtonInteractionStates:
+    - XRState: 0
+      ButtonSound: {fileID: 0}
+      LabelText: 
+      Icon: {fileID: 0}
+      IconColor: {r: 0, g: 0, b: 0, a: 0}
+      LabelFontSetting: {fileID: 0}
+      ScaleAdjust: 0
+      HintIcon: {fileID: 0}
+      HintIconColor: {r: 0, g: 0, b: 0, a: 0}
+      InformationIcon: {fileID: 0}
+      InformationIconColor: {r: 0, g: 0, b: 0, a: 0}
+    - XRState: 0
+      ButtonSound: {fileID: 0}
+      LabelText: 
+      Icon: {fileID: 0}
+      IconColor: {r: 0, g: 0, b: 0, a: 0}
+      LabelFontSetting: {fileID: 0}
+      ScaleAdjust: 0
+      HintIcon: {fileID: 0}
+      HintIconColor: {r: 0, g: 0, b: 0, a: 0}
+      InformationIcon: {fileID: 0}
+      InformationIconColor: {r: 0, g: 0, b: 0, a: 0}
+    - XRState: 0
+      ButtonSound: {fileID: 0}
+      LabelText: 
+      Icon: {fileID: 0}
+      IconColor: {r: 0, g: 0, b: 0, a: 0}
+      LabelFontSetting: {fileID: 0}
+      ScaleAdjust: 0
+      HintIcon: {fileID: 0}
+      HintIconColor: {r: 0, g: 0, b: 0, a: 0}
+      InformationIcon: {fileID: 0}
+      InformationIconColor: {r: 0, g: 0, b: 0, a: 0}
   DescriptionNotes: 

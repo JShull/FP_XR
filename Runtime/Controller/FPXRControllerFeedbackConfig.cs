@@ -7,6 +7,7 @@ namespace FuzzPhyte.XR
     public class FPXRControllerFeedbackConfig: FP_Data
     {
         public XRHandedness ControllerStartHandedness;
+        
         public List<ButtonFeedback> feedbacks;
         [TextArea(2, 4)]
         public string DescriptionNotes;

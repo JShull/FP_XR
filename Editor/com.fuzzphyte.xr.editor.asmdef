@@ -1,0 +1,18 @@
+{
+    "name": "com.fuzzphyte.xr.editor",
+    "rootNamespace": "FuzzPhyte.XR.Editor",
+    "references": [
+        "com.fuzzphyte.xr"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
