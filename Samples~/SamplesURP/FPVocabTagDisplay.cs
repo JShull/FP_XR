@@ -135,7 +135,10 @@ namespace FuzzPhyte.XR
         }
         public virtual void ShowAllRenderers(bool status)
         {
-            HideShowAllRenderers(status);
+            if (CheckMinCooldownTime())
+            {
+                HideShowAllRenderers(status);
+            }
         }
         #endregion
         protected virtual void Setup(FP_Tag tag, FP_Vocab vocab, FP_Theme theme, FP_Language startLanguage, bool display=false)
@@ -194,7 +197,7 @@ namespace FuzzPhyte.XR
         
         public virtual string DisplayVocabTranslation(TMP_Text textDisplay,FP_Language choice)
         {
-            if (CheckMinTime())
+            if (CheckMinCooldownTime())
             {
                 DisplayTranslationEvent.Invoke();
                 lastTimeSinceEvent = Time.time;
@@ -207,7 +210,7 @@ namespace FuzzPhyte.XR
         /// Quick time check since last event
         /// </summary>
         /// <returns></returns>
-        protected bool CheckMinTime()
+        public bool CheckMinCooldownTime()
         {
             if (Time.time - lastTimeSinceEvent < MinTimeBetweenEvents)
             {

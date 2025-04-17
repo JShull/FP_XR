@@ -50,9 +50,13 @@ namespace FuzzPhyte.XR
         }
         public void StartTypingEffect(FP_Language lang, bool useDefinition = false)
         {
+            //check typingData min cool down
             if (TypingData != null)
             {
-                StartTypingEffect(TypingData, lang, useDefinition, TextTypeReplace);
+                if (TypingData.CheckMinCooldownTime())
+                {
+                    StartTypingEffect(TypingData, lang, useDefinition, TextTypeReplace);
+                }
                 return;
             }
             else
@@ -61,7 +65,10 @@ namespace FuzzPhyte.XR
                 if (gameObject.GetComponent<FPVocabTagDisplay>())
                 {
                     TypingData = gameObject.GetComponent<FPVocabTagDisplay>();
-                    StartTypingEffect(TypingData,lang, useDefinition, TextTypeReplace);
+                    if (TypingData.CheckMinCooldownTime())
+                    {
+                        StartTypingEffect(TypingData, lang, useDefinition, TextTypeReplace);
+                    } 
                     return;
                 }
             }
@@ -73,7 +80,7 @@ namespace FuzzPhyte.XR
         /// <param name="typingData">VocabTag Data</param>
         /// <param name="lang">Language Request</param>
         /// <param name="useDefinition">Vocab or definition</param>
-        public void StartTypingEffect(FPVocabTagDisplay typingData,FP_Language lang,bool useDefinition=false, bool replaceFontVisual=false)
+        protected virtual void StartTypingEffect(FPVocabTagDisplay typingData,FP_Language lang,bool useDefinition=false, bool replaceFontVisual=false)
         {
             TypingData = typingData;
             var theClip = TypingData.SetAndReturnClip(lang, useDefinition);
@@ -98,7 +105,7 @@ namespace FuzzPhyte.XR
                 StartTypingEffect(TypingData.SecondaryTextDisplay, txtContent, theClip, rplFont);
             }
         }
-        public void StartTypingEffect(TMP_Text TxtComponent, string Txt, AudioClip audioFile, string startingTxt = "")
+        protected virtual void StartTypingEffect(TMP_Text TxtComponent, string Txt, AudioClip audioFile, string startingTxt = "")
         {
             if (!TypingData.RenderersActive)
             {
