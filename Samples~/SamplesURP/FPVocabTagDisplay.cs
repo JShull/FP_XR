@@ -29,6 +29,10 @@ namespace FuzzPhyte.XR
         public FP_Vocab VocabData;
         public FP_Theme ThemeData;
         public FP_Language AudioStartLanguage;
+        [Tooltip("Amount of time before we will fire off another tag display")]
+        [Range(1,20)]
+        public float MinTimeBetweenEvents = 3f;
+        protected float lastTimeSinceEvent = 0;
         public bool SetupOnStart = true;
         public bool HideOnStart = false;
         [Tooltip("All renderers associated with this tag")]
@@ -190,8 +194,26 @@ namespace FuzzPhyte.XR
         
         public virtual string DisplayVocabTranslation(TMP_Text textDisplay,FP_Language choice)
         {
-            DisplayTranslationEvent.Invoke();
-            return labelTag.ApplyVocabTranslationTextData(textDisplay, choice);
+            if (CheckMinTime())
+            {
+                DisplayTranslationEvent.Invoke();
+                lastTimeSinceEvent = Time.time;
+                return labelTag.ApplyVocabTranslationTextData(textDisplay, choice);
+            }
+            return "";
+            
+        }
+        /// <summary>
+        /// Quick time check since last event
+        /// </summary>
+        /// <returns></returns>
+        protected bool CheckMinTime()
+        {
+            if (Time.time - lastTimeSinceEvent < MinTimeBetweenEvents)
+            {
+                return false;
+            }
+            return true;
         }
         /// <summary>
         /// Returns the definition or translation based on the language requested
