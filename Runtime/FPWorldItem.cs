@@ -6,6 +6,7 @@ namespace FuzzPhyte.XR
     using UnityEngine.Events;
     using System;
     using System.Collections.Generic;
+    using System.Collections;
 
     /// <summary>
     /// This assumes that there is a collider directly on this object of some sorts...
@@ -81,11 +82,16 @@ namespace FuzzPhyte.XR
         [SerializeField]
         protected XRHandedness handState;
         public XRHandedness InHandState { get { return handState; } }
+        [Space]
+        [Header("Force Drop Unity Events")]
+        public UnityEvent OnForceDropEvent;
+        public UnityEvent OnEndFrameForceDropEvent;
         #endregion
         #region Action Related
         // Action events for external listeners
         public event Action<FPWorldItem, XRHandedness> ItemGrabbed;
         public event Action<FPWorldItem, XRHandedness> ItemDropped;
+        public event Action<FPWorldItem,XRHandedness> ItemForceDropped;
         public event Action<FPWorldItem> ItemDestroyed;
         public event Action<FPWorldItem> ItemSpawned;
         public event Action<FPWorldItem, FPSocket> ItemSocketSet;
@@ -191,6 +197,26 @@ namespace FuzzPhyte.XR
                 currentSocket = null;
                 ItemSocketRemoved?.Invoke(this, passedParent);
             }
+        }
+        public virtual void ForceDrop()
+        {
+            if (this.handState != XRHandedness.NONE)
+            {
+
+                ItemForceDropped?.Invoke(this, this.handState);
+            }
+            else
+            {
+                ItemForceDropped?.Invoke(this, XRHandedness.NONE);
+            }
+            this.handState = XRHandedness.NONE;
+            OnForceDropEvent.Invoke();
+            StartCoroutine(DelayEndFrameAction());
+        }
+        protected IEnumerator DelayEndFrameAction()
+        {
+            yield return new WaitForEndOfFrame();
+            OnEndFrameForceDropEvent.Invoke();
         }
         /// <summary>
         /// Called if something else spawns this item - don't want this in start/onEnable
