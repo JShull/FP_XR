@@ -328,20 +328,29 @@ namespace FuzzPhyte.XR
         {
             for (int i = 0; i < LabelInterfaces.Count; i++)
             {
-                LabelInterfaces[i].ShowAllRenderers(false);
+                LabelInterfaces[i].ForceHideRenderer();
             }
             DetailedLabelDeactivated.Invoke();
         }
         public virtual void ActivateDetailedLabelTimer(float time)
         {
-            for (int i = 0; i < LabelInterfaces.Count; i++) 
-            {
-                LabelInterfaces[i].ShowAllRenderers(true);
-                
-            }
             if (FP_Timer.CCTimer != null)
             {
                 FP_Timer.CCTimer.StartTimer(time, () => { DeactivateAllLabels(); });
+            }
+        }
+        public virtual void ShowAllTheRenderers()
+        {
+            for (int i = 0; i < LabelInterfaces.Count; i++)
+            {
+                LabelInterfaces[i].ShowAllRenderers(true);
+            }
+        }
+        public virtual void HideAllTheRenderers()
+        {
+            for (int i = 0; i < LabelInterfaces.Count; i++)
+            {
+                LabelInterfaces[i].ShowAllRenderers(false);
             }
         }
         public virtual void DetailedLabelVocabTranslationDisplay()

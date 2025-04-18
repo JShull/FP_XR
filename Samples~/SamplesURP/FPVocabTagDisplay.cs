@@ -133,12 +133,22 @@ namespace FuzzPhyte.XR
         {
             return DisplayVocabTranslation(SecondaryTextDisplay, choice);
         }
-        public virtual void ShowAllRenderers(bool status)
+        public virtual bool ShowAllRenderers(bool status)
         {
             if (CheckMinCooldownTime())
             {
                 HideShowAllRenderers(status);
+                return true;
             }
+            return false;
+        }
+        public virtual void ForceShowRenderer()
+        {
+            HideShowAllRenderers(true);
+        }
+        public virtual void ForceHideRenderer()
+        {
+            HideShowAllRenderers(false);
         }
         #endregion
         protected virtual void Setup(FP_Tag tag, FP_Vocab vocab, FP_Theme theme, FP_Language startLanguage, bool display=false)
@@ -200,7 +210,6 @@ namespace FuzzPhyte.XR
             if (CheckMinCooldownTime())
             {
                 DisplayTranslationEvent.Invoke();
-                lastTimeSinceEvent = Time.time;
                 return labelTag.ApplyVocabTranslationTextData(textDisplay, choice);
             }
             return "";
@@ -214,6 +223,7 @@ namespace FuzzPhyte.XR
         {
             if (Time.time - lastTimeSinceEvent > MinTimeBetweenEvents)
             {
+                lastTimeSinceEvent = Time.time;
                 return true;
             }
             return false;

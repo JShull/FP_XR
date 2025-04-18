@@ -1,10 +1,10 @@
-using FuzzPhyte.Utility;
-using FuzzPhyte.Utility.EDU;
-using TMPro;
-using UnityEngine;
-
 namespace FuzzPhyte.XR
 {
+    using FuzzPhyte.Utility;
+    using FuzzPhyte.Utility.EDU;
+    using TMPro;
+    using UnityEngine;
+
     public class FPXRInteractableLabel : MonoBehaviour, IFPXRLabel
     {
         public GameObject ParentLabelRef;
@@ -34,9 +34,18 @@ namespace FuzzPhyte.XR
             labelTag.ApplyVocabTextData(LabelText);
         }
 
-        public void ShowAllRenderers(bool status)
+        public virtual bool ShowAllRenderers(bool status)
         {
             //not sure on this item
+            return false;
+        }
+        public virtual void ForceShowRenderer()
+        {
+
+        }
+        public virtual void ForceHideRenderer()
+        {
+
         }
     }
 }
