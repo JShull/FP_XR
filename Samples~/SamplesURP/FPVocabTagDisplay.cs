@@ -212,11 +212,11 @@ namespace FuzzPhyte.XR
         /// <returns></returns>
         public bool CheckMinCooldownTime()
         {
-            if (Time.time - lastTimeSinceEvent < MinTimeBetweenEvents)
+            if (Time.time - lastTimeSinceEvent > MinTimeBetweenEvents)
             {
-                return false;
+                return true;
             }
-            return true;
+            return false;
         }
         /// <summary>
         /// Returns the definition or translation based on the language requested
