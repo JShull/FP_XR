@@ -205,16 +205,20 @@ namespace FuzzPhyte.XR
                 int startingTextCount = Mathf.FloorToInt(charIndexPosition * startingText.Length);
                 var startStringPartial = startingText.Substring(startingTextCount, startingText.Length - startingTextCount);
                 textComponent.text = fullText.Substring(0, characterCount) + startStringPartial;
-                if(runningLoopTime >= clipStartTimes[0])
+                if(clipStartTimes.Count>0)
                 {
-                    if (clipArrays.Count > 0)
+                    if(runningLoopTime >= clipStartTimes[0])
                     {
-                        AudioSource.clip = clipArrays[0];
-                        AudioSource.Play();
-                        clipStartTimes.RemoveAt(0);
-                        clipArrays.RemoveAt(0);
+                        if (clipArrays.Count > 0)
+                        {
+                            AudioSource.clip = clipArrays[0];
+                            AudioSource.Play();
+                            clipStartTimes.RemoveAt(0);
+                            clipArrays.RemoveAt(0);
+                        }
                     }
                 }
+                
                 yield return new WaitForEndOfFrame();
             }
 
