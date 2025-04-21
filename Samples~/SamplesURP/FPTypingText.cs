@@ -161,8 +161,8 @@ namespace FuzzPhyte.XR
             AudioSource.clip = aFile[0];
             List<float>clipStartTimes = new List<float>();
             List<AudioClip> clipArrays = new List<AudioClip>();
-
             clipStartTimes.Add(0f);
+
             if (aFile.Length > 1)
             {
                 for(int i=0; i < aFile.Length; i++)
@@ -182,6 +182,7 @@ namespace FuzzPhyte.XR
             {
                 if (aFile.Length == 1)
                 {
+                    Debug.LogWarning($"Clip length: 1");
                     estimateLength = aFile[0].length;
                     clipArrays.Add(aFile[0]);
                 }
@@ -190,7 +191,8 @@ namespace FuzzPhyte.XR
                     yield break;
                 }
             }
-
+            Debug.LogWarning($"ClipStart Times Count: {clipStartTimes.Count} with ClipArrays at {clipArrays.Count}");
+            
             yield return new WaitForEndOfFrame();
             // float clipLength = estimateLength;
             Debug.LogWarning($"Clip Length: {estimateLength}");
@@ -205,7 +207,7 @@ namespace FuzzPhyte.XR
                 textComponent.text = fullText.Substring(0, characterCount) + startStringPartial;
                 if(runningLoopTime >= clipStartTimes[0])
                 {
-                    if(clipArrays[0].length > 0)
+                    if (clipArrays.Count > 0)
                     {
                         AudioSource.clip = clipArrays[0];
                         AudioSource.Play();
