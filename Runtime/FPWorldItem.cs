@@ -44,7 +44,8 @@ namespace FuzzPhyte.XR
         [Tooltip("Place to centralize all the data for this item")]
         public XRDetailedLabelData DetailedLabelData;
         public FP_Language StartingFPLanguage;
-        public bool StartDetailedLabelOnStart;
+        public bool UseSupportCombinedVocabData = false;
+        //public bool StartDetailedLabelOnStart;
         public UnityEvent DetailedLabelActivated;
         public UnityEvent DetailedLabelDeactivated;
         [SerializeField] protected List<UnityEngine.Object> interfaceObjects = new List<UnityEngine.Object>();
@@ -249,7 +250,7 @@ namespace FuzzPhyte.XR
             //setup details on label if we have them
             for(int i = 0; i < LabelInterfaces.Count; i++)
             {
-                LabelInterfaces[i].SetupLabelData(DetailedLabelData, StartingFPLanguage, StartDetailedLabelOnStart);
+                LabelInterfaces[i].SetupLabelData(DetailedLabelData, StartingFPLanguage, UseSupportCombinedVocabData);
             }
         }
         public virtual void ResetLocation()

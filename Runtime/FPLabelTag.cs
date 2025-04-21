@@ -5,6 +5,7 @@ namespace FuzzPhyte.XR
     using FuzzPhyte.Utility;
     using UnityEngine;
     using TMPro;
+    using System.Linq;
     using System.Collections.Generic;
 
     // https://github.com/Antoshidza/NSprites
@@ -14,6 +15,10 @@ namespace FuzzPhyte.XR
         protected FP_Tag dataTag;
         protected FP_Vocab vocabData;
         protected FP_Theme themeData;
+        protected List<XRVocabSupportData> vocabSupportData;
+        // our combined vocab list based on XRVocabSupportData and by language requirements
+        protected List<FP_Vocab> allVocabCombined;
+        //protected bool useSupportData = false;
         #region Setup
         public FPLabelTag(FP_Tag dataTag)
         {
@@ -23,6 +28,12 @@ namespace FuzzPhyte.XR
         {
             this.vocabData = vocabData;
             themeData = theme;
+        }
+        public FPLabelTag(FP_Tag dataTag, FP_Vocab vocabData,FP_Theme theme, List<XRVocabSupportData> vocabSupportData) : this(dataTag, vocabData, theme)
+        {
+            this.vocabSupportData = new List<XRVocabSupportData>();
+            this.vocabSupportData.AddRange(vocabSupportData);
+            SetupCombinedVocabulary(vocabData.Language);
         }
         /// <summary>
         /// Send the list of fonts for the display system you're using
@@ -85,6 +96,70 @@ namespace FuzzPhyte.XR
                 backdrop.color = themeData.MainColor;
             }
         }
+        protected void SetupCombinedVocabulary(FP_Language language)
+        {
+            // rough out order then
+            allVocabCombined = new List<FP_Vocab>();
+            var categoryOrder = new Dictionary<FP_VocabSupport, int>();
+            FPLanguageAdjectiveRules rules = null;
+            switch (language)
+            {
+                case FP_Language.USEnglish:
+                    rules = FPLanguageUtility.USEnglishRules;
+                    categoryOrder = rules.SortOrder
+                        .Select((cat, index) => new { cat, index })
+                        .ToDictionary(x => x.cat, x => x.index);
+
+                    var sorted = vocabSupportData
+                        .OrderBy(v => categoryOrder.GetValueOrDefault(v.SupportCategory, int.MaxValue))
+                        .Select(v => v.SupportData);
+
+                    allVocabCombined.AddRange(sorted);
+                    allVocabCombined.Add(vocabData);
+                    break;
+                case FP_Language.Spanish:
+                    rules = FPLanguageUtility.SpanishRules;
+                    categoryOrder = rules.SortOrder
+                        .Select((cat, index) => new { cat, index })
+                        .ToDictionary(x => x.cat, x => x.index);
+
+                    var preES = vocabSupportData
+                        .Where(v => rules.PreNounCategories.Contains(v.SupportCategory))
+                        .OrderBy(v => categoryOrder.GetValueOrDefault(v.SupportCategory, int.MaxValue))
+                        .Select(v => v.SupportData);
+
+                    var postES = vocabSupportData
+                        .Where(v => !rules.PreNounCategories.Contains(v.SupportCategory))
+                        .OrderBy(v => categoryOrder.GetValueOrDefault(v.SupportCategory, int.MaxValue))
+                        .Select(v => v.SupportData);
+
+                    allVocabCombined.AddRange(preES);
+                    allVocabCombined.Add(vocabData);
+                    allVocabCombined.AddRange(postES);
+                    break;
+                case FP_Language.French:
+                    // Define categories that typically precede the noun
+                    rules = FPLanguageUtility.FrenchRules;
+                    categoryOrder = rules.SortOrder
+                        .Select((cat, index) => new { cat, index })
+                        .ToDictionary(x => x.cat, x => x.index);
+
+                    var preFR = vocabSupportData
+                        .Where(v => rules.PreNounCategories.Contains(v.SupportCategory))
+                        .OrderBy(v => categoryOrder.GetValueOrDefault(v.SupportCategory, int.MaxValue))
+                        .Select(v => v.SupportData);
+
+                    var postFR = vocabSupportData
+                        .Where(v => !rules.PreNounCategories.Contains(v.SupportCategory))
+                        .OrderBy(v => categoryOrder.GetValueOrDefault(v.SupportCategory, int.MaxValue))
+                        .Select(v => v.SupportData);
+
+                    allVocabCombined.AddRange(preFR);
+                    allVocabCombined.Add(vocabData);
+                    allVocabCombined.AddRange(postFR);
+                    break;
+            }
+        }
         #endregion
         #region Layout Based
         /// <summary>
@@ -128,30 +203,107 @@ namespace FuzzPhyte.XR
         /// <param name="language"></param>
         /// <returns></returns>
         #region Returns and Visuals
-        public string ReturnTranslation(FP_Language language, bool useDefin=false)
+        public string ReturnTranslation(FP_Language language, bool useDefin=false, bool useCombined = false)
         {
             for(int i = 0; i < vocabData.Translations.Count; i++)
             {
                 if(vocabData.Translations[i].Language == language)
                 {
-                    if (useDefin)
+                    if (useCombined)
                     {
-                        return vocabData.Translations[i].Definition;
+                        string combinedWords = string.Empty;
+                        SetupCombinedVocabulary(language);
+                        for (int j = 0; j < allVocabCombined.Count; j++)
+                        {
+                            if (useDefin)
+                            {
+                                if (j == allVocabCombined.Count - 1)
+                                {
+                                    combinedWords += allVocabCombined[j].Translations[i].Definition;
+                                }
+                                else
+                                {
+                                    combinedWords += allVocabCombined[j].Translations[i].Definition + " ";
+                                }
+                            }
+                            else
+                            {
+                                if (j == allVocabCombined.Count - 1)
+                                {
+                                    combinedWords += allVocabCombined[j].Translations[i].Word;
+                                }
+                                else
+                                {
+                                    combinedWords += allVocabCombined[j].Translations[i].Word + " ";
+                                }
+                            }
+                            
+                        }
+                        return combinedWords;
                     }
-                    return vocabData.Translations[i].Word;
+                    else
+                    {
+                        if (useDefin)
+                        {
+                            return vocabData.Translations[i].Definition;
+                        }
+                        return vocabData.Translations[i].Word;
+                    }
+                    
                 }
             }
             return null;
         }
         /// <summary>
+        /// Return the combined words based on the current language
+        /// </summary>
+        /// <param name="useDefin"></param>
+        /// <returns></returns>
+        public string ReturnCombinedWords(bool useDefin)
+        {
+            string combinedWords = string.Empty;
+            SetupCombinedVocabulary(vocabData.Language);
+            for (int j = 0; j < allVocabCombined.Count; j++)
+            {
+                if (useDefin)
+                {
+                    if (j == allVocabCombined.Count - 1)
+                    {
+                        combinedWords += allVocabCombined[j].Definition;
+                    }
+                    else
+                    {
+                        combinedWords += allVocabCombined[j].Definition + " ";
+                    }
+                }
+                else
+                {
+                    if (j == allVocabCombined.Count - 1)
+                    {
+                        combinedWords += allVocabCombined[j].Word;
+                    }
+                    else
+                    {
+                        combinedWords += allVocabCombined[j].Word + " ";
+                    }
+                }
+            }
+            return combinedWords;
+        }
+        
+        /// <summary>
         /// Return Audio Clip by matching language
         /// </summary>
         /// <param name="language"></param>
         /// <returns></returns>
-        public AudioClip ReturnAudio(FP_Language language,ref AudioType audioType, bool useDefinition=false, bool useTranslation=false)
+        public AudioClip ReturnAudio(FP_Language language,ref AudioType audioType, bool useDefinition=false, bool useTranslation=false, bool useCombined=false)
         {
             //go through my own language and my translations for a match
-
+            if (useCombined)
+            {
+                audioType = AudioType.UNKNOWN;
+                return null;
+            }
             if (!useTranslation)
             {
                 if (useDefinition)
@@ -190,29 +342,156 @@ namespace FuzzPhyte.XR
             audioType = AudioType.UNKNOWN;
             return null;
         }
+        /// <summary>
+        /// Will return the AudioClip Array based on language and your parameters
+        /// </summary>
+        /// <param name="language"></param>
+        /// <param name="audioType"></param>
+        /// <param name="useDefinition"></param>
+        /// <param name="useTranslation"></param>
+        /// <returns></returns>
+        public (bool,AudioClip[]) ReturnAudioArray(FP_Language language, ref AudioType audioType, bool useDefinition = false,bool useTranslation = false)
+        {
+            //build order by language
+            AudioClip[] audioClips = new AudioClip[allVocabCombined.Count];
+           
+            if (!useTranslation)
+            {
+                SetupCombinedVocabulary(vocabData.Language);
+                if (allVocabCombined.Count > 0)
+                {
+                    audioType = allVocabCombined[0].WordAudio.URLAudioType;
+                    if (useDefinition)
+                    {
+                        for (int i = 0; i < allVocabCombined.Count; i++)
+                        {
+                            audioClips[i] = allVocabCombined[i].DefinitionAudio.AudioClip;
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < allVocabCombined.Count; i++)
+                        {
+                            audioClips[i] = allVocabCombined[i].WordAudio.AudioClip;
+                        }
+                    }
+                    return (true,audioClips);
+                }
+                else
+                {
+                    return (false,null);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < vocabData.Translations.Count; i++)
+                {
+                    if (vocabData.Translations[i].Language == language)
+                    {
+                        //found match need to translate and setupCombinedVocab by language
+                        SetupCombinedVocabulary(language);
+                        if (allVocabCombined.Count > 0)
+                        {
+                            audioType = allVocabCombined[0].WordAudio.URLAudioType;
+                            if (useDefinition)
+                            {
+                                for (int j = 0; j < allVocabCombined.Count; j++)
+                                {
+                                    audioClips[j] = allVocabCombined[j].DefinitionAudio.AudioClip;
+                                }
+                            }
+                            else
+                            {
+                                for (int j = 0; j < allVocabCombined.Count; j++)
+                                {
+                                    audioClips[j] = allVocabCombined[j].WordAudio.AudioClip;
+                                }
+                            }
+                            return (true,audioClips);
+                        }
+                        else
+                        {
+                            return (false,null);
+                        }
+                    }
+                }
+            }
+            return (false, null);
+        }
         public string ApplyTagTextData(TMP_Text fontTagDisplay)
         {
             fontTagDisplay.text = dataTag.TagName;
             return fontTagDisplay.text;
         }
-        public string ApplyVocabTextData(TMP_Text vocabDisplay)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="vocabDisplay"></param>
+        /// <param name="useCombined">If we want to combine our support items e.g. color/size</param>
+        /// <returns></returns>
+        public string ApplyVocabTextData(TMP_Text vocabDisplay, bool useCombined=false)
         {
-            vocabDisplay.text = vocabData.Word;
+            if (useCombined)
+            {
+                string combinedWords = string.Empty;
+                //rebuild combined list by language
+                SetupCombinedVocabulary(vocabData.Language);
+                for (int j = 0; j < allVocabCombined.Count; j++)
+                {
+                    if (j == allVocabCombined.Count - 1)
+                    {
+                        combinedWords += allVocabCombined[j].Word;
+                    }
+                    else
+                    {
+                        combinedWords += allVocabCombined[j].Word + " ";
+                    }
+                }
+                return combinedWords;
+            }
+            else
+            {
+                vocabDisplay.text = vocabData.Word;
+                return vocabDisplay.text;
+            }
+                
+            
+        }
+        public string ApplyDefinitionTextData(TMP_Text defnDisplay, bool useCombined=false)
+        {
+            if (useCombined)
+            {
+                string combinedWords = string.Empty;
+                //rebuild combined list by language
+                SetupCombinedVocabulary(vocabData.Language);
+                for (int j = 0; j < allVocabCombined.Count; j++)
+                {
+                    if (j == allVocabCombined.Count - 1)
+                    {
+                        combinedWords += allVocabCombined[j].Definition;
+                    }
+                    else
+                    {
+                        combinedWords += allVocabCombined[j].Definition + " ";
+                    }
+                }
+                return combinedWords;
+            }
+            else
+            {
+                defnDisplay.text = vocabData.Definition;
+                return defnDisplay.text;
+            }
+                
+        }
+        public string ApplyVocabTranslationTextData(TMP_Text vocabDisplay,FP_Language language, bool useCombined)
+        {
+            vocabDisplay.text = ReturnTranslation(language,false,useCombined);
             return vocabDisplay.text;
         }
-        public string ApplyDefinitionTextData(TMP_Text defnDisplay)
+        public string ApplyDefnTranslationTextData(TMP_Text defnDisplay,FP_Language language, bool useCombined)
         {
-            defnDisplay.text = vocabData.Definition;
-            return defnDisplay.text;
-        }
-        public string ApplyVocabTranslationTextData(TMP_Text vocabDisplay,FP_Language language)
-        {
-            vocabDisplay.text = ReturnTranslation(language,false);
-            return vocabDisplay.text;
-        }
-        public string ApplyDefnTranslationTextData(TMP_Text defnDisplay,FP_Language language)
-        {
-            defnDisplay.text = ReturnTranslation(language, true);
+            defnDisplay.text = ReturnTranslation(language, true,useCombined);
             return defnDisplay.text;
         }
         #endregion

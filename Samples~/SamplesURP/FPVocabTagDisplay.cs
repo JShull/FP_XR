@@ -7,7 +7,6 @@ namespace FuzzPhyte.XR
     using FuzzPhyte.Utility;
     using UnityEngine.Events;
     using System.Collections.Generic;
-    using UnityEngine.SearchService;
 
     /// <summary>
     /// Mono Wrapper Class for FPLabelTag and for connecting various events, visuals etc.
@@ -27,7 +26,9 @@ namespace FuzzPhyte.XR
         [Header("Data")]
         public FP_Tag TagData;
         public FP_Vocab VocabData;
+        public List<XRVocabSupportData> SupportData;
         public FP_Theme ThemeData;
+        public bool UseCombinedVocabData = false;
         public FP_Language AudioStartLanguage;
         public bool SetupOnStart = true;
         public bool HideOnStart = false;
@@ -43,7 +44,9 @@ namespace FuzzPhyte.XR
         [SerializeField]protected Vector3 pivotLocation;
         [Header("Internal Data Set by Script")]
         [SerializeField] protected AudioClip audioClip;
+        [SerializeField] protected AudioClip[] audioClipArray;
         public AudioClip VocabTagAudioClip => audioClip;
+        public AudioClip[] VocabTagAudioClipArray => audioClipArray;
         [Space]
         [Header("Unity Events Registered with Default Functions")]
         public UnityEvent DisplayTagEvent;
@@ -113,6 +116,11 @@ namespace FuzzPhyte.XR
                     
                     if (AudioStartLanguage != FP_Language.NA)
                     {
+                        if(SupportData.Count > 0)
+                        {
+                            audioClipArray = new AudioClip[SupportData.Count];
+                            audioClipArray = SetupAudioClipArray(AudioStartLanguage, false, false);
+                        }
                         SetupAudioClip(AudioStartLanguage, false, false);
                     }
                 }
@@ -121,26 +129,29 @@ namespace FuzzPhyte.XR
             HideShowAllRenderers(!HideOnStart);
         }
         #region Interface Requirements
-        public void SetupLabelData(XRDetailedLabelData data, FP_Language startingLanguage, bool startActive)
+        public void SetupLabelData(XRDetailedLabelData data, FP_Language startingLanguage, bool startActive, bool useCombinedVocab)
         {
-            Setup(data.TagData, data.VocabData, data.ThemeData, startingLanguage, startActive);
+            UseCombinedVocabData = useCombinedVocab;
+            Setup(data.TagData, data.VocabData, data.ThemeData, startingLanguage, data.SupportVocabData,startActive);
         }
         public virtual string DisplayVocabTranslation(FP_Language choice)
         {
-            return DisplayVocabTranslation(SecondaryTextDisplay, choice);
+            return DisplayVocabTranslation(SecondaryTextDisplay, choice,UseCombinedVocabData);
         }
         public virtual void ShowAllRenderers(bool status)
         {
             HideShowAllRenderers(status);
         }
         #endregion
-        protected virtual void Setup(FP_Tag tag, FP_Vocab vocab, FP_Theme theme, FP_Language startLanguage, bool display=false)
+        protected virtual void Setup(FP_Tag tag, FP_Vocab vocab, FP_Theme theme, FP_Language startLanguage, List<XRVocabSupportData> supportVocabData, bool display =false)
         {
             TagData = tag;
             VocabData = vocab;
             ThemeData = theme;
+            SupportData = new List<XRVocabSupportData>();
+            SupportData.AddRange(supportVocabData);
             AudioStartLanguage = startLanguage;
-            labelTag = new FPLabelTag(TagData, VocabData, ThemeData);
+            labelTag = new FPLabelTag(TagData, VocabData, ThemeData, SupportData);
             pivotLocation = ReturnPivotLocation();
             if (AttachmentLocation != null)
             {
@@ -161,6 +172,11 @@ namespace FuzzPhyte.XR
                 }
                 if (AudioStartLanguage != FP_Language.NA)
                 {
+                    if (SupportData.Count > 0)
+                    {
+                        audioClipArray = new AudioClip[SupportData.Count];
+                        audioClipArray = SetupAudioClipArray(AudioStartLanguage, false, false);
+                    }
                     SetupAudioClip(AudioStartLanguage, false, false);
                 }
             }
@@ -188,10 +204,10 @@ namespace FuzzPhyte.XR
             }
         }
         
-        public virtual string DisplayVocabTranslation(TMP_Text textDisplay,FP_Language choice)
+        public virtual string DisplayVocabTranslation(TMP_Text textDisplay,FP_Language choice, bool useCombinedVocab)
         {
             DisplayTranslationEvent.Invoke();
-            return labelTag.ApplyVocabTranslationTextData(textDisplay, choice);
+            return labelTag.ApplyVocabTranslationTextData(textDisplay, choice, useCombinedVocab);
         }
         /// <summary>
         /// Returns the definition or translation based on the language requested
@@ -202,7 +218,15 @@ namespace FuzzPhyte.XR
         {
             if(choice==VocabData.Language)
             {
-                return VocabData.Definition;
+                if (UseCombinedVocabData)
+                {
+                    return labelTag.ReturnCombinedWords(true);
+                }
+                else
+                {
+                    return VocabData.Definition;
+                }
+                    
             }
             else
             {
@@ -216,13 +240,28 @@ namespace FuzzPhyte.XR
         /// <returns></returns>
         public virtual string ReturnVocab(FP_Language choice)
         {
-            if (choice == VocabData.Language)
+            if (UseCombinedVocabData)
             {
-                return VocabData.Word;
+                if (choice == VocabData.Language)
+                {
+                    return labelTag.ReturnCombinedWords(false);
+                    
+                }
+                else
+                {
+                    return labelTag.ReturnTranslation(choice, false,UseCombinedVocabData);
+                }
             }
             else
             {
-                return labelTag.ReturnTranslation(choice, false);
+                if (choice == VocabData.Language)
+                {
+                    return VocabData.Word;
+                }
+                else
+                {
+                    return labelTag.ReturnTranslation(choice, false,false);
+                }
             }
         }
         
@@ -234,6 +273,10 @@ namespace FuzzPhyte.XR
         /// <returns></returns>
         public virtual AudioClip SetAndReturnClip(FP_Language choice, bool useDefinition)
         {
+            if (UseCombinedVocabData)
+            {
+                Debug.LogError($"This is a singular clip request but you have combined vocab data set to true. This will only return the vocab data - call the other function for the array list.");
+            }
             if (choice == VocabData.Language)
             {
                 //don't use translation as these match just use the data and avoid translation data
@@ -242,6 +285,24 @@ namespace FuzzPhyte.XR
             else
             {
                 return SetupAudioClip(choice, useDefinition, true);
+            }
+        }
+        /// <summary>
+        /// Sets the audioclip array and returns the array based on the language & definition requested
+        /// </summary>
+        /// <param name="choice"></param>
+        /// <param name="useDefinition"></param>
+        /// <returns></returns>
+        public virtual AudioClip[] SetAndReturnClipArray(FP_Language choice, bool useDefinition)
+        {
+            if (choice == VocabData.Language)
+            {
+                //don't use translation as these match just use the data and avoid translation data
+                return SetupAudioClipArray(choice, useDefinition, false);
+            }
+            else
+            {
+                return SetupAudioClipArray(choice, useDefinition, true);
             }
         }
         #region Internal Functions
@@ -298,10 +359,11 @@ namespace FuzzPhyte.XR
         }
         protected virtual void SetupJustVocabText()
         {
-            labelTag.ApplyVocabTextData(SecondaryTextDisplay);
+            labelTag.ApplyVocabTextData(SecondaryTextDisplay,UseCombinedVocabData);
             TertiaryTextDisplay.gameObject.SetActive(false);
             MainTextDisplay.gameObject.SetActive(false);
         }
+        /// JOHN FINISH SETUP with AudioClip Array and accessing this information externally via other requests
         /// <summary>
         /// Sets our AudioClip based on the language requested
         /// </summary>
@@ -311,6 +373,10 @@ namespace FuzzPhyte.XR
         protected virtual AudioClip SetupAudioClip(FP_Language langRequest, bool useDefn, bool useTranslation)
         {
             AudioType audioT = AudioType.UNKNOWN;
+            if (SupportData.Count > 0)
+            {
+                Debug.LogWarning($"You're requesting a single audio clip but you have multiple support data items. This will only return the vocab data - call the other function for the array list.");
+            }
             audioClip = labelTag.ReturnAudio(langRequest, ref audioT, useDefn,useTranslation);
             if (audioT == AudioType.UNKNOWN)
             {
@@ -318,6 +384,20 @@ namespace FuzzPhyte.XR
                 Debug.LogError($"Audio clip was UNKNOWN for {langRequest} language.");
             }
             return audioClip;
+        }
+        protected virtual AudioClip[] SetupAudioClipArray(FP_Language langRequest,bool useDefn, bool useTranslation)
+        {
+            AudioType audioT = AudioType.UNKNOWN;
+            (bool success, AudioClip[] audioClips) = labelTag.ReturnAudioArray(langRequest, ref audioT, useDefn, useTranslation);
+            if (success && audioT !=AudioType.UNKNOWN)
+            {
+                return audioClips;
+            }
+            else
+            {
+                Debug.LogError($"Something happened to the audio clips for {langRequest} language | {audioT.ToString()}");
+                return null;
+            }
         }
         protected Vector3 ReturnPivotLocation()
         {

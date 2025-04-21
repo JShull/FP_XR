@@ -1,6 +1,7 @@
 namespace FuzzPhyte.XR
 {
     using FuzzPhyte.Utility;
+    using System.Collections.Generic;
     using System.Collections;
     using TMPro;
     using UnityEngine;
@@ -13,7 +14,9 @@ namespace FuzzPhyte.XR
         protected Coroutine typingCoroutine;
         public FP_Language CurrentLanguageSet;
         public bool TextTypeReplace = false;
-
+        public bool UseCombinedVocabData = false;
+        [Tooltip("Gap time to add between clips")]
+        public float TimeBetweenClips = 0.1f;
         public void OnDisable()
         {
             if (typingCoroutine != null)
@@ -52,7 +55,7 @@ namespace FuzzPhyte.XR
         {
             if (TypingData != null)
             {
-                StartTypingEffect(TypingData, lang, useDefinition, TextTypeReplace);
+                StartTypingEffect(TypingData, lang, useDefinition, TextTypeReplace, UseCombinedVocabData);
                 return;
             }
             else
@@ -61,7 +64,7 @@ namespace FuzzPhyte.XR
                 if (gameObject.GetComponent<FPVocabTagDisplay>())
                 {
                     TypingData = gameObject.GetComponent<FPVocabTagDisplay>();
-                    StartTypingEffect(TypingData,lang, useDefinition, TextTypeReplace);
+                    StartTypingEffect(TypingData,lang, useDefinition, TextTypeReplace, UseCombinedVocabData);
                     return;
                 }
             }
@@ -73,12 +76,20 @@ namespace FuzzPhyte.XR
         /// <param name="typingData">VocabTag Data</param>
         /// <param name="lang">Language Request</param>
         /// <param name="useDefinition">Vocab or definition</param>
-        public void StartTypingEffect(FPVocabTagDisplay typingData,FP_Language lang,bool useDefinition=false, bool replaceFontVisual=false)
+        public void StartTypingEffect(FPVocabTagDisplay typingData,FP_Language lang,bool useDefinition=false, bool replaceFontVisual=false, bool useSupportData=false)
         {
             TypingData = typingData;
-            var theClip = TypingData.SetAndReturnClip(lang, useDefinition);
+            AudioClip[] theClip = null;
+            //TypingData.SetAndReturnClip(lang, useDefinition);
             string txtContent = string.Empty;
             string rplFont = string.Empty;
+
+            // use support language or not
+            if (useSupportData)
+            {
+                Debug.LogWarning($"we are setting the combined data to true on your behalf now");
+                TypingData.UseCombinedVocabData = true;
+            }
             if (useDefinition)
             {
                 txtContent = TypingData.ReturnDefinition(lang);
@@ -86,19 +97,37 @@ namespace FuzzPhyte.XR
                 {
                     rplFont = TypingData.TertiaryTextDisplay.text;
                 }
+                if (useSupportData)
+                {
+                    theClip = TypingData.SetAndReturnClipArray(lang, true);
+                }
+                else
+                {
+                    theClip = new AudioClip[1];
+                    theClip[0] = TypingData.SetAndReturnClip(lang, true);
+                }
                 StartTypingEffect(TypingData.TertiaryTextDisplay, txtContent, theClip, rplFont);
             }
             else
             {
-                txtContent= TypingData.ReturnVocab(lang);
+                txtContent = TypingData.ReturnVocab(lang);
                 if (replaceFontVisual)
                 {
                     rplFont = TypingData.SecondaryTextDisplay.text;
                 }
+                if (useSupportData)
+                {
+                    theClip = TypingData.SetAndReturnClipArray(lang, false);
+                }
+                else
+                {
+                    theClip = new AudioClip[1];
+                    theClip[0] = TypingData.SetAndReturnClip(lang, false);
+                }
                 StartTypingEffect(TypingData.SecondaryTextDisplay, txtContent, theClip, rplFont);
             }
         }
-        public void StartTypingEffect(TMP_Text TxtComponent, string Txt, AudioClip audioFile, string startingTxt = "")
+        public void StartTypingEffect(TMP_Text TxtComponent, string Txt, AudioClip[] audioFile, string startingTxt = "")
         {
             if (!TypingData.RenderersActive)
             {
@@ -110,25 +139,66 @@ namespace FuzzPhyte.XR
             }
             typingCoroutine = StartCoroutine(TypeText(TxtComponent,Txt,audioFile, startingTxt));
         }
-        protected IEnumerator TypeText(TMP_Text textComponent,string fullText,AudioClip aFile, string startingText="")
+        protected IEnumerator TypeText(TMP_Text textComponent,string fullText,AudioClip[] aFile, string startingText="")
         {
-            AudioSource.clip = aFile;
-            AudioSource.Play();
-            yield return new WaitForEndOfFrame();
-            float clipLength = aFile.length;
-            Debug.LogWarning($"Clip Length: {clipLength}");
-            while (AudioSource.isPlaying)
-            {
-                float normalizedTime = AudioSource.time / clipLength;
-                //Debug.Log($"normalized time: {normalizedTime}");
-                float charIndexPosition = TypingCurve.Evaluate(normalizedTime);
+            //build out an estimate of length
+            var estimateLength = 0f;
+            var runningLoopTime = 0f;
+            AudioSource.clip = aFile[0];
+            List<float>clipStartTimes = new List<float>();
+            List<AudioClip> clipArrays = new List<AudioClip>();
 
+            clipStartTimes.Add(0f);
+            if (aFile.Length > 1)
+            {
+                for(int i=0; i < aFile.Length; i++)
+                {
+                    estimateLength += aFile[i].length;
+                    var clipStartTime = aFile[i].length;
+                    clipArrays.Add(aFile[i]);
+                    if (i < aFile.Length - 1)
+                    {
+                        //add in gap time
+                        estimateLength+=TimeBetweenClips;
+                        clipStartTimes.Add(clipStartTime+TimeBetweenClips);
+                    }
+                }
+            }
+            else
+            {
+                if (aFile.Length == 1)
+                {
+                    estimateLength = aFile[0].length;
+                    clipArrays.Add(aFile[0]);
+                }
+                else
+                {
+                    yield break;
+                }
+            }
+
+            yield return new WaitForEndOfFrame();
+            // float clipLength = estimateLength;
+            Debug.LogWarning($"Clip Length: {estimateLength}");
+            while(runningLoopTime < estimateLength)
+            {
+                runningLoopTime += Time.deltaTime;
+                float normalizedTime = runningLoopTime / estimateLength;
+                float charIndexPosition = TypingCurve.Evaluate(normalizedTime);
                 int characterCount = Mathf.FloorToInt(charIndexPosition * fullText.Length);
                 int startingTextCount = Mathf.FloorToInt(charIndexPosition * startingText.Length);
-                var startStringPartial = startingText.Substring(startingTextCount, startingText.Length-startingTextCount);
-               
+                var startStringPartial = startingText.Substring(startingTextCount, startingText.Length - startingTextCount);
                 textComponent.text = fullText.Substring(0, characterCount) + startStringPartial;
-
+                if(runningLoopTime >= clipStartTimes[0])
+                {
+                    if(clipArrays[0].length > 0)
+                    {
+                        AudioSource.clip = clipArrays[0];
+                        AudioSource.Play();
+                        clipStartTimes.RemoveAt(0);
+                        clipArrays.RemoveAt(0);
+                    }
+                }
                 yield return new WaitForEndOfFrame();
             }
 

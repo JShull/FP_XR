@@ -7,7 +7,6 @@ namespace FuzzPhyte.XR
     using UnityEngine;
     using UnityEngine.Events;
     using System.Collections.Generic;
-    using static FuzzPhyte.XR.FPXRControllerFeedback;
 
     public static class FPXRUtility
     {
@@ -168,11 +167,18 @@ namespace FuzzPhyte.XR
         [Space]
         public FP_Tag TagData;
         public FP_Vocab VocabData;
+        public List<XRVocabSupportData> SupportVocabData;
         public FP_Theme ThemeData;
+    }
+    [Serializable]
+    public struct XRVocabSupportData
+    {
+        public FP_Vocab SupportData;
+        public FP_VocabSupport SupportCategory;
     }
     public interface IFPXRLabel
     {
-        void SetupLabelData(XRDetailedLabelData data, FP_Language startingLanguage, bool startActive=true);
+        void SetupLabelData(XRDetailedLabelData data, FP_Language startingLanguage, bool startActive=true, bool useCombinedVocab=false);
         string DisplayVocabTranslation(FP_Language language=FP_Language.USEnglish);
         void ShowAllRenderers(bool status);
     }
