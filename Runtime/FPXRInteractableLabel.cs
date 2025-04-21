@@ -5,6 +5,7 @@ namespace FuzzPhyte.XR
     using TMPro;
     using UnityEngine;
     using System.Collections.Generic;
+
     public class FPXRInteractableLabel : MonoBehaviour, IFPXRLabel
     {
         public GameObject ParentLabelRef;
@@ -38,9 +39,18 @@ namespace FuzzPhyte.XR
             labelTag.ApplyVocabTextData(LabelText,UseCombinedVocabData);
         }
 
-        public void ShowAllRenderers(bool status)
+        public virtual bool ShowAllRenderers(bool status)
         {
             //not sure on this item
+            return false;
+        }
+        public virtual void ForceShowRenderer()
+        {
+
+        }
+        public virtual void ForceHideRenderer()
+        {
+
         }
     }
 }

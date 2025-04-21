@@ -180,7 +180,9 @@ namespace FuzzPhyte.XR
     {
         void SetupLabelData(XRDetailedLabelData data, FP_Language startingLanguage, bool startActive=true, bool useCombinedVocab=false);
         string DisplayVocabTranslation(FP_Language language=FP_Language.USEnglish);
-        void ShowAllRenderers(bool status);
+        bool ShowAllRenderers(bool status);
+        void ForceShowRenderer();
+        void ForceHideRenderer();
     }
     /// <summary>
     /// Help manage delegate/event requirements for Controllers and Button Events

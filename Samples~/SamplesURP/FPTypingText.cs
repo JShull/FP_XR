@@ -5,7 +5,6 @@ namespace FuzzPhyte.XR
     using System.Collections;
     using TMPro;
     using UnityEngine;
-
     public class FPTypingText : MonoBehaviour
     {
         public FPVocabTagDisplay TypingData;
@@ -51,11 +50,17 @@ namespace FuzzPhyte.XR
         {
             StartTypingEffect(lang, false);
         }
-        public void StartTypingEffect(FP_Language lang, bool useDefinition = false)
+        protected virtual void StartTypingEffect(FP_Language lang, bool useDefinition = false)
         {
+            //check typingData min cool down
             if (TypingData != null)
             {
-                StartTypingEffect(TypingData, lang, useDefinition, TextTypeReplace, UseCombinedVocabData);
+                //StartTypingEffect(TypingData, lang, useDefinition, TextTypeReplace, UseCombinedVocabData);
+                if (TypingData.CheckMinCooldownTime())
+                {
+                    TypingData.ForceShowRenderer();
+                    StartTypingEffect(TypingData, lang, useDefinition, TextTypeReplace);
+                }
                 return;
             }
             else
@@ -64,7 +69,16 @@ namespace FuzzPhyte.XR
                 if (gameObject.GetComponent<FPVocabTagDisplay>())
                 {
                     TypingData = gameObject.GetComponent<FPVocabTagDisplay>();
-                    StartTypingEffect(TypingData,lang, useDefinition, TextTypeReplace, UseCombinedVocabData);
+                    if(TypingData!=null)
+                    {
+                    //StartTypingEffect(TypingData,lang, useDefinition, TextTypeReplace, UseCombinedVocabData);
+                        if (TypingData.CheckMinCooldownTime())
+                        {
+                            TypingData.ForceShowRenderer();
+                            StartTypingEffect(TypingData, lang, useDefinition, TextTypeReplace);
+                        } 
+                    }
+                    
                     return;
                 }
             }

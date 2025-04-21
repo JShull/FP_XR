@@ -30,6 +30,10 @@ namespace FuzzPhyte.XR
         public FP_Theme ThemeData;
         public bool UseCombinedVocabData = false;
         public FP_Language AudioStartLanguage;
+        [Tooltip("Amount of time before we will fire off another tag display")]
+        [Range(1,20)]
+        public float MinTimeBetweenEvents = 3f;
+        protected float lastTimeSinceEvent = 0;
         public bool SetupOnStart = true;
         public bool HideOnStart = false;
         [Tooltip("All renderers associated with this tag")]
@@ -138,9 +142,22 @@ namespace FuzzPhyte.XR
         {
             return DisplayVocabTranslation(SecondaryTextDisplay, choice,UseCombinedVocabData);
         }
-        public virtual void ShowAllRenderers(bool status)
+        public virtual bool ShowAllRenderers(bool status)
         {
-            HideShowAllRenderers(status);
+            if (CheckMinCooldownTime())
+            {
+                HideShowAllRenderers(status);
+                return true;
+            }
+            return false;
+        }
+        public virtual void ForceShowRenderer()
+        {
+            HideShowAllRenderers(true);
+        }
+        public virtual void ForceHideRenderer()
+        {
+            HideShowAllRenderers(false);
         }
         #endregion
         protected virtual void Setup(FP_Tag tag, FP_Vocab vocab, FP_Theme theme, FP_Language startLanguage, List<XRVocabSupportData> supportVocabData, bool display =false)
@@ -206,8 +223,27 @@ namespace FuzzPhyte.XR
         
         public virtual string DisplayVocabTranslation(TMP_Text textDisplay,FP_Language choice, bool useCombinedVocab)
         {
-            DisplayTranslationEvent.Invoke();
-            return labelTag.ApplyVocabTranslationTextData(textDisplay, choice, useCombinedVocab);
+            //return labelTag.ApplyVocabTranslationTextData(textDisplay, choice, useCombinedVocab);
+            if (CheckMinCooldownTime())
+            {
+                DisplayTranslationEvent.Invoke();
+                return  labelTag.ApplyVocabTranslationTextData(textDisplay, choice, useCombinedVocab);
+            }
+            return "";
+            
+        }
+        /// <summary>
+        /// Quick time check since last event
+        /// </summary>
+        /// <returns></returns>
+        public bool CheckMinCooldownTime()
+        {
+            if (Time.time - lastTimeSinceEvent > MinTimeBetweenEvents)
+            {
+                lastTimeSinceEvent = Time.time;
+                return true;
+            }
+            return false;
         }
         /// <summary>
         /// Returns the definition or translation based on the language requested

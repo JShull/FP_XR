@@ -36,6 +36,8 @@ namespace FuzzPhyte.XR
         [Tooltip("Managing cache for RB settings")]
         protected bool _isKinematic;
         protected bool _useGravity;
+        protected float lastTimeTimerRan;
+        protected float lastTimerValue;
         #region FP Related
         [Space]
         [Header("FP Data")]
@@ -329,20 +331,40 @@ namespace FuzzPhyte.XR
         {
             for (int i = 0; i < LabelInterfaces.Count; i++)
             {
-                LabelInterfaces[i].ShowAllRenderers(false);
+                LabelInterfaces[i].ForceHideRenderer();
             }
             DetailedLabelDeactivated.Invoke();
         }
         public virtual void ActivateDetailedLabelTimer(float time)
         {
-            for (int i = 0; i < LabelInterfaces.Count; i++) 
-            {
-                LabelInterfaces[i].ShowAllRenderers(true);
-                
-            }
             if (FP_Timer.CCTimer != null)
             {
-                FP_Timer.CCTimer.StartTimer(time, () => { DeactivateAllLabels(); });
+                if(Time.time-lastTimeTimerRan> lastTimerValue)
+                {
+                    //timer has already deactivated by now
+                    FP_Timer.CCTimer.StartTimer(time, () => { DeactivateAllLabels(); });
+                    lastTimeTimerRan = Time.time;
+                    lastTimerValue = time;
+                }
+                else
+                {
+                    //already have a timer in the queue
+                    Debug.LogWarning($"Already have a timer in the queue! - should be running at {lastTimeTimerRan + lastTimerValue}");
+                }
+            }
+        }
+        public virtual void ShowAllTheRenderers()
+        {
+            for (int i = 0; i < LabelInterfaces.Count; i++)
+            {
+                LabelInterfaces[i].ShowAllRenderers(true);
+            }
+        }
+        public virtual void HideAllTheRenderers()
+        {
+            for (int i = 0; i < LabelInterfaces.Count; i++)
+            {
+                LabelInterfaces[i].ShowAllRenderers(false);
             }
         }
         public virtual void DetailedLabelVocabTranslationDisplay()
