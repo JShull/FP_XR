@@ -16,7 +16,7 @@ None
 ### 0.5.0 Changed
 
 - [@JShull](https://github.com/jshull).
-  - 
+  - FPWorldItem across FPVocabTagDisplay and others now supports an array building sequence for AudioClips
 
 ## [0.4.0] - 2025-03-25
 
