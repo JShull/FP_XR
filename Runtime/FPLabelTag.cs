@@ -353,6 +353,10 @@ namespace FuzzPhyte.XR
         public (bool,AudioClip[]) ReturnAudioArray(FP_Language language, ref AudioType audioType, bool useDefinition = false,bool useTranslation = false)
         {
             //build order by language
+            if(allVocabCombined == null)
+            {
+                SetupCombinedVocabulary(language);
+            }
             AudioClip[] audioClips = new AudioClip[allVocabCombined.Count];
            
             if (!useTranslation)
