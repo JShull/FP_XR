@@ -59,7 +59,7 @@ namespace FuzzPhyte.XR
                 if (TypingData.CheckMinCooldownTime())
                 {
                     TypingData.ForceShowRenderer();
-                    StartTypingEffect(TypingData, lang, useDefinition, TextTypeReplace);
+                    StartTypingEffect(TypingData, lang, useDefinition, TextTypeReplace, UseCombinedVocabData);
                 }
                 return;
             }
@@ -75,7 +75,7 @@ namespace FuzzPhyte.XR
                         if (TypingData.CheckMinCooldownTime())
                         {
                             TypingData.ForceShowRenderer();
-                            StartTypingEffect(TypingData, lang, useDefinition, TextTypeReplace);
+                            StartTypingEffect(TypingData, lang, useDefinition, TextTypeReplace,UseCombinedVocabData);
                         } 
                     }
                     
