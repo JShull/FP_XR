@@ -368,10 +368,12 @@ namespace FuzzPhyte.XR
             if (choice == VocabData.Language)
             {
                 //don't use translation as these match just use the data and avoid translation data
+                Debug.LogWarning($"Had a match on what we started with, no translation needed");
                 return SetupAudioClipArray(choice, useDefinition, false);
             }
             else
             {
+                Debug.LogWarning($"Didn't have a match on what we started with, translation needed! {choice.ToString()}");
                 return SetupAudioClipArray(choice, useDefinition, true);
             }
         }
