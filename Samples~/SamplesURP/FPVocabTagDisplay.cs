@@ -144,8 +144,10 @@ namespace FuzzPhyte.XR
                     }
                 }
             }
-
-            HideShowAllRenderers(!HideOnStart);
+            if (HideOnStart)
+            {
+                ForceHideRenderer();
+            }  
         }
         #region Interface Requirements
         public void SetupLabelData(XRDetailedLabelData data, FP_Language startingLanguage, bool startActive, bool useCombinedVocab)
@@ -221,7 +223,14 @@ namespace FuzzPhyte.XR
                     SetupAudioClip(AudioStartLanguage, false, false);
                 }
             }
-            HideShowAllRenderers(display);
+            if (display)
+            {
+                ForceShowRenderer();
+            }
+            else
+            {
+                ForceHideRenderer();
+            }
         }
         public virtual void DisplayTag()
         {
@@ -262,6 +271,7 @@ namespace FuzzPhyte.XR
         /// <returns></returns>
         public bool CheckMinCooldownTime()
         {
+            Debug.LogWarning($"Check Min CoolDown Time!");
             if (Time.time - lastTimeSinceEvent > MinTimeBetweenEvents)
             {
                 lastTimeSinceEvent = Time.time;

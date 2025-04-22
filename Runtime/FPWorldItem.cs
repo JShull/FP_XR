@@ -36,8 +36,8 @@ namespace FuzzPhyte.XR
         [Tooltip("Managing cache for RB settings")]
         protected bool _isKinematic;
         protected bool _useGravity;
-        protected float lastTimeTimerRan;
-        protected float lastTimerValue;
+        protected float lastTimeTimerRan=0;
+        protected float lastTimerValue=0;
         #region FP Related
         [Space]
         [Header("FP Data")]
@@ -345,11 +345,12 @@ namespace FuzzPhyte.XR
                     FP_Timer.CCTimer.StartTimer(time, () => { DeactivateAllLabels(); });
                     lastTimeTimerRan = Time.time;
                     lastTimerValue = time;
+                    Debug.LogWarning($"Timer Activated, Last Time Timer Ran = {lastTimerValue.ToString()}, Last Timer Value = {lastTimerValue}");
                 }
                 else
                 {
                     //already have a timer in the queue
-                    Debug.LogWarning($"Already have a timer in the queue! - should be running at {lastTimeTimerRan + lastTimerValue}");
+                    Debug.LogWarning($"Already have a timer for deactivating in the queue! - should be running at {lastTimeTimerRan + lastTimerValue}");
                 }
             }
         }
