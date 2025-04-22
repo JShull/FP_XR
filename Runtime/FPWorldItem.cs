@@ -345,12 +345,12 @@ namespace FuzzPhyte.XR
                     FP_Timer.CCTimer.StartTimer(time, () => { DeactivateAllLabels(); });
                     lastTimeTimerRan = Time.time;
                     lastTimerValue = time;
-                    Debug.LogWarning($"Timer Activated, Last Time Timer Ran = {lastTimerValue.ToString()}, Last Timer Value = {lastTimerValue}");
+                    Debug.LogWarning($"Timer Activated, Last Time Timer Ran = {lastTimeTimerRan.ToString()}, Last Timer Value = {lastTimerValue}");
                 }
                 else
                 {
                     //already have a timer in the queue
-                    Debug.LogWarning($"Already have a timer for deactivating in the queue! - should be running at {lastTimeTimerRan + lastTimerValue}");
+                    Debug.LogWarning($"Already have a timer for deactivating in the queue! - should be running at {lastTimeTimerRan + lastTimerValue} - and we are currently at {Time.time}");
                 }
             }
         }
