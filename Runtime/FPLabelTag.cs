@@ -109,7 +109,6 @@ namespace FuzzPhyte.XR
                     categoryOrder = rules.SortOrder
                         .Select((cat, index) => new { cat, index })
                         .ToDictionary(x => x.cat, x => x.index);
-
                     var sorted = vocabSupportData
                         .OrderBy(v => categoryOrder.GetValueOrDefault(v.SupportCategory, int.MaxValue))
                         .Select(v => v.SupportData);
@@ -122,7 +121,6 @@ namespace FuzzPhyte.XR
                     categoryOrder = rules.SortOrder
                         .Select((cat, index) => new { cat, index })
                         .ToDictionary(x => x.cat, x => x.index);
-
                     var preES = vocabSupportData
                         .Where(v => rules.PreNounCategories.Contains(v.SupportCategory))
                         .OrderBy(v => categoryOrder.GetValueOrDefault(v.SupportCategory, int.MaxValue))
@@ -138,7 +136,6 @@ namespace FuzzPhyte.XR
                     allVocabCombined.AddRange(postES);
                     break;
                 case FP_Language.French:
-                    // Define categories that typically precede the noun
                     rules = FPLanguageUtility.FrenchRules;
                     categoryOrder = rules.SortOrder
                         .Select((cat, index) => new { cat, index })
@@ -457,9 +454,7 @@ namespace FuzzPhyte.XR
             {
                 vocabDisplay.text = vocabData.Word;
                 return vocabDisplay.text;
-            }
-                
-            
+            } 
         }
         public string ApplyDefinitionTextData(TMP_Text defnDisplay, bool useCombined=false)
         {

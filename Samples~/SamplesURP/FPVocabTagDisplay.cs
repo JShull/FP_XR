@@ -7,6 +7,7 @@ namespace FuzzPhyte.XR
     using FuzzPhyte.Utility;
     using UnityEngine.Events;
     using System.Collections.Generic;
+    using System;
 
     /// <summary>
     /// Mono Wrapper Class for FPLabelTag and for connecting various events, visuals etc.
@@ -122,8 +123,14 @@ namespace FuzzPhyte.XR
                     {
                         if(SupportData.Count > 0)
                         {
-                            audioClipArray = new AudioClip[SupportData.Count];
-                            audioClipArray = SetupAudioClipArray(AudioStartLanguage, false, false);
+                            var returnClipArray = SetupAudioClipArray(AudioStartLanguage, false, false);
+                            if (returnClipArray==null)
+                            {
+                                Debug.LogError($"Null return audio clip, something is up!");
+                                return;
+                            }
+                            audioClipArray = new AudioClip[returnClipArray.Length];
+                            Array.Copy(returnClipArray,audioClipArray,returnClipArray.Length);
                         }
                         SetupAudioClip(AudioStartLanguage, false, false);
                     }
