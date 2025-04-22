@@ -99,7 +99,15 @@ namespace FuzzPhyte.XR
         {
             if (SetupOnStart)
             {
-                labelTag = new FPLabelTag(TagData, VocabData, ThemeData);
+                if (UseCombinedVocabData)
+                {
+                    labelTag = new FPLabelTag(TagData, VocabData, ThemeData, SupportData);
+                }
+                else
+                {
+                    labelTag = new FPLabelTag(TagData, VocabData, ThemeData);
+                }
+                   
                 pivotLocation = ReturnPivotLocation();
                 if (AttachmentLocation != null)
                 {
@@ -143,7 +151,7 @@ namespace FuzzPhyte.XR
         public void SetupLabelData(XRDetailedLabelData data, FP_Language startingLanguage, bool startActive, bool useCombinedVocab)
         {
             UseCombinedVocabData = useCombinedVocab;
-            Setup(data.TagData, data.VocabData, data.ThemeData, startingLanguage, data.SupportVocabData,startActive);
+            Setup(data.TagData, data.VocabData, data.ThemeData, startingLanguage, data.SupportVocabData, UseCombinedVocabData,startActive);
         }
         public virtual string DisplayVocabTranslation(FP_Language choice)
         {
@@ -167,13 +175,22 @@ namespace FuzzPhyte.XR
             HideShowAllRenderers(false);
         }
         #endregion
-        protected virtual void Setup(FP_Tag tag, FP_Vocab vocab, FP_Theme theme, FP_Language startLanguage, List<XRVocabSupportData> supportVocabData, bool display =false)
+        protected virtual void Setup(FP_Tag tag, FP_Vocab vocab, FP_Theme theme, FP_Language startLanguage, List<XRVocabSupportData> supportVocabData, bool useSupportVocabData,bool display =false)
         {
             TagData = tag;
             VocabData = vocab;
             ThemeData = theme;
-            SupportData = new List<XRVocabSupportData>();
-            SupportData.AddRange(supportVocabData);
+            
+            if (supportVocabData.Count > 0)
+            {
+                SupportData = new List<XRVocabSupportData>();
+                SupportData.AddRange(supportVocabData);
+            }
+            UseCombinedVocabData = useSupportVocabData;
+            if (this.gameObject.GetComponent<FPTypingText>())
+            {
+                this.gameObject.GetComponent<FPTypingText>().UseCombinedVocabData = UseCombinedVocabData;
+            }
             AudioStartLanguage = startLanguage;
             labelTag = new FPLabelTag(TagData, VocabData, ThemeData, SupportData);
             pivotLocation = ReturnPivotLocation();
