@@ -41,8 +41,8 @@ namespace FuzzPhyte.XR
         #region FP Related
         [Space]
         [Header("FP Data")]
-        [Tooltip("Generic Data Object")]
-        public FP_Data TheFPData;
+        //[Tooltip("Generic Data Object")]
+        //public FP_Data TheFPData;
         [Tooltip("Place to centralize all the data for this item")]
         public XRDetailedLabelData DetailedLabelData;
         public FP_Language StartingFPLanguage;
