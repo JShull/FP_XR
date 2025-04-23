@@ -1,6 +1,8 @@
 namespace FuzzPhyte.XR
 {
     using UnityEngine;
+    using UnityEngine.Events;
+
     [ExecuteInEditMode]
     public class FPSocket : MonoBehaviour
     {
@@ -15,6 +17,10 @@ namespace FuzzPhyte.XR
         public XRInteractorState SocketStatus;
         public XRInteractorState SpaceTaken;
         public bool SetupOnStart=true;
+        [Space]
+        [Header("Unity Events")]
+        public UnityEvent OnSocketGivenItem;
+        public UnityEvent OnSocketRemovedItem;
         /// <summary>
         /// Main setup point for our FPSocket
         /// </summary>
@@ -87,6 +93,7 @@ namespace FuzzPhyte.XR
                         SpaceTaken = XRInteractorState.IsOccupied;
                         LinkItem(worldItem);
                         bitItem.SetInSocket(this);
+                        
                         return true;
                     }
                     else
@@ -149,6 +156,7 @@ namespace FuzzPhyte.XR
             //pop from hand?
             currentItem = item;
             currentItem.LinkSocket(this);
+            OnSocketGivenItem.Invoke();
         }
 
         protected virtual void UnLinkItem(bool isBit = false)
@@ -163,6 +171,7 @@ namespace FuzzPhyte.XR
                 {
                     currentItem = null;
                 }
+                OnSocketRemovedItem.Invoke();
             }
         }
 
