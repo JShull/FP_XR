@@ -14,13 +14,14 @@ namespace FuzzPhyte.XR
         public FPXRSocketTag SocketRequirement;
         public XRInteractorState SocketStatus;
         public XRInteractorState SpaceTaken;
+        public bool SetupOnStart=true;
         /// <summary>
         /// Main setup point for our FPSocket
         /// </summary>
         /// <param name="index"></param>
         /// <param name="position"></param>
         /// <param name="theCase"></param>
-        public void PositionInCase(int index, Vector3 position, FPXRCase theCase)
+        public virtual void PositionInCase(int index, Vector3 position, FPXRCase theCase=null)
         {
             socketIndex = index;
             this.transform.position = position;
@@ -28,15 +29,18 @@ namespace FuzzPhyte.XR
         }
         protected virtual void Start()
         {
-            socketCollider = GetComponent<Collider>();
-            if (socketCollider == null || !socketCollider.isTrigger)
+            if (SetupOnStart)
             {
-                Debug.LogError($"Socket at index {socketIndex} requires a trigger collider.");
+                socketCollider = GetComponent<Collider>();
+                if (socketCollider == null || !socketCollider.isTrigger)
+                {
+                    Debug.LogError($"Socket at index {socketIndex} requires a trigger collider.");
+                }
+                SpaceTaken = XRInteractorState.Open;
+                SocketStatus = XRInteractorState.None;
             }
-            SpaceTaken = XRInteractorState.Open;
-            SocketStatus = XRInteractorState.None;
         } 
-        public bool GivenItem(FPWorldItem item)
+        public virtual bool GivenItem(FPWorldItem item)
         {
             //Are we open?
             if(SpaceTaken != XRInteractorState.Open)
@@ -97,7 +101,7 @@ namespace FuzzPhyte.XR
             }
             return false;
         }
-        public bool RemoveItem(FPWorldItem item){
+        public virtual bool RemoveItem(FPWorldItem item){
             //we do have something here
             if(SpaceTaken == XRInteractorState.IsOccupied)
             {
@@ -145,7 +149,6 @@ namespace FuzzPhyte.XR
             //pop from hand?
             currentItem = item;
             currentItem.LinkSocket(this);
-            
         }
 
         protected virtual void UnLinkItem(bool isBit = false)
