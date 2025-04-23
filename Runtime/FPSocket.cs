@@ -3,7 +3,6 @@ namespace FuzzPhyte.XR
     using UnityEngine;
     using UnityEngine.Events;
 
-    [ExecuteInEditMode]
     public class FPSocket : MonoBehaviour
     {
         public int socketIndex; // Index in the socketPositions array
