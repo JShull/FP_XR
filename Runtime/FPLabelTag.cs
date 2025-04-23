@@ -109,7 +109,6 @@ namespace FuzzPhyte.XR
                     categoryOrder = rules.SortOrder
                         .Select((cat, index) => new { cat, index })
                         .ToDictionary(x => x.cat, x => x.index);
-
                     var sorted = vocabSupportData
                         .OrderBy(v => categoryOrder.GetValueOrDefault(v.SupportCategory, int.MaxValue))
                         .Select(v => v.SupportData);
@@ -122,7 +121,6 @@ namespace FuzzPhyte.XR
                     categoryOrder = rules.SortOrder
                         .Select((cat, index) => new { cat, index })
                         .ToDictionary(x => x.cat, x => x.index);
-
                     var preES = vocabSupportData
                         .Where(v => rules.PreNounCategories.Contains(v.SupportCategory))
                         .OrderBy(v => categoryOrder.GetValueOrDefault(v.SupportCategory, int.MaxValue))
@@ -138,7 +136,6 @@ namespace FuzzPhyte.XR
                     allVocabCombined.AddRange(postES);
                     break;
                 case FP_Language.French:
-                    // Define categories that typically precede the noun
                     rules = FPLanguageUtility.FrenchRules;
                     categoryOrder = rules.SortOrder
                         .Select((cat, index) => new { cat, index })
@@ -219,22 +216,62 @@ namespace FuzzPhyte.XR
                             {
                                 if (j == allVocabCombined.Count - 1)
                                 {
-                                    combinedWords += allVocabCombined[j].Translations[i].Definition;
+                                    var curFPWord = allVocabCombined[j];
+                                    (bool success, FP_Vocab returnWord) = curFPWord.ReturnTranslatedFPVocab(language);
+                                    if (success)
+                                    {
+                                        combinedWords += returnWord.Definition;
+                                    }
+                                    else
+                                    {
+                                        Debug.LogError($"Missing translation for {allVocabCombined[j]} for {language}");
+                                        combinedWords += " ... ";
+                                    }
                                 }
                                 else
                                 {
-                                    combinedWords += allVocabCombined[j].Translations[i].Definition + " ";
+                                    var curFPWord = allVocabCombined[j];
+                                    (bool success, FP_Vocab returnWord) = curFPWord.ReturnTranslatedFPVocab(language);
+                                    if (success)
+                                    {
+                                        combinedWords += returnWord.Definition + " ";
+                                    }
+                                    else
+                                    {
+                                        Debug.LogError($"Missing translation for {allVocabCombined[j]} for {language}");
+                                        combinedWords += " ... ";
+                                    }
                                 }
                             }
                             else
                             {
                                 if (j == allVocabCombined.Count - 1)
                                 {
-                                    combinedWords += allVocabCombined[j].Translations[i].Word;
+                                    var curFPWord = allVocabCombined[j];
+                                    (bool success, FP_Vocab returnWord) = curFPWord.ReturnTranslatedFPVocab(language);
+                                    if (success)
+                                    {
+                                        combinedWords += returnWord.Word;
+                                    }
+                                    else
+                                    {
+                                        Debug.LogError($"Missing translation for {allVocabCombined[j]} for {language}");
+                                        combinedWords += " ... ";
+                                    }
                                 }
                                 else
                                 {
-                                    combinedWords += allVocabCombined[j].Translations[i].Word + " ";
+                                    var curFPWord = allVocabCombined[j];
+                                    (bool success, FP_Vocab returnWord) = curFPWord.ReturnTranslatedFPVocab(language);
+                                    if (success)
+                                    {
+                                        combinedWords += returnWord.Word + " ";
+                                    }
+                                    else
+                                    {
+                                        Debug.LogError($"Missing translation for {allVocabCombined[j]} for {language}");
+                                        combinedWords += " ... ";
+                                    }
                                 }
                             }
                             
@@ -388,6 +425,7 @@ namespace FuzzPhyte.XR
             }
             else
             {
+                //use translation
                 for (int i = 0; i < vocabData.Translations.Count; i++)
                 {
                     if (vocabData.Translations[i].Language == language)
@@ -401,14 +439,31 @@ namespace FuzzPhyte.XR
                             {
                                 for (int j = 0; j < allVocabCombined.Count; j++)
                                 {
-                                    audioClips[j] = allVocabCombined[j].DefinitionAudio.AudioClip;
+                                    (bool success, FP_Vocab curTranslationFPVocab) = allVocabCombined[j].ReturnTranslatedFPVocab(language);
+                                    //translate
+                                    if (success)
+                                    {
+                                        audioClips[j] = curTranslationFPVocab.DefinitionAudio.AudioClip;
+                                    }
+                                    else
+                                    {
+                                        Debug.LogError($"Missing defn audio/translation for {allVocabCombined[j].Definition} missing the {language} language translation");
+                                    }
                                 }
                             }
                             else
                             {
                                 for (int j = 0; j < allVocabCombined.Count; j++)
                                 {
-                                    audioClips[j] = allVocabCombined[j].WordAudio.AudioClip;
+                                    (bool success, FP_Vocab curTranslationFPVocab) = allVocabCombined[j].ReturnTranslatedFPVocab(language);
+                                    if (success)
+                                    {
+                                        audioClips[j] = curTranslationFPVocab.WordAudio.AudioClip;
+                                    }
+                                    else
+                                    {
+                                        Debug.LogError($"Missing word audio/translation for {allVocabCombined[j].Word} missing the {language} language translation");
+                                    }
                                 }
                             }
                             return (true,audioClips);
@@ -457,9 +512,7 @@ namespace FuzzPhyte.XR
             {
                 vocabDisplay.text = vocabData.Word;
                 return vocabDisplay.text;
-            }
-                
-            
+            } 
         }
         public string ApplyDefinitionTextData(TMP_Text defnDisplay, bool useCombined=false)
         {

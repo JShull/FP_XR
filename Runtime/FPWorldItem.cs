@@ -36,18 +36,18 @@ namespace FuzzPhyte.XR
         [Tooltip("Managing cache for RB settings")]
         protected bool _isKinematic;
         protected bool _useGravity;
-        protected float lastTimeTimerRan;
-        protected float lastTimerValue;
+        protected float lastTimeTimerRan=0;
+        protected float lastTimerValue=0;
         #region FP Related
         [Space]
         [Header("FP Data")]
-        [Tooltip("Generic Data Object")]
-        public FP_Data TheFPData;
+        //[Tooltip("Generic Data Object")]
+        //public FP_Data TheFPData;
         [Tooltip("Place to centralize all the data for this item")]
         public XRDetailedLabelData DetailedLabelData;
         public FP_Language StartingFPLanguage;
         public bool UseSupportCombinedVocabData = false;
-        //public bool StartDetailedLabelOnStart;
+        public bool StartDetailedLabelOnStart;
         public UnityEvent DetailedLabelActivated;
         public UnityEvent DetailedLabelDeactivated;
         [SerializeField] protected List<UnityEngine.Object> interfaceObjects = new List<UnityEngine.Object>();
@@ -252,7 +252,7 @@ namespace FuzzPhyte.XR
             //setup details on label if we have them
             for(int i = 0; i < LabelInterfaces.Count; i++)
             {
-                LabelInterfaces[i].SetupLabelData(DetailedLabelData, StartingFPLanguage, UseSupportCombinedVocabData);
+                LabelInterfaces[i].SetupLabelData(DetailedLabelData, StartingFPLanguage, StartDetailedLabelOnStart, UseSupportCombinedVocabData);
             }
         }
         public virtual void ResetLocation()
@@ -345,11 +345,12 @@ namespace FuzzPhyte.XR
                     FP_Timer.CCTimer.StartTimer(time, () => { DeactivateAllLabels(); });
                     lastTimeTimerRan = Time.time;
                     lastTimerValue = time;
+                    Debug.LogWarning($"Timer Activated, Last Time Timer Ran = {lastTimeTimerRan.ToString()}, Last Timer Value = {lastTimerValue}");
                 }
                 else
                 {
                     //already have a timer in the queue
-                    Debug.LogWarning($"Already have a timer in the queue! - should be running at {lastTimeTimerRan + lastTimerValue}");
+                    Debug.LogWarning($"Already have a timer for deactivating in the queue! - should be running at {lastTimeTimerRan + lastTimerValue} - and we are currently at {Time.time}");
                 }
             }
         }

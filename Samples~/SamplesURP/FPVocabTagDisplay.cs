@@ -7,6 +7,7 @@ namespace FuzzPhyte.XR
     using FuzzPhyte.Utility;
     using UnityEngine.Events;
     using System.Collections.Generic;
+    using System;
 
     /// <summary>
     /// Mono Wrapper Class for FPLabelTag and for connecting various events, visuals etc.
@@ -98,7 +99,15 @@ namespace FuzzPhyte.XR
         {
             if (SetupOnStart)
             {
-                labelTag = new FPLabelTag(TagData, VocabData, ThemeData);
+                if (UseCombinedVocabData)
+                {
+                    labelTag = new FPLabelTag(TagData, VocabData, ThemeData, SupportData);
+                }
+                else
+                {
+                    labelTag = new FPLabelTag(TagData, VocabData, ThemeData);
+                }
+                   
                 pivotLocation = ReturnPivotLocation();
                 if (AttachmentLocation != null)
                 {
@@ -122,21 +131,29 @@ namespace FuzzPhyte.XR
                     {
                         if(SupportData.Count > 0)
                         {
-                            audioClipArray = new AudioClip[SupportData.Count];
-                            audioClipArray = SetupAudioClipArray(AudioStartLanguage, false, false);
+                            var returnClipArray = SetupAudioClipArray(AudioStartLanguage, false, false);
+                            if (returnClipArray==null)
+                            {
+                                Debug.LogError($"Null return audio clip, something is up!");
+                                return;
+                            }
+                            audioClipArray = new AudioClip[returnClipArray.Length];
+                            Array.Copy(returnClipArray,audioClipArray,returnClipArray.Length);
                         }
                         SetupAudioClip(AudioStartLanguage, false, false);
                     }
                 }
             }
-
-            HideShowAllRenderers(!HideOnStart);
+            if (HideOnStart)
+            {
+                ForceHideRenderer();
+            }  
         }
         #region Interface Requirements
         public void SetupLabelData(XRDetailedLabelData data, FP_Language startingLanguage, bool startActive, bool useCombinedVocab)
         {
             UseCombinedVocabData = useCombinedVocab;
-            Setup(data.TagData, data.VocabData, data.ThemeData, startingLanguage, data.SupportVocabData,startActive);
+            Setup(data.TagData, data.VocabData, data.ThemeData, startingLanguage, data.SupportVocabData, UseCombinedVocabData,startActive);
         }
         public virtual string DisplayVocabTranslation(FP_Language choice)
         {
@@ -160,13 +177,22 @@ namespace FuzzPhyte.XR
             HideShowAllRenderers(false);
         }
         #endregion
-        protected virtual void Setup(FP_Tag tag, FP_Vocab vocab, FP_Theme theme, FP_Language startLanguage, List<XRVocabSupportData> supportVocabData, bool display =false)
+        protected virtual void Setup(FP_Tag tag, FP_Vocab vocab, FP_Theme theme, FP_Language startLanguage, List<XRVocabSupportData> supportVocabData, bool useSupportVocabData,bool display =false)
         {
             TagData = tag;
             VocabData = vocab;
             ThemeData = theme;
-            SupportData = new List<XRVocabSupportData>();
-            SupportData.AddRange(supportVocabData);
+            
+            if (supportVocabData.Count > 0)
+            {
+                SupportData = new List<XRVocabSupportData>();
+                SupportData.AddRange(supportVocabData);
+            }
+            UseCombinedVocabData = useSupportVocabData;
+            if (this.gameObject.GetComponent<FPTypingText>())
+            {
+                this.gameObject.GetComponent<FPTypingText>().UseCombinedVocabData = UseCombinedVocabData;
+            }
             AudioStartLanguage = startLanguage;
             labelTag = new FPLabelTag(TagData, VocabData, ThemeData, SupportData);
             pivotLocation = ReturnPivotLocation();
@@ -197,7 +223,14 @@ namespace FuzzPhyte.XR
                     SetupAudioClip(AudioStartLanguage, false, false);
                 }
             }
-            HideShowAllRenderers(display);
+            if (display)
+            {
+                ForceShowRenderer();
+            }
+            else
+            {
+                ForceHideRenderer();
+            }
         }
         public virtual void DisplayTag()
         {
@@ -238,6 +271,7 @@ namespace FuzzPhyte.XR
         /// <returns></returns>
         public bool CheckMinCooldownTime()
         {
+            Debug.LogWarning($"Check Min CoolDown Time!");
             if (Time.time - lastTimeSinceEvent > MinTimeBetweenEvents)
             {
                 lastTimeSinceEvent = Time.time;
@@ -334,10 +368,12 @@ namespace FuzzPhyte.XR
             if (choice == VocabData.Language)
             {
                 //don't use translation as these match just use the data and avoid translation data
+                Debug.LogWarning($"Had a match on what we started with, no translation needed");
                 return SetupAudioClipArray(choice, useDefinition, false);
             }
             else
             {
+                Debug.LogWarning($"Didn't have a match on what we started with, translation needed! {choice.ToString()}");
                 return SetupAudioClipArray(choice, useDefinition, true);
             }
         }
