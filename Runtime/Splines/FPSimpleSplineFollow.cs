@@ -13,7 +13,7 @@ namespace FuzzPhyte.XR
         public float speed = 0.1f; // Fraction of spline per second
         public Vector3 offsetFromPath = Vector3.zero;
 
-        private SplinePath path;
+        protected SplinePath path;
         private float t = 0f;
 
         void Start()
@@ -42,15 +42,12 @@ namespace FuzzPhyte.XR
 
         void Update()
         {
-            if (path == null || npc == null)
-                return;
-
             // Move along the path
             Vector3 position = path.EvaluatePosition(t);
             npc.transform.position = position + offsetFromPath;
 
             t += speed * Time.deltaTime;
-            if (t > 1f) t -= 1f; // Loop back to start
+            if (t > 1f) t = 0f;
         }
     }
 }
