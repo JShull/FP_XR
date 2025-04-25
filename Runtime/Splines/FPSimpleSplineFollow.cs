@@ -1,5 +1,6 @@
 namespace FuzzPhyte.XR
 {
+    using System.Linq;
     using UnityEngine;
     using UnityEngine.Splines;
     public class FPSimpleSplineFollow : MonoBehaviour
@@ -8,7 +9,9 @@ namespace FuzzPhyte.XR
         public GameObject npc;
         public SplineContainer splineContainer;
         public int splineIndex = 0;
-
+        [Tooltip("The count of segments to go through on the spline")]
+        public int splineRange = 1;
+        public bool AllRange = false;
         [Header("Movement Settings")]
         public float speed = 0.1f; // Fraction of spline per second
         public Vector3 offsetFromPath = Vector3.zero;
@@ -33,10 +36,15 @@ namespace FuzzPhyte.XR
 
             var spline = splineContainer.Splines[splineIndex];
             var transformMatrix = splineContainer.transform.localToWorldMatrix;
-
+            var numKnots = spline.Knots.ToList().Count;
+            if(AllRange)
+            {
+                splineRange = numKnots - 1;
+                Debug.LogWarning($"Using all range on count, entire spline in play: {splineRange}");
+            }
             path = new SplinePath(new[]
             {
-                new SplineSlice<Spline>(spline, new SplineRange(0, 1), transformMatrix)
+                new SplineSlice<Spline>(spline, new SplineRange(0, splineRange), transformMatrix)
             });
         }
 
