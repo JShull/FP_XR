@@ -166,6 +166,7 @@ namespace FuzzPhyte.XR
     {
         [Space]
         public FP_Tag TagData;
+        public FPXRSocketTag SocketTag;
         public FP_Vocab VocabData;
         public List<XRVocabSupportData> SupportVocabData;
         public FP_Theme ThemeData;
