@@ -52,5 +52,10 @@ namespace FuzzPhyte.XR
         {
 
         }
+
+        public void ReturnGameObject(ref GameObject returnedItem)
+        {
+            returnedItem = this.gameObject;
+        }
     }
 }

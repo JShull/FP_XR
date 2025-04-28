@@ -176,6 +176,12 @@ namespace FuzzPhyte.XR
         {
             HideShowAllRenderers(false);
         }
+        public virtual void ReturnGameObject(ref GameObject returnedItem)
+        {
+            returnedItem = this.gameObject;
+        }
+
+
         #endregion
         protected virtual void Setup(FP_Tag tag, FP_Vocab vocab, FP_Theme theme, FP_Language startLanguage, List<XRVocabSupportData> supportVocabData, bool useSupportVocabData,bool display =false)
         {
@@ -508,7 +514,7 @@ namespace FuzzPhyte.XR
             return pivot;
         }
 
-       
+        
         #endregion
     }
 

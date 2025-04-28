@@ -184,6 +184,7 @@ namespace FuzzPhyte.XR
         bool ShowAllRenderers(bool status);
         void ForceShowRenderer();
         void ForceHideRenderer();
+        void ReturnGameObject(ref GameObject returnedItem);
     }
     /// <summary>
     /// Help manage delegate/event requirements for Controllers and Button Events
