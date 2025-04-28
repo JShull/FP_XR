@@ -82,6 +82,7 @@ namespace FuzzPhyte.XR
         [Space]
         [SerializeField]
         protected FPSocket currentSocket;
+        public FPSocket CurrentSocket { get { return currentSocket; } } 
         [SerializeField]
         protected XRHandedness handState;
         public XRHandedness InHandState { get { return handState; } }
