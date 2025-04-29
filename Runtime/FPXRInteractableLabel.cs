@@ -53,9 +53,16 @@ namespace FuzzPhyte.XR
 
         }
 
-        public void ReturnGameObject(ref GameObject returnedItem)
+        public GameObject ReturnGameObject()
         {
-            returnedItem = this.gameObject;
+            return this.gameObject;
         }
+
+        public FPLabelTag ReturnDataObject()
+        {
+            return this.labelTag;
+        }
+
+       
     }
 }

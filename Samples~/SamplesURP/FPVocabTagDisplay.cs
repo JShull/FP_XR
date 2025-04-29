@@ -176,9 +176,13 @@ namespace FuzzPhyte.XR
         {
             HideShowAllRenderers(false);
         }
-        public virtual void ReturnGameObject(ref GameObject returnedItem)
+        public virtual GameObject ReturnGameObject()
         {
-            returnedItem = this.gameObject;
+            return this.gameObject;
+        }
+        public virtual FPLabelTag ReturnDataObject()
+        {
+            return labelTag;
         }
 
 

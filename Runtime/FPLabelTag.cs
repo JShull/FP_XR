@@ -36,6 +36,29 @@ namespace FuzzPhyte.XR
             SetupCombinedVocabulary(vocabData.Language);
         }
         /// <summary>
+        /// Only returns the first matching support category
+        /// </summary>
+        /// <param name="language"></param>
+        /// <param name="category"></param>
+        /// <returns></returns>
+        public AudioClip ReturnFirstMatchSupportAudio(FP_Language language, FP_VocabSupport category)
+        {
+            for(int i=0;i< vocabSupportData.Count; i++)
+            {
+                var curVocabCombined = vocabSupportData[i];
+                if (category == curVocabCombined.SupportCategory)
+                {
+                    //find correct language
+                    (bool success,FP_Vocab data) = curVocabCombined.SupportData.ReturnTranslatedFPVocab(language);
+                    if (success)
+                    {
+                        return data.WordAudio.AudioClip;
+                    }
+                }
+            }
+            return null;
+        }
+        /// <summary>
         /// Send the list of fonts for the display system you're using
         /// This function will make sure they have the correct settings by theme by FontSetingLabel based on order H1-H7
         /// </summary>
