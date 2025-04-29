@@ -97,7 +97,8 @@ namespace FuzzPhyte.XR
             //TypingData.SetAndReturnClip(lang, useDefinition);
             string txtContent = string.Empty;
             string rplFont = string.Empty;
-
+            //update our last language
+            CurrentLanguageSet = lang;
             // use support language or not
             if (useSupportData)
             {
