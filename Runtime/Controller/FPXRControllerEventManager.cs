@@ -387,6 +387,14 @@ namespace FuzzPhyte.XR
             controllerDelegates.Clear();
         }
         #endregion
+        public void EnforceLock()
+        {
+            enforceLockState = true;
+        }
+        public void DisableEnforcedLock()
+        {
+            enforceLockState = false;
+        }
         #region Public Methods & Functions for Button States, Locking, Info/Hints
         /// <summary>
         /// Reset and load both controllers

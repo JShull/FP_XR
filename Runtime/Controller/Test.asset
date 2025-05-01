@@ -16,12 +16,4 @@ MonoBehaviour:
   ControllerStartHandedness: 0
   feedbacks: []
   DescriptionNotes: 
-  AcknowledgeSequence:
-  - Hand: 1
-    Button: 3
-    AutoHideHint: 0
-    StepNote: 
-  - Hand: 1
-    Button: 4
-    AutoHideHint: 0
-    StepNote: 
+  AcknowledgeSequence: []
