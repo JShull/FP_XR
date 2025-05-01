@@ -11,5 +11,7 @@ namespace FuzzPhyte.XR
         public List<ButtonFeedback> feedbacks;
         [TextArea(2, 4)]
         public string DescriptionNotes;
+        [Space]
+        public List<XRButtonHintStep> AcknowledgeSequence;
     }
 }

@@ -43,7 +43,8 @@ namespace FuzzPhyte.XR
         SecondaryButton = 4,
         Thumbstick = 5,
         MenuButton =6,
-        ExtraButton = 9
+        ExtraButton = 9,
+        All=99,
     }
     [Serializable]
     public enum XRInteractionStatus
@@ -90,6 +91,25 @@ namespace FuzzPhyte.XR
         SocketBit=5,
         Custom = 9
     }
+
+    [Serializable]
+    public struct XRButtonHintStep
+    {
+        public XRHandedness Hand;
+        public XRButton Button;
+        public bool AutoHideHint;
+        public Action OnStepAcknowledged;
+        [TextArea(1,3)]
+        public string StepNote;
+        public XRButtonHintStep(XRHandedness theHand, XRButton button, bool autoHideHint, Action onStepAcknowledged,string notes="Note?")
+        {
+            Hand = theHand;
+            Button = button;
+            AutoHideHint = autoHideHint;
+            OnStepAcknowledged = onStepAcknowledged;
+            StepNote = notes;
+        }
+    }
     [Serializable]
     public struct ContainerRequirementD
     {
@@ -105,6 +125,7 @@ namespace FuzzPhyte.XR
         public Vector3 ScaleAdjustment;
 
     }
+    [Serializable]
     public struct XRButtonData
     {
         public GameObject WorldItem;

@@ -1,9 +1,12 @@
 namespace FuzzPhyte.XR
 {
     using System.Collections.Generic;
+    using System.Collections;
+    using System;
     using UnityEngine;
     /// <summary>
     /// Manage Controller data coming in from various XR/VR platforms/SDKs/APIs
+    /// This class Tracks Interaction whereas FPXRControllerFeedback shows interactions
     /// Allows direct communication with all of the FPXRController settings
     /// Driven by the FPXRControllerFeedback data files
     /// Should be used to communicate to the internal system
@@ -11,6 +14,9 @@ namespace FuzzPhyte.XR
     /// The listener is at a controller level and you will be able to parse what you want 
     /// e.g. if you want to listen at a higher level for all general controller logic events to be parsed by the events/functions
     /// tied to the IFPXControllerListener interface
+    /// NOTE: Hint visuals are not gated by lock state.
+    /// They are used for onboarding/tutorial flows to draw attention to buttons,
+    /// even when input is not yet active or mapped.
     /// </summary>
     public class FPXRControllerEventManager : MonoBehaviour, IFPXRControllerSetup<IFPXRControllerListener>
     {
@@ -197,11 +203,23 @@ namespace FuzzPhyte.XR
                 controllerDelegates.Remove(value);
             }
         }
+
+        //raw events - for internal use only and for our hintAcknowledge listeners
+        private event XRControllerEvent rawButtonPressed;
+        private event XRControllerEvent rawButtonReleased;
         #endregion
         [Space]
         [Header("Controller Feedback")] 
         [SerializeField] protected FPXRControllerFeedback leftControllerFeedback;
         [SerializeField] protected FPXRControllerFeedback rightControllerFeedback;
+        [Space]
+        [Header("Controller Setup Options")]
+        [Tooltip("If true, this system will not fire off events associated with a locked button")]
+        protected bool enforceLockState = false;
+        [Tooltip("Will manage our hint acknowledge listeners for cases of explaining controller buttons and being locked out")]
+        protected Dictionary<(XRHandedness,XRButton),XRControllerEvent>hintAcknowledgeListeners = new Dictionary<(XRHandedness, XRButton), XRControllerEvent>();
+        [Tooltip("Will hold the routine for our current hint/information sequence")]
+        protected Coroutine currentSequenceRoutine;
         protected virtual void Awake()
         {
             if (Instance && Instance != this)
@@ -216,6 +234,7 @@ namespace FuzzPhyte.XR
             }
             
         }
+#if UNITY_EDITOR
         #region Testing
         [ContextMenu("Testing ControllerManager, Left Hand, Primary Button, Select")]
         public void LeftControllerPrimaryButtonSelectAction()
@@ -303,6 +322,7 @@ namespace FuzzPhyte.XR
             UpdateButtonState(XRHandedness.Left, XRButton.PrimaryButton, XRInteractionStatus.Hover);
         }
         #endregion
+#endif
         #region Public Event Listener Registration
         /// <summary>
         /// Easy way to add all events/listeners to our interface referenced item
@@ -384,6 +404,54 @@ namespace FuzzPhyte.XR
             }
         }
         /// <summary>
+        /// Reset, load both controllers, and run the sequence
+        /// </summary>
+        /// <param name="leftConfig"></param>
+        /// <param name="rightConfig"></param>
+        /// <param name="onComplete"></param>
+        public virtual void ResetControllersAndRunSequence(FPXRControllerFeedbackConfig leftConfig,FPXRControllerFeedbackConfig rightConfig,Action onComplete = null)
+        {
+            // Stop any active sequence first
+            CancelCurrentAcknowledgmentSequence();
+
+            // Reset feedback data
+            ResetDataControllers(leftConfig, rightConfig);
+
+            // Merge sequences from both controllers
+            var combinedSteps = new List<XRButtonHintStep>();
+            if (leftConfig.AcknowledgeSequence != null)
+                combinedSteps.AddRange(leftConfig.AcknowledgeSequence);
+            if (rightConfig.AcknowledgeSequence != null)
+                combinedSteps.AddRange(rightConfig.AcknowledgeSequence);
+
+            if (combinedSteps.Count == 0)
+            {
+                Debug.LogWarning("No acknowledgment sequence defined in either controller config.");
+                onComplete?.Invoke();
+                return;
+            }
+
+            RunButtonAcknowledgmentSequence(combinedSteps, onComplete);
+        }
+        /// <summary>
+        /// Lock the controllers, reset them, and run the sequence
+        /// </summary>
+        /// <param name="leftConfig"></param>
+        /// <param name="rightConfig"></param>
+        /// <param name="onComplete"></param>
+        public virtual void ResetControllersRunLockedTutorialSequence(FPXRControllerFeedbackConfig leftConfig,FPXRControllerFeedbackConfig rightConfig,Action onComplete = null)
+        {
+            LockController(XRHandedness.Left);
+            LockController(XRHandedness.Right);
+
+            ResetControllersAndRunSequence(leftConfig, rightConfig, () =>
+            {
+                UnlockController(XRHandedness.Left);
+                UnlockController(XRHandedness.Right);
+                onComplete?.Invoke();
+            });
+        }
+        /// <summary>
         /// Reset and load LEFT Controller
         /// </summary>
         /// <param name="leftControllerData">left controller data?</param>
@@ -394,6 +462,25 @@ namespace FuzzPhyte.XR
                 leftControllerFeedback.ResetUpdateControllerData(leftControllerData);
                 controllerResetLeft?.Invoke(XRHandedness.Left, XRButton.NA);
             }
+        }
+        /// <summary>
+        /// Reset and load LEFT controller and run the sequence
+        /// </summary>
+        /// <param name="leftControllerData"></param>
+        /// <param name="onComplete"></param>
+        public virtual void ResetDataLeftRunSequence(FPXRControllerFeedbackConfig leftControllerData, Action onComplete = null)
+        {
+            CancelCurrentAcknowledgmentSequence();
+            ResetDataLeftController(leftControllerData);
+
+            if (leftControllerData.AcknowledgeSequence == null || leftControllerData.AcknowledgeSequence.Count == 0)
+            {
+                Debug.LogWarning("No acknowledgment sequence defined in left controller config.");
+                onComplete?.Invoke();
+                return;
+            }
+
+            RunButtonAcknowledgmentSequence(leftControllerData.AcknowledgeSequence, onComplete);
         }
         /// <summary>
         /// Reset and load RIGHT controller
@@ -408,17 +495,148 @@ namespace FuzzPhyte.XR
             }
         }
         /// <summary>
+        /// Reset and load Right controller and run the sequence
+        /// </summary>
+        /// <param name="rightControllerData"></param>
+        /// <param name="onComplete"></param>
+        public virtual void ResetDataRightRunSequence(FPXRControllerFeedbackConfig rightControllerData, Action onComplete = null)
+        {
+            CancelCurrentAcknowledgmentSequence();
+            ResetDataRightController(rightControllerData);
+
+            if (rightControllerData.AcknowledgeSequence == null || rightControllerData.AcknowledgeSequence.Count == 0)
+            {
+                Debug.LogWarning($"No acknowledgment sequence defined in right controller config.");
+                onComplete?.Invoke();
+                return;
+            }
+            RunButtonAcknowledgmentSequence(rightControllerData.AcknowledgeSequence, onComplete);
+        }
+
+        /// <summary>
+        /// Adds a temporary internal raw listener based on user needs
+        /// </summary>
+        /// <param name="hand"></param>
+        /// <param name="button"></param>
+        /// <param name="onAcknowledged"></param>
+        /// <param name="autoHide"></param>
+
+        #region Hint Acknowledge Functions
+        public virtual void WaitForButtonAcknowledge(XRHandedness hand,XRButton button,Action onAcknowledged,bool autoHide = true)
+        {
+            // Define the temporary listener
+            XRControllerEvent listener = null;
+            listener = (eventHand, eventButton) =>
+            {
+                if (eventHand == hand && eventButton == button)
+                {
+                    rawButtonPressed -= listener; // Remove listener once triggered
+                    hintAcknowledgeListeners.Remove((hand, button));
+
+                    if (autoHide)
+                        ShowHideHintControllerButton(hand, button, XRInteractionStatus.Select, false);
+
+                    onAcknowledged?.Invoke();
+                }
+            };
+
+            // Store and subscribe
+            hintAcknowledgeListeners[(hand, button)] = listener;
+            rawButtonPressed += listener;
+        }
+        /// <summary>
+        /// Removes the temporary listener for button acknowledge
+        /// </summary>
+        /// <param name="hand"></param>
+        /// <param name="button"></param>
+        public virtual void CancelButtonAcknowledgeWait(XRHandedness hand, XRButton button)
+        {
+            var key = (hand, button);
+            if (hintAcknowledgeListeners.TryGetValue(key, out var listener))
+            {
+                rawButtonPressed -= listener;
+                hintAcknowledgeListeners.Remove(key);
+            }
+        }
+        public virtual void RunButtonAcknowledgmentSequence(List<XRButtonHintStep>steps,Action onSequenceComplete)
+        {
+            if (currentSequenceRoutine != null)
+            {
+                Debug.LogWarning($"Button Acknowledgment sequence already running. Cancelling the previous one.");
+                CancelCurrentAcknowledgmentSequence();
+            }
+            currentSequenceRoutine = StartCoroutine(HandleAcknowledgmentSequence(steps, onSequenceComplete));
+        }
+        public virtual void CancelCurrentAcknowledgmentSequence()
+        {
+            if (currentSequenceRoutine != null)
+            {
+                StopCoroutine(currentSequenceRoutine);
+                currentSequenceRoutine = null;
+            }
+        }
+        protected virtual IEnumerator HandleAcknowledgmentSequence(List<XRButtonHintStep> steps,Action onSequenceComplete)
+        {
+            foreach (var step in steps)
+            {
+                bool acknowledged = false;
+
+                // Show the hint
+                ShowHideHintControllerButton(step.Hand, step.Button, XRInteractionStatus.Select, true);
+
+                // Set up acknowledgment
+                WaitForButtonAcknowledge(step.Hand, step.Button, () =>
+                {
+                    acknowledged = true;
+
+                    step.OnStepAcknowledged?.Invoke();
+
+                    if (step.AutoHideHint)
+                    {
+                        ShowHideHintControllerButton(step.Hand, step.Button, XRInteractionStatus.Select, false);
+                    }
+                });
+
+                // Wait until the player presses the button
+                while (!acknowledged)
+                    yield return null;
+            }
+
+            currentSequenceRoutine = null;
+            onSequenceComplete?.Invoke();
+        }
+        #endregion
+        /// <summary>
         /// External SDKs (e.g., Oculus, Unity XR Toolkit) invoke this to report button states.
         /// Make sure to pass Select/Unselect only here anything else will be ignored
         /// </summary>
         public virtual void UpdateButtonState(XRHandedness hand, XRButton button, XRInteractionStatus buttonState, float controllerData=1f)
         {
-            if(buttonState== XRInteractionStatus.Locked)
-            {
-                //John = quick reminder
-                Debug.LogWarning($"You should be locking and calling the Lock Controller Button Function!");
-            }
             FPXRControllerFeedback feedback = GetFeedbackForHand(hand);
+            feedback?.SetButtonState(button, buttonState, controllerData);
+
+            //fire raw events
+            switch (buttonState)
+            {
+                case XRInteractionStatus.Select:
+                    rawButtonPressed?.Invoke(hand, button);
+                    break;
+                case XRInteractionStatus.Unselect:
+                    rawButtonReleased?.Invoke(hand, button);
+                    break;
+            }
+            // locked enforcing and other button states/events
+            if(enforceLockState && ReturnControllerLockStatus(hand,button))
+            {
+                //if we are locked and enforcing: don't do anything
+                return;
+            }
+            if (buttonState == XRInteractionStatus.Locked)
+            {
+                //Quick reminder
+                Debug.LogWarning($"If you're intention was to lock the controller - please call 'LockControllerButton'!");
+            }
+            
             //drives visuals and audio
             feedback?.SetButtonState(button, buttonState,controllerData);
             switch(buttonState)
@@ -472,7 +690,7 @@ namespace FuzzPhyte.XR
             if (feedback != null)
             {
                 feedback?.LockAllButtons();
-                controllerLocked?.Invoke(hand, XRButton.NA);
+                controllerLocked?.Invoke(hand, XRButton.All);
             }
         }
         /// <summary>
@@ -485,7 +703,7 @@ namespace FuzzPhyte.XR
             if (feedback != null)
             {
                 feedback?.UnlockAllButtons();
-                controllerUnlocked?.Invoke(hand, XRButton.NA);
+                controllerUnlocked?.Invoke(hand, XRButton.All);
             }
         }  
         /// <summary>
@@ -575,6 +793,17 @@ namespace FuzzPhyte.XR
             {
                 feedback.SetButtonSecondaryIconRenderOrder(button, renderOrder);
             }
+        }
+        /// <summary>
+        /// Function to return the button lock status by hand in one call
+        /// </summary>
+        /// <param name="hand">Controller Hand In Question</param>
+        /// <param name="button">Button in question</param>
+        /// <returns></returns>
+        public virtual bool ReturnControllerLockStatus(XRHandedness hand, XRButton button)
+        {
+            FPXRControllerFeedback feedback = GetFeedbackForHand(hand);
+            return feedback !=null && feedback.ReturnButtonLockState(button);
         }
         /// <summary>
         /// Will return if the entire controller is locked

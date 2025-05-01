@@ -2,7 +2,9 @@
     "name": "com.fuzzphyte.xr.editor",
     "rootNamespace": "FuzzPhyte.XR.Editor",
     "references": [
-        "com.fuzzphyte.xr"
+        "com.fuzzphyte.xr",
+        "com.fuzzphyte.utility",
+        "com.fuzzphyte.utility.editor"
     ],
     "includePlatforms": [
         "Editor"

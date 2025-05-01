@@ -6,6 +6,7 @@ namespace FuzzPhyte.XR
 
     /// <summary>
     /// Manage Button data UI/UX data associated with a controller
+    /// This class Shows Interaction whereas FPXRControllerEventManager tracks interactions
     /// Allows direct communication the UI/UX FPXRControllerRef script that is associated with each button
     /// Driven by the FPXRControllerFeedback data files
     /// If you want to register a listener with 'SetupItemForListeningAllEvents' and utilize the IFPXButtonListener interface
@@ -590,11 +591,11 @@ namespace FuzzPhyte.XR
 
             if (spawnedData.ContainsKey(button)) 
             {
-                var dataReturnTuple = LookUpByButtonState(button, currentButtonStatus);
-                if (dataReturnTuple.Item3)
+                //FPXRControllerRef,ButtonLabelState,bool
+
+                (FPXRControllerRef cachedItem, ButtonLabelState label, bool foundMatch) = LookUpByButtonState(button, currentButtonStatus);
+                if (foundMatch)
                 {
-                    var label = dataReturnTuple.Item2;
-                    var cachedItem = dataReturnTuple.Item1;
                     bool lockState = controllerButtonsLocked[button];
                     //confirm direct label match
                     if (label.XRState == currentButtonStatus)
