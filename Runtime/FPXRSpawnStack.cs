@@ -9,6 +9,7 @@ namespace FuzzPhyte.XR
     {
        
         [SerializeField] private List<GameObject> spawnStack = new List<GameObject>(); // List of prefabs in stack order
+        public List<GameObject>ReturnPrefabStack {  get { return spawnStack; } }
         [SerializeField] private List<GameObject> randomSpawnedItems = new List<GameObject>(); //list of randomly spawned items out there in the world
         [SerializeField] protected int currentIndex = 0;
         [SerializeField] protected Transform BottomStackPosition;
