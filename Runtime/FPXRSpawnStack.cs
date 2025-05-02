@@ -403,9 +403,16 @@ namespace FuzzPhyte.XR
             //need the ratio which is always the spawnPosition prior to the actual spawn - call before we adjust the location
             var curDist = Vector3.Distance(spawnPosition.position, BottomStackPosition.position);
             var ratio = curDist / stackRange;
-            if (ratio < 0.001f)
+            if (float.IsNaN(ratio))
             {
                 ratio = 0;
+            }
+            else
+            {
+                if (ratio < 0.001f)
+                {
+                    ratio = 0;
+                }
             }
             var newScale = new Vector3(UnderStackVisualization.transform.localScale.x, ratio, UnderStackVisualization.transform.localScale.z);
             UnderStackVisualization.transform.localScale = newScale;
