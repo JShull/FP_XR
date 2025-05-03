@@ -20,6 +20,8 @@ namespace FuzzPhyte.XR
        
         [SerializeField] protected GameObject currentOnStackItem;
         [SerializeField] protected Transform SpawnParentRoot;
+        public delegate void SpawnStackEvent(GameObject spawnedItem);
+        public event SpawnStackEvent OnSpawnedItem;
         [Space]
         public GameObject TestItem;
         [Tooltip("Will not use a stack approach but just randomly pull from the list")]
@@ -99,6 +101,7 @@ namespace FuzzPhyte.XR
             stackStepSize = stackRange / (currentIndex);
             AdjustSpawnPosition(TopStackPosition.position);
         }
+        
 
 #if UNITY_EDITOR
         
@@ -196,6 +199,7 @@ namespace FuzzPhyte.XR
             var stackCountHeightDiff = maxRandomSpawns - currentIndex;
             AdjustSpawnPosition(ReturnPointOnLine((stackCountHeightDiff) * stackStepSize));
             UpdateVisualStackSize();
+            OnSpawnedItem?.Invoke(spawned);
             return spawned;
         }
         public GameObject SpawnNextItem()
@@ -218,6 +222,7 @@ namespace FuzzPhyte.XR
                         grabbedItemListenerList.Add(fpWorld);
                     }
                 }
+                OnSpawnedItem?.Invoke(currentOnStackItem);
             }
             return currentOnStackItem;
         }
