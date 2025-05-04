@@ -9,6 +9,7 @@ namespace FuzzPhyte.XR
     {
        
         [SerializeField] private List<GameObject> spawnStack = new List<GameObject>(); // List of prefabs in stack order
+        protected List<GameObject> cachedSpawnedStack = new List<GameObject>(); // list of prefabs that have been spawned
         public List<GameObject>ReturnPrefabStack {  get { return spawnStack; } }
         [SerializeField] private List<GameObject> randomSpawnedItems = new List<GameObject>(); //list of randomly spawned items out there in the world
         [SerializeField] protected int currentIndex = 0;
@@ -17,7 +18,6 @@ namespace FuzzPhyte.XR
         [SerializeField] protected float stackRange;
         [SerializeField] protected float stackStepSize;
         [SerializeField] protected GameObject UnderStackVisualization;
-       
         [SerializeField] protected GameObject currentOnStackItem;
         [SerializeField] protected Transform SpawnParentRoot;
         public delegate void SpawnStackEvent(GameObject spawnedItem);
@@ -26,6 +26,8 @@ namespace FuzzPhyte.XR
         public GameObject TestItem;
         [Tooltip("Will not use a stack approach but just randomly pull from the list")]
         public bool UseRandomPull = false;
+        [Tooltip("If we want to reduce from the stack")]
+        public bool RemoveFromRandomListOnSpawn = false;
         public bool SetupOnStart = true;
         [SerializeField]protected int maxRandomSpawns = 10;
         //[SerializeField] protected int currentRandomSpawns = 0;
@@ -58,7 +60,7 @@ namespace FuzzPhyte.XR
                 }
             }
         }
-        public virtual void SetupAndUseRandomBin(List<GameObject>spawnedItems,int maxSize)
+        public virtual void SetupAndUseRandomBin(List<GameObject>spawnedItems,int maxSize, bool reduceFromList=false)
         {
             ResetSystem();
             spawnStack.Clear();
@@ -76,6 +78,7 @@ namespace FuzzPhyte.XR
             stackStepSize = stackRange / maxRandomSpawns;
             AdjustSpawnPosition(TopStackPosition.position);
             UseRandomPull = true;
+            RemoveFromRandomListOnSpawn = reduceFromList;
         }
         public virtual void SetupAndUseStackBin(List<GameObject>spawnedItems)
         {
@@ -189,11 +192,22 @@ namespace FuzzPhyte.XR
                 Debug.LogWarning("Spawn stack is empty.");
                 return null;
             }
-
+            
             int randomIndex = Random.Range(0, spawnStack.Count);
             GameObject prefab = spawnStack[randomIndex];
-
             GameObject spawned = Instantiate(prefab, spawnPosition.position, Quaternion.identity);
+            if (RemoveFromRandomListOnSpawn)
+            {
+                spawnStack.RemoveAt(randomIndex);
+                cachedSpawnedStack.Add(prefab);
+                if(spawnStack.Count == 0)
+                {
+                    Debug.LogWarning("Spawn stack is empty after removing item.");
+                    //transfer from cached back
+                    spawnStack.AddRange(cachedSpawnedStack);
+                    cachedSpawnedStack.Clear();
+                }
+            }
             randomSpawnedItems.Add(spawned);
             currentIndex++;
             var stackCountHeightDiff = maxRandomSpawns - currentIndex;
@@ -317,7 +331,6 @@ namespace FuzzPhyte.XR
         }
         public void ReturnItem(GameObject theItemPassedToUs)
         {
-            //returnprefab = adjusts our currentIndex up one and returns true if we can return an item
             if (UseRandomPull)
             {
                 Debug.LogError($"Random pull doesn't support returned item to the bin...yet");
@@ -411,13 +424,13 @@ namespace FuzzPhyte.XR
             var ratio = curDist / stackRange;
             if (float.IsNaN(ratio))
             {
-                ratio = 0;
+                ratio = 0.01f;
             }
             else
             {
                 if (ratio < 0.001f)
                 {
-                    ratio = 0;
+                    ratio = 0.01f;
                 }
             }
             var newScale = new Vector3(UnderStackVisualization.transform.localScale.x, ratio, UnderStackVisualization.transform.localScale.z);
