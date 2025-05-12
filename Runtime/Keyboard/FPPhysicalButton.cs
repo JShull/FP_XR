@@ -25,6 +25,7 @@ namespace FuzzPhyte.XR
         [Space]
         [SerializeField] protected bool onStartSetup = true;
         protected bool setupComplete = false;
+        public bool KeyActive = false;
         [SerializeField] protected Vector3 localPressDirection = Vector3.down;
         [SerializeField] protected float MaxDistance = -0.075f;
         [SerializeField] protected float ReturnSpeed = 10f;
@@ -70,6 +71,7 @@ namespace FuzzPhyte.XR
                 if (keyType == FPKeyboardKey.NumericalKey)
                 {
                     FPTextVisual.text = fPKey.ToString();
+                    FPTextVisualSecondary.text = fPKeyShift.ToString();
                 }
                 if (keyType == FPKeyboardKey.PunctuationKey)
                 {
@@ -93,6 +95,7 @@ namespace FuzzPhyte.XR
                 var worldPressDirection = FPButton.TransformDirection(localPressDirection).normalized;
                 maxLocalPosition = restPosition - worldPressDirection * MaxDistance;
                 setupComplete = true;
+                KeyActive = true;
                 if (keyType == FPKeyboardKey.RegularKey || keyType == FPKeyboardKey.NumericalKey)
                 {
                     this.gameObject.name += "_" + fPKey;
@@ -113,7 +116,7 @@ namespace FuzzPhyte.XR
             }
             else
             {
-                FPButton.gameObject.SetActive(false);
+                //FPButton.gameObject.SetActive(false);
             }
             
         }
@@ -193,12 +196,13 @@ namespace FuzzPhyte.XR
                 }
 
             }
-            FPButton.gameObject.SetActive(true);
+            //FPButton.gameObject.SetActive(true);
             setupComplete = true;
+            KeyActive = true;
         }
         public void Pressed()
         {
-            if (!setupComplete)
+            if (!setupComplete ||!KeyActive)
             {
                 return;
             }
@@ -207,7 +211,7 @@ namespace FuzzPhyte.XR
         }
         public void Released()
         {
-            if (!setupComplete)
+            if (!setupComplete|| !KeyActive)
             {
                 return;
             }
@@ -216,7 +220,7 @@ namespace FuzzPhyte.XR
         }
         public void MoveToPosition(Vector3 targetPosition,bool pressedDown)
         {
-            if (!setupComplete)
+            if (!setupComplete||!KeyActive)
             {
                 return;
             }

@@ -5,16 +5,40 @@ namespace FuzzPhyte.XR
     using System.Collections.Generic;
     using System.Linq;
     using System;
-
+    using System.Collections;
+    using FuzzPhyte.Utility;
+    using TMPro;
+   
     public class FPPhysicalKeyboard : MonoBehaviour
     {
-        //public List<FPPhysicalKeyData> TopRowData = new List<FPPhysicalKeyData>();
-        public GameObject KeyPrefab;
+        public GameObject KeyboardParent;
+        
+        [SerializeField] Vector3 startScale = Vector3.one;
+        [SerializeField] Vector3 endScale = new Vector3(0.1f,0.1f,0.1f);
+        public FP_ScaleLerp KeyboardScaler;
+        public TMP_InputField ActiveInputField;
+        [Tooltip("Input Fields you want us to monitor")]
+        [SerializeField] protected List<TMP_InputField> allInputFields = new List<TMP_InputField>();
         [SerializeField] protected List<FPPhysicalButton> theKeys = new List<FPPhysicalButton>();
         public bool CapsOn;
         public bool ShiftDown;
         [TextArea(2,4)]
         [SerializeField] protected string typedField;
+        public string TypedField { get => typedField;
+            set
+            {
+                if (typedField != value)
+                {
+                    typedField = value;
+                    if (ActiveInputField != null)
+                    {
+                        ActiveInputField.text = typedField;
+                        ActiveInputField.caretPosition = ActiveInputField.text.Length;
+                    }
+                }
+            }
+        }
+        [SerializeField] protected bool displaying;
         [Space]
         [Header("Events")]
         public UnityEvent CapKeyOn;
@@ -32,7 +56,19 @@ namespace FuzzPhyte.XR
                     aKey.IsReleased += KeyReleased;
                     aKey.IsHeldDown += KeyHeldDown;
                 }
+                Debug.LogWarning($"On Enable: Keys Registered!");
             }
+            if (allInputFields.Count == 0)
+            {
+                Debug.LogError($"You should reference some input fields, or the keyboard might never work right!");
+            }
+            foreach (var input in allInputFields)
+            {
+                input.onSelect.AddListener(delegate { OnAnyTMPInputFieldSelected(input); });
+                input.onDeselect.AddListener(delegate { OnAnyTMPInputFieldDeselect(input); });
+            }
+            
+            
         }
         public void Start()
         {
@@ -53,8 +89,24 @@ namespace FuzzPhyte.XR
                     }
                 }
             }
+            Debug.LogWarning($"On Start: Keys Should already be registered");
+            if (KeyboardScaler != null)
+            {
+                KeyboardScaler.TargetObject = KeyboardParent.transform;
+                KeyboardScaler.StartScale = endScale;
+                KeyboardScaler.EndScale = startScale;
+                KeyboardScaler.ResetMotion();
+                KeyboardScaler.TargetObject.localScale = endScale;
+            }
+            //default is to start off
+            foreach (var aKey in theKeys)
+            {
+                aKey.KeyActive = false;
+            }
+            KeyboardParent.SetActive(false);
+            displaying = false;
         }
-        
+
         public void OnDisable()
         {
             if (theKeys.Count > 0)
@@ -67,14 +119,45 @@ namespace FuzzPhyte.XR
                     aKey.IsHeldDown -= KeyHeldDown;
                 }
             }
-        }
-
-        
-        protected Vector3 SpawnKeyPositionByIndex(int row,int indexInRow,float xOffset=0)
-        {
-            float verticalOffset = .1f*KeyCapSize.y;
-            return new Vector3(KeyCapSize.x * 0.5f*(indexInRow+1)+xOffset, -verticalOffset*row, KeyCapSize.z * -0.5f*(row+1));
+           
+            for (int j = 0; j < allInputFields.Count; j++)
+            {
+                var inputField = allInputFields[j];
+                inputField.onSelect.RemoveListener(delegate { OnAnyTMPInputFieldSelected(inputField); });
+                inputField.onDeselect.RemoveListener(delegate { OnAnyTMPInputFieldDeselect(inputField); });
+            }
             
+            
+        }
+        protected virtual void OnAnyTMPInputFieldSelected(TMP_InputField inputField)
+        {
+            if (ActiveInputField != null)
+            {
+                //we had an active inputfield already do we just clear that input out?
+                ActiveInputField = null;
+                //clear typed field
+                typedField = "";
+            }
+            ActiveInputField = inputField;
+            if (!displaying)
+            {
+                DisplayKeyboard(true);
+            }
+            if (ActiveInputField.text.Length > 0)
+            {
+                //update my typeField to match what's in the ActiveInputField
+                typedField= ActiveInputField.text;
+                ActiveInputField.caretPosition = ActiveInputField.text.Length;
+            }
+        }
+        protected virtual void OnAnyTMPInputFieldDeselect(TMP_InputField inputField)
+        {
+            if (ActiveInputField == inputField)
+            {
+                //we had an active inputfield already do we just clear that input out?
+                ActiveInputField = null;
+                typedField = "";
+            }
         }
         protected void KeyPressed(FPPhysicalButton aKey)
         {
@@ -84,18 +167,21 @@ namespace FuzzPhyte.XR
                 case Utility.FPKeyboardKey.Backspace:
                     if (typedField.Length > 0)
                     {
-                        typedField = typedField.Substring(0, (typedField.Length - 1));
+                        TypedField = typedField.Substring(0, (typedField.Length - 1));
                     }
                     return;
                 case Utility.FPKeyboardKey.Space:
-                    typedField += " ";
+                    TypedField += " ";
+                    return;
+                case Utility.FPKeyboardKey.Tab:
+                    TypedField += "    ";
                     return;
                 case Utility.FPKeyboardKey.Shift:
                     ShiftDown = true;
                     return;
                 case Utility.FPKeyboardKey.Enter:
                     keyValue = Environment.NewLine;
-                    typedField += keyValue;
+                    TypedField += keyValue;
                     return;
                 case Utility.FPKeyboardKey.CapsLock:
                     CapsOn = !CapsOn;
@@ -108,6 +194,9 @@ namespace FuzzPhyte.XR
                         CapKeyOff.Invoke();
                     }
                     return;
+                case Utility.FPKeyboardKey.Esc:
+                    DisplayKeyboard(false);
+                    return;
             }
             if(CapsOn || ShiftDown)
             {
@@ -117,7 +206,7 @@ namespace FuzzPhyte.XR
             {
                 keyValue = aKey.FPKey.ToString();
             }
-            typedField += keyValue;
+            TypedField += keyValue;
         }
         protected void KeyHeldDown(FPPhysicalButton aKey)
         {
@@ -137,5 +226,76 @@ namespace FuzzPhyte.XR
                     break;
             }
         }
+        public void DisplayKeyboard(bool display)
+        {
+            if (displaying == display)
+            {
+                //already displaying just need to refocus the object to the correct field
+                Debug.LogWarning($"Keyboard is already in the same state");
+                return;
+            }
+            if (KeyboardScaler != null)
+            {
+                if (display)
+                {
+
+                    KeyboardScaler.StartScale = endScale;
+                    KeyboardScaler.EndScale = startScale;
+                    KeyboardScaler.ResetMotion();
+                    KeyboardParent.SetActive(true);
+                    KeyboardScaler.OnEndMotion.RemoveAllListeners();
+                    KeyboardScaler.OnEndMotion.AddListener(OnEndScaleUp);
+                    KeyboardScaler.StartMotion();
+                }
+                else
+                {
+                    KeyboardScaler.StartScale = startScale;
+                    KeyboardScaler.EndScale = endScale;
+                    KeyboardScaler.ResetMotion();
+                    foreach (var aKey in theKeys)
+                    {
+                        aKey.KeyActive = false;
+                    }
+                    KeyboardScaler.OnEndMotion.RemoveAllListeners();
+                    KeyboardScaler.OnEndMotion.AddListener(OnEndScaleDown);
+                    KeyboardScaler.StartMotion();
+                }
+            }
+            
+            displaying = display;
+        }
+        public void OnEndScaleUp()
+        {
+            foreach(var aKey in theKeys)
+            {
+                aKey.KeyActive = true;
+            }
+        }
+        public void OnEndScaleDown()
+        {
+            KeyboardParent.SetActive(false);
+        }
+#if UNITY_EDITOR
+        [ContextMenu("Test Show Keyboard")]
+        public void TestShowKeyboard()
+        {
+            DisplayKeyboard(true);
+        }
+        [ContextMenu("Test Hide Keyboard")]
+        public void TestHideKeyboard()
+        {
+            DisplayKeyboard(false);
+        }
+        [ContextMenu("Test Typing Keyboard Sync")]
+        public void TypeOutRandomLetter()
+        {
+            var randomIndex = UnityEngine.Random.Range(0, theKeys.Count);
+            var randomKey = theKeys[randomIndex];
+            if(randomKey.KeyType== FPKeyboardKey.RegularKey||randomKey.KeyType==FPKeyboardKey.NumericalKey||randomKey.KeyType==FPKeyboardKey.PunctuationKey)
+            {
+                KeyPressed(randomKey);
+            }
+        }
+#endif
     }
 }
