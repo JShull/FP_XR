@@ -11,6 +11,7 @@ namespace FuzzPhyte.XR
    
     public class FPPhysicalKeyboard : MonoBehaviour
     {
+        [Header("Keyboard Parent")]
         public GameObject KeyboardParent;
         
         [SerializeField] Vector3 startScale = Vector3.one;
