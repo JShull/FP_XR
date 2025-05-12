@@ -1,21 +1,26 @@
-
 namespace FuzzPhyte.XR
 {
-
     using UnityEngine;
     using UnityEngine.Events;
     using System.Collections.Generic;
+    using System.Linq;
     using System;
 
     public class FPPhysicalKeyboard : MonoBehaviour
     {
+        //public List<FPPhysicalKeyData> TopRowData = new List<FPPhysicalKeyData>();
+        public GameObject KeyPrefab;
         [SerializeField] protected List<FPPhysicalButton> theKeys = new List<FPPhysicalButton>();
         public bool CapsOn;
         public bool ShiftDown;
         [TextArea(2,4)]
         [SerializeField] protected string typedField;
+        [Space]
+        [Header("Events")]
         public UnityEvent CapKeyOn;
         public UnityEvent CapKeyOff;
+        public Vector3 KeyCapSize = new Vector3(0.05f, 0.05f,0.05f);
+        public float KeyCapSpaceInteriorScale = 0.1f; 
         public void OnEnable()
         {
             if (theKeys.Count > 0)
@@ -64,6 +69,13 @@ namespace FuzzPhyte.XR
             }
         }
 
+        
+        protected Vector3 SpawnKeyPositionByIndex(int row,int indexInRow,float xOffset=0)
+        {
+            float verticalOffset = .1f*KeyCapSize.y;
+            return new Vector3(KeyCapSize.x * 0.5f*(indexInRow+1)+xOffset, -verticalOffset*row, KeyCapSize.z * -0.5f*(row+1));
+            
+        }
         protected void KeyPressed(FPPhysicalButton aKey)
         {
             string keyValue = "";

@@ -4,24 +4,37 @@ namespace FuzzPhyte.XR
     using UnityEngine.Events;
     using UnityEngine;
     using FuzzPhyte.Utility;
-    public class FPPhysicalButton : MonoBehaviour
+    using TMPro;
+    public class FPPhysicalButton : MonoBehaviour,IFPOnStartSetup
     {
-        public char FPKey;
-        public char FPKeyShift;
-        public FPKeyboardKey KeyType=FPKeyboardKey.None;
+        [Header("Key Parameters")]
+        public FPPhysicalKeyData KeyData;
+        protected char fPKey;
+        public char FPKey { get => fPKey; }
+        protected char fPKeyShift;
+        public char FPKeyShift { get => fPKeyShift; }
+        protected FPKeyboardKey keyType=FPKeyboardKey.None;
+        public FPKeyboardKey KeyType { get=>keyType; }
         [Tooltip("The transform we are moving")]
         public Transform FPButton;
-        public Vector3 localPressDirection = Vector3.down;
-        public float MaxDistance = -0.075f;
-        public float ReturnSpeed = 10f;
-        public float DistanceThreshold = 0.001f;
+        public Collider FPCollider;
+        public Transform FPVisual;
+        public TextMeshPro FPTextVisual;
+        public TextMeshPro FPTextVisualSecondary;
+        [SerializeField]protected Vector3 thePhysicalKeySize = new Vector3(0.05f,0.05f,0.05f);
+        [Space]
+        [SerializeField] protected bool onStartSetup = true;
+        protected bool setupComplete = false;
+        [SerializeField] protected Vector3 localPressDirection = Vector3.down;
+        [SerializeField] protected float MaxDistance = -0.075f;
+        [SerializeField] protected float ReturnSpeed = 10f;
+        [SerializeField] protected float DistanceThreshold = 0.001f;
         public float PressedTimeRepeat = 1f;
         [Range(0.01f,1f)]
         public float PressedTimeResetPercentage =0.75f;
         public UnityEvent UnityPressedEvent;
         public UnityEvent UnityHeldEvent;
         public UnityEvent UnityReleasedEvent;
-
 
         public delegate void FPhysicalButtonActions(FPPhysicalButton theButton);
         public event FPhysicalButtonActions IsPressed;
@@ -31,6 +44,8 @@ namespace FuzzPhyte.XR
         public Vector3 RestPosition { get=>restPosition; }
         [SerializeField] protected Vector3 maxLocalPosition;
         public Vector3 PushedPosition { get => maxLocalPosition; }
+        public bool SetupStart { get => onStartSetup; set => onStartSetup=value; }
+
         [SerializeField] protected Rigidbody rb;
         protected Coroutine moveCoroutine;
         [Header("Editor Based")]
@@ -39,17 +54,113 @@ namespace FuzzPhyte.XR
         [SerializeField] protected float maxDot;
         public virtual void Awake() 
         {
-            if(KeyType== FPKeyboardKey.RegularKey || KeyType == FPKeyboardKey.NumericalKey)
-            {
-                this.gameObject.name += "_" + FPKey;
-            }
-            else
-            {
-                this.gameObject.name += "_" + KeyType.ToString();
-            }
+            
         }
         public virtual void Start()
         {
+            if (SetupStart && KeyData!=null)
+            {
+                fPKey = KeyData.TheFPKey;
+                fPKeyShift = KeyData.TheFPKeyShift;
+                keyType = KeyData.TheKeyType;
+                if (keyType == FPKeyboardKey.RegularKey)
+                {
+                    FPTextVisual.text = fPKeyShift.ToString();
+                }
+                if (keyType == FPKeyboardKey.NumericalKey)
+                {
+                    FPTextVisual.text = fPKey.ToString();
+                }
+                if (keyType == FPKeyboardKey.PunctuationKey)
+                {
+                    FPTextVisual.text = fPKey.ToString();
+                    FPTextVisualSecondary.text = fPKeyShift.ToString();
+                }
+
+                if (rb == null)
+                {
+                    Debug.LogError($"Missing RB! Checking if it's on this item...");
+                    rb = GetComponent<Rigidbody>();
+                    if (rb == null)
+                    {
+                        Debug.LogError($"Oh you really are missing the RB! - ERROR");
+                        return;
+                    }
+                }
+                //rb.constraints = RigidbodyConstraints.FreezeRotation;
+                //rb.constraints
+                restPosition = FPButton.localPosition;
+                var worldPressDirection = FPButton.TransformDirection(localPressDirection).normalized;
+                maxLocalPosition = restPosition - worldPressDirection * MaxDistance;
+                setupComplete = true;
+                if (keyType == FPKeyboardKey.RegularKey || keyType == FPKeyboardKey.NumericalKey)
+                {
+                    this.gameObject.name += "_" + fPKey;
+                    FPTextVisual.gameObject.name += "_" + fPKey;
+                }
+                else 
+                {
+                    if(KeyType== FPKeyboardKey.PunctuationKey)
+                    {
+                        this.gameObject.name += "_" + fPKey + "_" + fPKeyShift;
+                    }
+                    else
+                    {
+                        this.gameObject.name += "_" + keyType.ToString();
+                    }
+                        
+                }
+            }
+            else
+            {
+                FPButton.gameObject.SetActive(false);
+            }
+            
+        }
+        public virtual void SetupKey(
+            Vector3 keySize, FPKeyboardKey passedKeyType, char keyValue, 
+            char keyShiftValue, float distanceT, float maxDT, 
+            float pressSpeed, bool useCollision=true)
+        {
+            MaxDistance = maxDT;
+            ReturnSpeed= pressSpeed;
+            DistanceThreshold= distanceT;
+            fPKey = keyValue;
+            fPKeyShift = keyShiftValue;
+            keyType = passedKeyType;
+            thePhysicalKeySize = keySize;
+            if (keyType == FPKeyboardKey.RegularKey)
+            {
+                FPTextVisual.text = fPKeyShift.ToString();
+            }
+            if(keyType == FPKeyboardKey.NumericalKey)
+            {
+                FPTextVisual.text = fPKey.ToString();
+            }
+            if (keyType == FPKeyboardKey.PunctuationKey)
+            {
+                FPTextVisual.text = fPKey.ToString();
+                FPTextVisualSecondary.text = fPKeyShift.ToString();
+            }
+            if (FPCollider != null)
+            {
+                var bcCollider = FPCollider as BoxCollider;
+                if (bcCollider != null)
+                {
+                    bcCollider.size = keySize;
+                    bcCollider.center = new Vector3(0, keySize.y * -0.5f, 0);
+                }
+                var collisionSystem = FPCollider.gameObject.GetComponent<FPPhysicalButton>();
+                if (collisionSystem!=null)
+                {
+                    collisionSystem.enabled = useCollision;
+                }
+            }
+            if (FPVisual!=null)
+            {
+                FPVisual.localScale = keySize;
+                FPVisual.localPosition = new Vector3(0, keySize.y * -0.5f, 0);
+            }
             if (rb == null)
             {
                 Debug.LogError($"Missing RB! Checking if it's on this item...");
@@ -65,19 +176,50 @@ namespace FuzzPhyte.XR
             restPosition = FPButton.localPosition;
             var worldPressDirection = FPButton.TransformDirection(localPressDirection).normalized;
             maxLocalPosition = restPosition - worldPressDirection * MaxDistance;
+            if (keyType == FPKeyboardKey.RegularKey || keyType == FPKeyboardKey.NumericalKey)
+            {
+                this.gameObject.name += "_" + fPKey;
+                FPTextVisual.gameObject.name += "_" + fPKey;
+            }
+            else
+            {
+                if (KeyType == FPKeyboardKey.PunctuationKey)
+                {
+                    this.gameObject.name += "_" + fPKey + "_" + fPKeyShift;
+                }
+                else
+                {
+                    this.gameObject.name += "_" + keyType.ToString();
+                }
+
+            }
+            FPButton.gameObject.SetActive(true);
+            setupComplete = true;
         }
         public void Pressed()
         {
+            if (!setupComplete)
+            {
+                return;
+            }
             IsPressed?.Invoke(this);
             UnityPressedEvent.Invoke();
         }
         public void Released()
         {
+            if (!setupComplete)
+            {
+                return;
+            }
             IsReleased?.Invoke(this);
             UnityReleasedEvent.Invoke();
         }
         public void MoveToPosition(Vector3 targetPosition,bool pressedDown)
         {
+            if (!setupComplete)
+            {
+                return;
+            }
             if (moveCoroutine != null)
             {
                 StopCoroutine(moveCoroutine);
@@ -147,6 +289,15 @@ namespace FuzzPhyte.XR
             {
                 Gizmos.DrawLine(giz.StartPos, giz.EndPos);
             }
+            if (setupComplete)
+            {
+                Gizmos.color = Color.green;
+            }
+            else
+            {
+                Gizmos.color= Color.red;
+            }
+            Gizmos.DrawWireCube(restWorldPos+new Vector3(0,thePhysicalKeySize.y*-0.5f,0), thePhysicalKeySize*1.05f);
             
         }
 #endif
