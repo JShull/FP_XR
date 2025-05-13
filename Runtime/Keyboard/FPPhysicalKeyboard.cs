@@ -23,6 +23,11 @@ namespace FuzzPhyte.XR
         [SerializeField] protected List<FPPhysicalButton> theKeys = new List<FPPhysicalButton>();
         public bool CapsOn;
         public bool ShiftDown;
+        [Space]
+        [Tooltip("Will only use raycast approach, will deactivate all physics Trigger/stay/exit based items/components")]
+        public bool UseRaycastONLY = false;
+        public bool ReplaceLayerMaskingForButtons = false;
+        [SerializeField] protected LayerMask triggerLayersKeyboard;
         [TextArea(2,4)]
         [SerializeField] protected string typedField;
         public string TypedField { get => typedField;
@@ -44,9 +49,19 @@ namespace FuzzPhyte.XR
         [Header("Events")]
         public UnityEvent CapKeyOn;
         public UnityEvent CapKeyOff;
+        public Transform CapsRelativeLocation;
         public Vector3 KeyCapSize = new Vector3(0.05f, 0.05f,0.05f);
-        public float KeyCapSpaceInteriorScale = 0.1f; 
-        public void OnEnable()
+        public float KeyCapSpaceInteriorScale = 0.1f;
+        [Tooltip("We jump this audio component around based on key information")]
+        public AudioSource KeyButtonSoundEmitter;
+        public AudioSource KeyButtonSoundEmitterBackup;
+        public AudioClip KeyButtonSoundPressed;
+        public AudioClip KeyButtonSoundReleased;
+        public AudioClip KeyButtonSoundHover;
+        public AudioClip KeyButtonSoundUnHover;
+        public AudioClip CapsActive;
+        public AudioClip CapsInactive;
+        public virtual void OnEnable()
         {
             if (theKeys.Count > 0)
             {
@@ -56,6 +71,16 @@ namespace FuzzPhyte.XR
                     aKey.IsPressed += KeyPressed;
                     aKey.IsReleased += KeyReleased;
                     aKey.IsHeldDown += KeyHeldDown;
+                    aKey.IsHovering += KeyHover;
+                    aKey.IsUnhovering += KeyUnhover;
+                    if (UseRaycastONLY)
+                    {
+                        RemovePhysicsFromButtons(aKey);
+                    }
+                    if (ReplaceLayerMaskingForButtons)
+                    {
+                        ReplaceLayerMaskForButtons(aKey);
+                    }
                 }
                 Debug.LogWarning($"On Enable: Keys Registered!");
             }
@@ -68,10 +93,8 @@ namespace FuzzPhyte.XR
                 input.onSelect.AddListener(delegate { OnAnyTMPInputFieldSelected(input); });
                 input.onDeselect.AddListener(delegate { OnAnyTMPInputFieldDeselect(input); });
             }
-            
-            
         }
-        public void Start()
+        public virtual void Start()
         {
             //loop through all children and find FPPhysicalButtons
             if (theKeys.Count == 0)
@@ -86,7 +109,17 @@ namespace FuzzPhyte.XR
                         aKey.IsPressed += KeyPressed;
                         aKey.IsReleased += KeyReleased;
                         aKey.IsHeldDown += KeyHeldDown;
+                        aKey.IsHovering += KeyHover;
+                        aKey.IsUnhovering += KeyUnhover;
                         theKeys.Add(aKey);
+                        if (UseRaycastONLY)
+                        {
+                            RemovePhysicsFromButtons(aKey);
+                        }
+                        if (ReplaceLayerMaskingForButtons)
+                        {
+                            ReplaceLayerMaskForButtons(aKey);
+                        }
                     }
                 }
             }
@@ -108,7 +141,7 @@ namespace FuzzPhyte.XR
             displaying = false;
         }
 
-        public void OnDisable()
+        public virtual void OnDisable()
         {
             if (theKeys.Count > 0)
             {
@@ -118,6 +151,8 @@ namespace FuzzPhyte.XR
                     aKey.IsPressed -= KeyPressed;
                     aKey.IsReleased -= KeyReleased;
                     aKey.IsHeldDown -= KeyHeldDown;
+                    aKey.IsHovering -= KeyHover;
+                    aKey.IsUnhovering -= KeyUnhover;
                 }
             }
            
@@ -127,8 +162,22 @@ namespace FuzzPhyte.XR
                 inputField.onSelect.RemoveListener(delegate { OnAnyTMPInputFieldSelected(inputField); });
                 inputField.onDeselect.RemoveListener(delegate { OnAnyTMPInputFieldDeselect(inputField); });
             }
-            
-            
+        }
+        protected void RemovePhysicsFromButtons(FPPhysicalButton aKey)
+        {
+            if (aKey.FPCollider.GetComponent<FPPhysicalButtonCollision>() != null)
+            {
+                var ButtonCollision = aKey.FPCollider.GetComponent<FPPhysicalButtonCollision>();
+                ButtonCollision.UsePhysicsMode = false;
+            }
+        }
+        protected void ReplaceLayerMaskForButtons(FPPhysicalButton aKey)
+        {
+            if (aKey.FPCollider.GetComponent<FPPhysicalButtonCollision>() != null)
+            {
+                var ButtonCollision = aKey.FPCollider.GetComponent<FPPhysicalButtonCollision>();
+                ButtonCollision.TriggeredLayers = triggerLayersKeyboard;
+            }
         }
         protected virtual void OnAnyTMPInputFieldSelected(TMP_InputField inputField)
         {
@@ -160,9 +209,11 @@ namespace FuzzPhyte.XR
                 typedField = "";
             }
         }
+        
         protected void KeyPressed(FPPhysicalButton aKey)
         {
             string keyValue = "";
+            KeyAudioEvent(KeyButtonSoundPressed, aKey.transform.position);
             switch (aKey.KeyType)
             {
                 case Utility.FPKeyboardKey.Backspace:
@@ -189,10 +240,12 @@ namespace FuzzPhyte.XR
                     if (CapsOn)
                     {
                         CapKeyOn.Invoke();
+                        KeyAudioEvent(CapsActive, CapsRelativeLocation.position);
                     }
                     else
                     {
                         CapKeyOff.Invoke();
+                        KeyAudioEvent(CapsInactive, CapsRelativeLocation.position);
                     }
                     return;
                 case Utility.FPKeyboardKey.Esc:
@@ -218,13 +271,44 @@ namespace FuzzPhyte.XR
             }
             KeyPressed(aKey);
         }
+        protected virtual void KeyHover(FPPhysicalButton aKey)
+        {
+            KeyAudioEvent(KeyButtonSoundHover, aKey.transform.position);
+        }
+        protected virtual void KeyUnhover(FPPhysicalButton aKey)
+        {
+            KeyAudioEvent(KeyButtonSoundUnHover, aKey.transform.position);
+        }
         protected void KeyReleased(FPPhysicalButton aKey) 
         {
+            KeyAudioEvent(KeyButtonSoundReleased, aKey.transform.position);
             switch (aKey.KeyType)
             {
                 case Utility.FPKeyboardKey.Shift:
                     ShiftDown = false;
                     break;
+            }
+        }
+        protected virtual void KeyAudioEvent(AudioClip aClip, Vector3 worldLocation)
+        {
+            if (KeyButtonSoundEmitter != null)
+            {
+                if (KeyButtonSoundEmitter.isPlaying)
+                {
+                    //try other one
+                    if (KeyButtonSoundEmitterBackup != null)
+                    {
+                        KeyButtonSoundEmitterBackup.transform.position = worldLocation;
+                        KeyButtonSoundEmitterBackup.clip = aClip;
+                        KeyButtonSoundEmitterBackup.Play();
+                    }
+                }
+                else
+                {
+                    KeyButtonSoundEmitter.transform.position = worldLocation;
+                    KeyButtonSoundEmitter.clip = aClip;
+                    KeyButtonSoundEmitter.Play();
+                }
             }
         }
         public void DisplayKeyboard(bool display)

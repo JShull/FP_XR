@@ -36,11 +36,15 @@ namespace FuzzPhyte.XR
         public UnityEvent UnityPressedEvent;
         public UnityEvent UnityHeldEvent;
         public UnityEvent UnityReleasedEvent;
-
+        [Space]
+        public UnityEvent UnityHoverEvent;
+        public UnityEvent UnityUnhoverEvent;
         public delegate void FPhysicalButtonActions(FPPhysicalButton theButton);
         public event FPhysicalButtonActions IsPressed;
         public event FPhysicalButtonActions IsReleased;
         public event FPhysicalButtonActions IsHeldDown;
+        public event FPhysicalButtonActions IsHovering;
+        public event FPhysicalButtonActions IsUnhovering;
         [SerializeField] protected Vector3 restPosition;
         public Vector3 RestPosition { get=>restPosition; }
         [SerializeField] protected Vector3 maxLocalPosition;
@@ -217,6 +221,16 @@ namespace FuzzPhyte.XR
             }
             IsReleased?.Invoke(this);
             UnityReleasedEvent.Invoke();
+        }
+        public virtual void Hover()
+        {
+            UnityHoverEvent?.Invoke();
+            IsHovering?.Invoke(this);
+        }
+        public virtual void UnHover()
+        {
+            UnityUnhoverEvent?.Invoke();
+            IsUnhovering?.Invoke(this);
         }
         public void MoveToPosition(Vector3 targetPosition,bool pressedDown)
         {
