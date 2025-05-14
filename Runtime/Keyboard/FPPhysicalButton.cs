@@ -29,7 +29,10 @@ namespace FuzzPhyte.XR
         [SerializeField] protected Vector3 localPressDirection = Vector3.down;
         [SerializeField] protected float MaxDistance = -0.075f;
         [SerializeField] protected float ReturnSpeed = 10f;
+        [Tooltip("This is the distance we need to be greater than to actually consider starting the press")]
         [SerializeField] protected float DistanceThreshold = 0.001f;
+        [Tooltip("This is the distance from rest position to confirm a 'press' needs to happen")]
+        [SerializeField] protected float DistanceConfirmPress = 0.03f;
         public float PressedTimeRepeat = 1f;
         [Range(0.01f,1f)]
         public float PressedTimeResetPercentage =0.75f;
@@ -210,8 +213,9 @@ namespace FuzzPhyte.XR
             {
                 return;
             }
-            IsPressed?.Invoke(this);
             UnityPressedEvent.Invoke();
+            IsPressed?.Invoke(this);
+           
         }
         public void Released()
         {
@@ -219,7 +223,22 @@ namespace FuzzPhyte.XR
             {
                 return;
             }
+            UnityReleasedEvent.Invoke();
             IsReleased?.Invoke(this);
+            
+        }
+        /// <summary>
+        /// really only for situations in which we are doing something and we close the keyboard and/or have some sort of enable/disable mismatch
+        /// E.g. Escape Key
+        /// </summary>
+        public void ForceResetReleaseKey()
+        {
+            if (moveCoroutine != null)
+            {
+                StopCoroutine(moveCoroutine);
+            }
+            FPButton.localPosition = restPosition;
+            //don't call internal isReleased - might cause a loop
             UnityReleasedEvent.Invoke();
         }
         public virtual void Hover()
@@ -231,6 +250,18 @@ namespace FuzzPhyte.XR
         {
             UnityUnhoverEvent?.Invoke();
             IsUnhovering?.Invoke(this);
+        }
+        /// <summary>
+        /// Method to confirm that we have gone enough of a distance to actually press the button
+        /// </summary>
+        public bool CheckDistanceForPressed()
+        {
+            //Debug.LogWarning($"Distance Check: {Vector3.Distance(FPButton.localPosition, restPosition)}");
+            if(Vector3.Distance(FPButton.localPosition, restPosition) >= DistanceConfirmPress)
+            {
+                return true;
+            }
+            return false;
         }
         public void MoveToPosition(Vector3 targetPosition,bool pressedDown)
         {

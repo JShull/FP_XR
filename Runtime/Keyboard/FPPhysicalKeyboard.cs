@@ -3,9 +3,7 @@ namespace FuzzPhyte.XR
     using UnityEngine;
     using UnityEngine.Events;
     using System.Collections.Generic;
-    using System.Linq;
     using System;
-    using System.Collections;
     using FuzzPhyte.Utility;
     using TMPro;
    
@@ -26,6 +24,7 @@ namespace FuzzPhyte.XR
         [Space]
         [Tooltip("Will only use raycast approach, will deactivate all physics Trigger/stay/exit based items/components")]
         public bool UseRaycastONLY = false;
+        public bool UseRaycastAndPhysics = false;
         public bool ReplaceLayerMaskingForButtons = false;
         [SerializeField] protected LayerMask triggerLayersKeyboard;
         [TextArea(2,4)]
@@ -49,6 +48,8 @@ namespace FuzzPhyte.XR
         [Header("Events")]
         public UnityEvent CapKeyOn;
         public UnityEvent CapKeyOff;
+        public UnityEvent EscapeKeyPushed;
+        public bool UseEscapeCloseKeyboard = true;
         public Transform CapsRelativeLocation;
         public Vector3 KeyCapSize = new Vector3(0.05f, 0.05f,0.05f);
         public float KeyCapSpaceInteriorScale = 0.1f;
@@ -73,10 +74,18 @@ namespace FuzzPhyte.XR
                     aKey.IsHeldDown += KeyHeldDown;
                     aKey.IsHovering += KeyHover;
                     aKey.IsUnhovering += KeyUnhover;
-                    if (UseRaycastONLY)
+                    if (UseRaycastAndPhysics)
                     {
-                        RemovePhysicsFromButtons(aKey);
+                        //do nothing
                     }
+                    else
+                    {
+                        if (UseRaycastONLY)
+                        {
+                            RemovePhysicsFromButtons(aKey);
+                        }
+                    }
+                    
                     if (ReplaceLayerMaskingForButtons)
                     {
                         ReplaceLayerMaskForButtons(aKey);
@@ -112,9 +121,16 @@ namespace FuzzPhyte.XR
                         aKey.IsHovering += KeyHover;
                         aKey.IsUnhovering += KeyUnhover;
                         theKeys.Add(aKey);
-                        if (UseRaycastONLY)
+                        if (UseRaycastAndPhysics)
                         {
-                            RemovePhysicsFromButtons(aKey);
+                            //do nothing
+                        }
+                        else
+                        {
+                            if (UseRaycastONLY)
+                            {
+                                RemovePhysicsFromButtons(aKey);
+                            }
                         }
                         if (ReplaceLayerMaskingForButtons)
                         {
@@ -249,7 +265,12 @@ namespace FuzzPhyte.XR
                     }
                     return;
                 case Utility.FPKeyboardKey.Esc:
-                    DisplayKeyboard(false);
+                    EscapeKeyPushed?.Invoke();
+                    if (UseEscapeCloseKeyboard)
+                    {
+                        aKey.ForceResetReleaseKey();
+                        DisplayKeyboard(false);
+                    }
                     return;
             }
             if(CapsOn || ShiftDown)
