@@ -1,4 +1,3 @@
-
 namespace FuzzPhyte.XR
 {
     using UnityEngine;
@@ -24,6 +23,8 @@ namespace FuzzPhyte.XR
         [SerializeField] protected List<GameObject> cachedSpawnedItems = new List<GameObject>();
         [Space]
         public UnityEvent AdditionalSpawnEvent;
+        public delegate void SpawnPiecesEvent(GameObject spawnedItem);
+        public event SpawnPiecesEvent OnSpawnedItem;
         protected override GameObject GetNextPrefab()
         {
             spawnPosition = spawnLocations[currentIndex];
@@ -74,9 +75,11 @@ namespace FuzzPhyte.XR
                     currentIndex = i;
                     var prefabItem = Spawn();
                     cachedSpawnedItems.Add(prefabItem);
+                    OnSpawnedItem?.Invoke(prefabItem);
                 }
                 AdditionalSpawnEvent.Invoke();
                 spawnedAtLeastOnce = true;
+                return;
             }
             if (!spawnOnce)
             {
@@ -93,22 +96,18 @@ namespace FuzzPhyte.XR
                     currentIndex = i;
                     var prefabItem = Spawn();
                     cachedSpawnedItems.Add(prefabItem);
+                    OnSpawnedItem?.Invoke(prefabItem);
                 }
                 AdditionalSpawnEvent.Invoke();
             }
         }
 
 #if UNITY_EDITOR
-        public virtual void Update()
+
+        [ContextMenu("Test The Spawn Pieces")]
+        public void SpawnTester()
         {
-            if (!Testing)
-            {
-                return;
-            }
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                SpawnThePieces();
-            }
+            SpawnThePieces();
         }
 #endif
         protected void OnDrawGizmos()

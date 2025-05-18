@@ -139,8 +139,13 @@ namespace FuzzPhyte.XR
                             }
                             audioClipArray = new AudioClip[returnClipArray.Length];
                             Array.Copy(returnClipArray,audioClipArray,returnClipArray.Length);
+                            SetupAudioClipArray(AudioStartLanguage, false, false);
                         }
-                        SetupAudioClip(AudioStartLanguage, false, false);
+                        else
+                        {
+                            SetupAudioClip(AudioStartLanguage, false, false);
+                        }
+                            
                     }
                 }
             }
@@ -230,7 +235,15 @@ namespace FuzzPhyte.XR
                         audioClipArray = new AudioClip[SupportData.Count];
                         audioClipArray = SetupAudioClipArray(AudioStartLanguage, false, false);
                     }
-                    SetupAudioClip(AudioStartLanguage, false, false);
+                    if (useSupportVocabData)
+                    {
+                        SetupAudioClipArray(AudioStartLanguage, false, false);
+                    }
+                    else
+                    {
+                        SetupAudioClip(AudioStartLanguage, false, false);
+                    }
+                        
                 }
             }
             if (display)

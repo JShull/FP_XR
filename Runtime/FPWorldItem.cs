@@ -102,6 +102,7 @@ namespace FuzzPhyte.XR
         public event Action<FPWorldItem, FPSocket> ItemSocketRemoved;
         public event Action<FPWorldItem, XRHandedness> ItemRaySelect;
         public event Action<FPWorldItem> ItemRayUnselected;
+        public event Action<FPWorldItem> ItemLabelActivated;
         #endregion
 
         #region Methods for Actions
@@ -299,6 +300,10 @@ namespace FuzzPhyte.XR
                 InteractableLabel.gameObject.SetActive(state);
                 InteractableLabel.DisplayVocabTranslation(StartingFPLanguage);
                 ActivatedInteractionLabelEvent.Invoke();
+                if (state)
+                {
+                    ItemLabelActivated?.Invoke(this);
+                }
             }
         }
         /// <summary>
@@ -312,6 +317,7 @@ namespace FuzzPhyte.XR
                 InteractableLabel.gameObject.SetActive(true);
                 InteractableLabel.DisplayVocabTranslation(StartingFPLanguage);
                 ActivatedInteractionLabelEvent.Invoke();
+                ItemLabelActivated?.Invoke(this);
                 if (FP_Timer.CCTimer != null)
                 {
                     FP_Timer.CCTimer.StartTimer(time, () => { InteractableLabel.gameObject.SetActive(false); });
@@ -326,6 +332,7 @@ namespace FuzzPhyte.XR
             {
                 LabelInterfaces[i].ShowAllRenderers(true);
             }
+            ItemLabelActivated?.Invoke(this);
             DetailedLabelActivated.Invoke();
         }
         public virtual void DeactivateAllLabels()
@@ -347,6 +354,7 @@ namespace FuzzPhyte.XR
                     lastTimeTimerRan = Time.time;
                     lastTimerValue = time;
                     Debug.LogWarning($"Timer Activated, Last Time Timer Ran = {lastTimeTimerRan.ToString()}, Last Timer Value = {lastTimerValue}");
+                    ItemLabelActivated?.Invoke(this);
                 }
                 else
                 {
@@ -375,6 +383,7 @@ namespace FuzzPhyte.XR
             {
                 LabelInterfaces[i].DisplayVocabTranslation(StartingFPLanguage);
             }
+            ItemLabelActivated?.Invoke(this);
         }
         
         #endregion

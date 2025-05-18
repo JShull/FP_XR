@@ -438,6 +438,7 @@ namespace FuzzPhyte.XR
                         {
                             audioClips[i] = allVocabCombined[i].WordAudio.AudioClip;
                         }
+                        
                     }
                     return (true,audioClips);
                 }

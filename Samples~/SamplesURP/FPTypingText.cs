@@ -168,14 +168,11 @@ namespace FuzzPhyte.XR
             {
                 for(int i=0; i < aFile.Length; i++)
                 {
-                    estimateLength += aFile[i].length;
-                    var clipStartTime = aFile[i].length;
+                    estimateLength += aFile[i].length+TimeBetweenClips;
                     clipArrays.Add(aFile[i]);
-                    if (i < aFile.Length - 1)
+                    if (i > 0)
                     {
-                        //add in gap time
-                        estimateLength+=TimeBetweenClips;
-                        clipStartTimes.Add(clipStartTime+TimeBetweenClips);
+                        clipStartTimes.Add(estimateLength - aFile[i - 1].length);
                     }
                 }
             }
@@ -183,7 +180,7 @@ namespace FuzzPhyte.XR
             {
                 if (aFile.Length == 1)
                 {
-                    Debug.LogWarning($"Clip length: 1");
+                    //Debug.LogWarning($"Clip length: 1");
                     estimateLength = aFile[0].length;
                     clipArrays.Add(aFile[0]);
                 }
@@ -192,11 +189,11 @@ namespace FuzzPhyte.XR
                     yield break;
                 }
             }
-            Debug.LogWarning($"ClipStart Times Count: {clipStartTimes.Count} with ClipArrays at {clipArrays.Count}");
+            //Debug.LogWarning($"ClipStart Times Count: {clipStartTimes.Count} with ClipArrays at {clipArrays.Count}");
             
             yield return new WaitForEndOfFrame();
             // float clipLength = estimateLength;
-            Debug.LogWarning($"Clip Length: {estimateLength}");
+            //Debug.LogWarning($"Clip Length: {estimateLength}");
             while(runningLoopTime < estimateLength)
             {
                 runningLoopTime += Time.deltaTime;
@@ -206,14 +203,18 @@ namespace FuzzPhyte.XR
                 int startingTextCount = Mathf.FloorToInt(charIndexPosition * startingText.Length);
                 var startStringPartial = startingText.Substring(startingTextCount, startingText.Length - startingTextCount);
                 textComponent.text = fullText.Substring(0, characterCount) + startStringPartial;
+                
                 if(clipStartTimes.Count>0)
                 {
                     if(runningLoopTime >= clipStartTimes[0])
                     {
                         if (clipArrays.Count > 0)
                         {
+                            //Debug.LogWarning($"Clip playing: {clipArrays[0].name}");
                             AudioSource.clip = clipArrays[0];
                             AudioSource.Play();
+                           
+                            yield return new WaitForEndOfFrame();
                             clipStartTimes.RemoveAt(0);
                             clipArrays.RemoveAt(0);
                         }
