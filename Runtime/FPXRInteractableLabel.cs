@@ -22,6 +22,10 @@ namespace FuzzPhyte.XR
         {
             return labelTag.ApplyVocabTranslationTextData(LabelText, language,UseCombinedVocabData);
         }
+        public string ReturnVocabTranslation(FP_Language language = FP_Language.USEnglish)
+        {
+            return labelTag.GetVocabTranslationTextData(language, UseCombinedVocabData);
+        }
 
         public void SetupLabelData(XRDetailedLabelData data, FP_Language startingLanguage, bool startActive = true, bool useCombined=false)
         {

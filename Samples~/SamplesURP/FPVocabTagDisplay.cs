@@ -164,6 +164,10 @@ namespace FuzzPhyte.XR
         {
             return DisplayVocabTranslation(SecondaryTextDisplay, choice,UseCombinedVocabData);
         }
+        public virtual string ReturnVocabTranslation(FP_Language choice)
+        {
+            return labelTag.GetVocabTranslationTextData(choice, UseCombinedVocabData);
+        }
         public virtual bool ShowAllRenderers(bool status)
         {
             if (CheckMinCooldownTime())

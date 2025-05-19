@@ -570,6 +570,17 @@ namespace FuzzPhyte.XR
             vocabDisplay.text = ReturnTranslation(language,false,useCombined);
             return vocabDisplay.text;
         }
+        /// <summary>
+        /// Will return the translation text based on the language and if we want to use combined
+        /// Does not update our display just a get function
+        /// </summary>
+        /// <param name="language"></param>
+        /// <param name="useCombined"></param>
+        /// <returns></returns>
+        public string GetVocabTranslationTextData(FP_Language language, bool useCombined)
+        {
+            return ReturnTranslation(language, false, useCombined);
+        }
         public string ApplyDefnTranslationTextData(TMP_Text defnDisplay,FP_Language language, bool useCombined)
         {
             defnDisplay.text = ReturnTranslation(language, true,useCombined);

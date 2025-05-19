@@ -202,6 +202,7 @@ namespace FuzzPhyte.XR
     {
         void SetupLabelData(XRDetailedLabelData data, FP_Language startingLanguage, bool startActive=true, bool useCombinedVocab=false);
         string DisplayVocabTranslation(FP_Language language=FP_Language.USEnglish);
+        string ReturnVocabTranslation(FP_Language language= FP_Language.USEnglish);
         bool ShowAllRenderers(bool status);
         void ForceShowRenderer();
         void ForceHideRenderer();
