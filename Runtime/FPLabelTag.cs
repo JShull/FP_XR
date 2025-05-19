@@ -15,9 +15,9 @@ namespace FuzzPhyte.XR
         protected FP_Tag dataTag;
         protected FP_Vocab vocabData;
         protected FP_Theme themeData;
-        protected List<XRVocabSupportData> vocabSupportData;
+        protected List<XRVocabSupportData> vocabSupportData = new List<XRVocabSupportData>();
         // our combined vocab list based on XRVocabSupportData and by language requirements
-        protected List<FP_Vocab> allVocabCombined;
+        protected List<FP_Vocab> allVocabCombined = new List<FP_Vocab>();
         //protected bool useSupportData = false;
         #region Setup
         public FPLabelTag(FP_Tag dataTag)
