@@ -103,6 +103,7 @@ namespace FuzzPhyte.XR
         public event Action<FPWorldItem, XRHandedness> ItemRaySelect;
         public event Action<FPWorldItem> ItemRayUnselected;
         public event Action<FPWorldItem> ItemLabelActivated;
+        public event Action<FPWorldItem> ItemCamRayActivated;
         #endregion
 
         #region Methods for Actions
@@ -230,6 +231,13 @@ namespace FuzzPhyte.XR
         public virtual void ItemSpawnedEvent()
         {
             ItemSpawned?.Invoke(this);
+        }
+        /// <summary>
+        /// This is if we are engaging with the item via maybe another camera system of some sorts
+        /// </summary>
+        public virtual void ItemCameraRayEvent()
+        {
+            ItemCamRayActivated?.Invoke(this);
         }
         #endregion
         public virtual void Start()
