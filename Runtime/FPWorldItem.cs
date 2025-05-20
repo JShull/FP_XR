@@ -95,7 +95,7 @@ namespace FuzzPhyte.XR
         // Action events for external listeners
         public event Action<FPWorldItem, XRHandedness> ItemGrabbed;
         public event Action<FPWorldItem, XRHandedness> ItemDropped;
-        public event Action<FPWorldItem,XRHandedness> ItemForceDropped;
+        public event Action<FPWorldItem, XRHandedness> ItemForceDropped;
         public event Action<FPWorldItem> ItemDestroyed;
         public event Action<FPWorldItem> ItemSpawned;
         public event Action<FPWorldItem, FPSocket> ItemSocketSet;
