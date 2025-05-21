@@ -187,7 +187,6 @@ namespace FuzzPhyte.XR
         {
             if (this.handState != XRHandedness.NONE)
             {
-
                 ItemDropped?.Invoke(this, this.handState);
             }
             else
