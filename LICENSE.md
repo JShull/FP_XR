@@ -661,7 +661,7 @@ to attach them to the start of each source file to most effectively
 state the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
-    FP_XR is a Unity based package for building on Unity Character Controller to help generate a character controller driven by a data file.
+    FP_XR is a Unity based package for building XR agnostic code that will work with other XR SDKs
     Copyright (C) 2025  John B. Shull
 
     This program is free software: you can redistribute it and/or modify

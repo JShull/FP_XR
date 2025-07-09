@@ -2,10 +2,11 @@
 
 ## XR
 
-FP_XR is designed and built to be utilized with FP_Utility and FP_Ray with the intention of having some core functions that could be helpful in XR projects with 0 dependencies to other XR libraries. Includes a robust set of Controller Event scripts that can be wired up to whatever XR/VR package you're using and with a few lines of code can heavily modify button overlay text/icon information as well as lock the controller. The internal system requires some setup mainly tied to the delegates/events associated with at the controller(s) level or the button(s) level of each controller.
+FP_XR is designed and built to be utilized with [FP_Utility](https://github.com/jshull/FP_Utility.git), [FP_Ray](https://github.com/jshull/FP_Ray.git), and [FP_SGraph](https://github.com/jshull/FP_SGraph.git) with the intention of having some core functions that could be helpful in XR projects with 0 dependencies to other XR libraries. Includes a robust set of Controller Event scripts that can be wired up to whatever XR/VR package you're using and with a few lines of code can heavily modify button overlay text/icon information as well as lock the controller. The internal system requires some setup mainly tied to the delegates/events associated with at the controller(s) level or the button(s) level of each controller.
 
 ## Setup & Design
 
+**This package supports [FP_Installer](https://github.com/jshull/FP_Installer.git)** - bring the installer package in first to then help automate other git packages.
 This package could be used in non-xr projects as a lot of the features/functions are more about spatial layout than anything else.
 
 SamplesURP will require additional package imports.

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2025-07-09
+
+### 0.6.0 Added
+
+- [@JShull](https://github.com/jshull).
+  - FP_Installer Setup
+
+### 0.6.0 Changed
+
+- [@JShull](https://github.com/jshull).
+  - FP_XRControllerRef.cs
+    - Checked if our sound source object is enabled before running play
+
 ## [0.5.0] - 2025-04-21
 
 ### 0.5.0 Added

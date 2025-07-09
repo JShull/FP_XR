@@ -127,7 +127,10 @@ namespace FuzzPhyte.XR
             if (worldAudioRef!=null && audioRef!=null)
             {
                 worldAudioRef.clip = audioRef;
-                worldAudioRef.Play();
+                if (worldAudioRef.isActiveAndEnabled)
+                {
+                    worldAudioRef.Play();
+                }
             }
             if (useOffset)
             {
