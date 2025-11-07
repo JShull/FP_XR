@@ -67,6 +67,18 @@ namespace FuzzPhyte.XR
                 return interfaces;
             }
         }
+        /// <summary>
+        /// This will replace and set the internal interfaceObjects via the interface
+        /// </summary>
+        /// <param name="newInterfaces"></param>
+        public virtual void SetLabelInterfaces(List<IFPXRLabel> newInterfaces)
+        {
+            interfaceObjects.Clear();
+            for(int i = 0;i < newInterfaces.Count; i++)
+            {
+                interfaceObjects.Add((UnityEngine.Object)newInterfaces[i]);
+            }
+        }
         protected virtual void OnValidate()
         {
             // Validate that all objects in the list implement the interface
