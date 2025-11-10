@@ -110,6 +110,32 @@ namespace FuzzPhyte.XR
             StepNote = notes;
         }
     }
+    /// <summary>
+    /// For data parameters tied to OVRFPAudioTriggers and other Audio Setting Needs
+    /// </summary>
+    [Serializable]
+    public struct XRPhysicsAudio
+    {
+        public List<AudioClip> SourceClips;
+        [Range(0,1)]
+        public float Volume;
+        public XRAudioRandomizer VolumeRandomizer;
+        [Range(-3f,3f)]
+        public float Pitch;
+        public XRAudioRandomizer PitchRandomizer;
+        public bool Spatialize;
+        public bool Loop;
+        [Tooltip("Should be probably 100 - anything else will be a probability that it doesn't play")]
+        public float ChanceToPlay;
+        public bool PlayOnStart;
+    }
+    [Serializable]
+    public struct XRAudioRandomizer
+    {
+        public bool UseRandomRange;
+        public float MinRandom;
+        public float MaxRandom;
+    }
     [Serializable]
     public struct ContainerRequirementD
     {

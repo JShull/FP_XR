@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - FP_XRPhysicsEvents.cs
     - way to publicly inject the rigidbody reference
     - way to publicly inject float thresholds
+  - FPXRUtility.cs
+    - Added in XRPhysicsAudio struct
 
 ## [0.6.0] - 2025-07-09
 
