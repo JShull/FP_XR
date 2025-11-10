@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2025-11-10
+
+### 0.6.1 Added
+
+### 0.6.1 Changed
+
+- [@JShull](https://github.com/jshull).
+  - FP_XRPhysicsEvents.cs
+    - way to publicly inject the rigidbody reference
+
 ## [0.6.0] - 2025-07-09
 
 ### 0.6.0 Added

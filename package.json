@@ -1,6 +1,6 @@
 {
     "name": "com.fuzzphyte.xr",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "displayName": "FP XR",
     "description": "FP XR is a generic collection of useful resources/scripts to do basic things without hooks to specific XR dependencies. Make sure to install FP_Installer prior!",
     "unity": "6000.1",

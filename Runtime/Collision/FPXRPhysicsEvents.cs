@@ -40,6 +40,28 @@ namespace FuzzPhyte.XR
                 Setup();
             }
         }
+        
+        public virtual void OnDestroy()
+        {
+            if (fPXRPhysicsListener != null)
+            {
+                fPXRPhysicsListener.OnCollisionEnterEvent -= FPXRCollisionEnter;
+                fPXRPhysicsListener.OnTriggerEnterEvent -= FPXRTriggerEnter;
+            }
+        }
+        /// <summary>
+        /// Inject Rigidbody Reference, you should optionally consider running setup here
+        /// </summary>
+        /// <param name="rigidbody"></param>
+        /// <param name="runSetup"></param>
+        public virtual void InjectRigidbody(Rigidbody rigidbody,bool runSetup=false)
+        {
+            _rigidbody = rigidbody;
+            if (runSetup)
+            {
+                Setup();
+            } 
+        }
         protected virtual void Setup()
         {
             if (_rigidbody == null)
@@ -60,14 +82,6 @@ namespace FuzzPhyte.XR
             fPXRPhysicsListener.UseTriggerEnterEvent = true;
             fPXRPhysicsListener.OnCollisionEnterEvent += FPXRCollisionEnter;
             fPXRPhysicsListener.OnTriggerEnterEvent += FPXRTriggerEnter;
-        }
-        public virtual void OnDestroy()
-        {
-            if (fPXRPhysicsListener != null)
-            {
-                fPXRPhysicsListener.OnCollisionEnterEvent -= FPXRCollisionEnter;
-                fPXRPhysicsListener.OnTriggerEnterEvent -= FPXRTriggerEnter;
-            }
         }
         /// <summary>
         /// For Trigger Events
