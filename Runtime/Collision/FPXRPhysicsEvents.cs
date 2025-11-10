@@ -62,6 +62,13 @@ namespace FuzzPhyte.XR
                 Setup();
             } 
         }
+        public virtual void InjectThresholdValues(float lowToMedium, float mediumToHigh, float minThreshold, float timeBetwenCol)
+        {
+            lowToMediumThreshold = lowToMedium;
+            mediumToHighThreshold = mediumToHigh;
+            minimumThreshold = minThreshold;
+            timeBetweenCollisions = timeBetwenCol;
+        }
         protected virtual void Setup()
         {
             if (_rigidbody == null)

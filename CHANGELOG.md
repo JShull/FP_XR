@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [@JShull](https://github.com/jshull).
   - FP_XRPhysicsEvents.cs
     - way to publicly inject the rigidbody reference
+    - way to publicly inject float thresholds
 
 ## [0.6.0] - 2025-07-09
 
