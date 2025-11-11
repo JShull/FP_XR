@@ -7,9 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.6.1] - 2025-11-10
+## [0.6.1] - 2025-11-11
 
 ### 0.6.1 Added
+
+- [@JShull](https://github.com/jshull).
+  - FPXRGhostFollower.cs
+    - way to track an item via physics for other physics based interactions but not on the main tracked item (on the ghost)
 
 ### 0.6.1 Changed
 
