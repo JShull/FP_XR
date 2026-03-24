@@ -9,6 +9,7 @@ namespace FuzzPhyte.XR
         private GameObject ghostObject = null; // Static reference to the ghost object
         private Renderer ghostRenderer = null;
         private bool isCollidingActive = false;
+        public bool IsCollidingActive => isCollidingActive;
         /// <summary>
         /// Initializes the ghost object for surface locking.
         /// </summary>

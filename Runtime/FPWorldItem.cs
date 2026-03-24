@@ -276,6 +276,10 @@ namespace FuzzPhyte.XR
                 LabelInterfaces[i].SetupLabelData(DetailedLabelData, StartingFPLanguage, StartDetailedLabelOnStart, UseSupportCombinedVocabData);
             }
         }
+        public virtual void OnDestroy()
+        {
+            ItemDestroyed?.Invoke(this);
+        }
         public virtual void ResetLocation()
         {
             ItemTransform.position = _startPosition;
