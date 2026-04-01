@@ -46,6 +46,11 @@ namespace FuzzPhyte.XR
         protected FP_Raycaster _raycaster;
         protected FP_RayArgumentHit _rayHit;
         public FP_Raycaster Raycaster { get { return _raycaster; } set { _raycaster = value; } }
+
+        [SerializeField]
+        protected bool drawEditorGizmos=true;
+        public bool DrawEditorGizmos { get { return drawEditorGizmos; } }
+
         public virtual void SetupRaycaster()
         {
             _raycaster = new FP_Raycaster(this);
@@ -157,6 +162,7 @@ namespace FuzzPhyte.XR
         protected virtual void OnDrawGizmos()
         {
 #if UNITY_EDITOR
+            if (!drawEditorGizmos) { return; }
             if (UnityEditor.Selection.activeGameObject == this.gameObject)
             {
                 if (RaycastOrigin != null && RaycastEndDir != null)
@@ -172,7 +178,6 @@ namespace FuzzPhyte.XR
                     Gizmos.DrawSphere(RaycastEndDir.position, 0.1f);
                 }
             }
-            
 #endif
         }
     }
