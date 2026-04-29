@@ -70,6 +70,15 @@ namespace FuzzPhyte.XR
         Forward = 2
     }
     [Serializable]
+    public enum XRJoystickDirection
+    {
+        Centered = 0,
+        Forward = 1,
+        Backward = 2,
+        Left = 3,
+        Right = 4
+    }
+    [Serializable]
     public enum XRInteractorType
     {
         None = 0,
@@ -264,6 +273,17 @@ namespace FuzzPhyte.XR
         void RightControllerReset(XRHandedness hand, XRButton button);
         void LeftControllerReset(XRHandedness hand, XRButton button);
 
+    }
+    /// <summary>
+    /// Optional listener for controller joystick/thumbstick axis updates handled by FPXRControllerEventManager.
+    /// Kept separate from IFPXRControllerListener so existing button listeners do not need new methods.
+    /// </summary>
+    public interface IFPXRControllerJoystickListener
+    {
+        void AnyControllerJoystickMoved(XRHandedness hand, Vector2 axisValue, XRJoystickDirection direction);
+        void AnyControllerJoystickDirectionStarted(XRHandedness hand, Vector2 axisValue, XRJoystickDirection direction);
+        void AnyControllerJoystickDirectionChanged(XRHandedness hand, Vector2 axisValue, XRJoystickDirection previousDirection, XRJoystickDirection currentDirection);
+        void AnyControllerJoystickDirectionEnded(XRHandedness hand, Vector2 axisValue, XRJoystickDirection direction);
     }
     /// <summary>
     /// Functions required to be a full blown button listener for various VR controllers as part of the FPXRControllerFeedback

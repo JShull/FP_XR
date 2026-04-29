@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-04-29
+
+### 0.7.0 Added
+
+- [@JShull](https://github.com/jshull).
+  - FPXRControllerEventManager.cs
+    - Added normalized joystick/thumbstick event support without tying FP_XR to a specific XR SDK
+    - Added UpdateJoystickState for external SDK layers to pass in Vector2 joystick axis data
+    - Added joystick moved, direction started, direction changed, and direction ended events
+    - Added dead zone and direction threshold settings for determining centered/forward/backward/left/right joystick directions
+    - Added optional joystick listener registration via IFPXRControllerJoystickListener
+  - FPXRUtility.cs
+    - Added XRJoystickDirection enum
+    - Added IFPXRControllerJoystickListener interface
+
 ## [0.6.1] - 2025-11-11
 
 ### 0.6.1 Added

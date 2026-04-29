@@ -25,6 +25,8 @@ namespace FuzzPhyte.XR
         public bool DontDestroy = false;
         #region Delegates and Events
         protected List<XRControllerEvent> controllerDelegates = new List<XRControllerEvent>();
+        protected List<XRControllerJoystickEvent> controllerJoystickDelegates = new List<XRControllerJoystickEvent>();
+        protected List<XRControllerJoystickDirectionChangedEvent> controllerJoystickDirectionChangedDelegates = new List<XRControllerJoystickDirectionChangedEvent>();
         /// <summary>
         /// Controller Level Delegate - based on the hand and the button
         /// </summary>
@@ -207,6 +209,68 @@ namespace FuzzPhyte.XR
         //raw events - for internal use only and for our hintAcknowledge listeners
         private event XRControllerEvent rawButtonPressed;
         private event XRControllerEvent rawButtonReleased;
+
+        /// <summary>
+        /// Controller joystick delegate - based on hand, current axis, and calculated direction.
+        /// </summary>
+        public delegate void XRControllerJoystickEvent(XRHandedness hand, Vector2 axisValue, XRJoystickDirection direction);
+        public delegate void XRControllerJoystickDirectionChangedEvent(XRHandedness hand, Vector2 axisValue, XRJoystickDirection previousDirection, XRJoystickDirection currentDirection);
+        private event XRControllerJoystickEvent joystickMoved;
+        private event XRControllerJoystickEvent joystickDirectionStarted;
+        private event XRControllerJoystickEvent joystickDirectionEnded;
+        private event XRControllerJoystickDirectionChangedEvent joystickDirectionChanged;
+        public event XRControllerJoystickEvent JoystickMoved
+        {
+            add
+            {
+                joystickMoved += value;
+                controllerJoystickDelegates.Add(value);
+            }
+            remove
+            {
+                joystickMoved -= value;
+                controllerJoystickDelegates.Remove(value);
+            }
+        }
+        public event XRControllerJoystickEvent JoystickDirectionStarted
+        {
+            add
+            {
+                joystickDirectionStarted += value;
+                controllerJoystickDelegates.Add(value);
+            }
+            remove
+            {
+                joystickDirectionStarted -= value;
+                controllerJoystickDelegates.Remove(value);
+            }
+        }
+        public event XRControllerJoystickEvent JoystickDirectionEnded
+        {
+            add
+            {
+                joystickDirectionEnded += value;
+                controllerJoystickDelegates.Add(value);
+            }
+            remove
+            {
+                joystickDirectionEnded -= value;
+                controllerJoystickDelegates.Remove(value);
+            }
+        }
+        public event XRControllerJoystickDirectionChangedEvent JoystickDirectionChanged
+        {
+            add
+            {
+                joystickDirectionChanged += value;
+                controllerJoystickDirectionChangedDelegates.Add(value);
+            }
+            remove
+            {
+                joystickDirectionChanged -= value;
+                controllerJoystickDirectionChangedDelegates.Remove(value);
+            }
+        }
         #endregion
         [Space]
         [Header("Controller Feedback")] 
@@ -220,6 +284,14 @@ namespace FuzzPhyte.XR
         protected Dictionary<(XRHandedness,XRButton),XRControllerEvent>hintAcknowledgeListeners = new Dictionary<(XRHandedness, XRButton), XRControllerEvent>();
         [Tooltip("Will hold the routine for our current hint/information sequence")]
         protected Coroutine currentSequenceRoutine;
+        [Space]
+        [Header("Joystick Options")]
+        [SerializeField, Range(0f, 1f), Tooltip("Axis magnitude below this value is treated as centered.")]
+        protected float joystickDeadZone = 0.25f;
+        [SerializeField, Range(0f, 1f), Tooltip("Dominant axis value required before a cardinal joystick direction is active.")]
+        protected float joystickDirectionThreshold = 0.6f;
+        protected Dictionary<XRHandedness, Vector2> joystickAxes = new Dictionary<XRHandedness, Vector2>();
+        protected Dictionary<XRHandedness, XRJoystickDirection> joystickDirections = new Dictionary<XRHandedness, XRJoystickDirection>();
         protected virtual void Awake()
         {
             if (Instance && Instance != this)
@@ -232,6 +304,7 @@ namespace FuzzPhyte.XR
             {
                 DontDestroyOnLoad(gameObject);
             }
+            InitializeJoystickState();
             
         }
 #if UNITY_EDITOR
@@ -321,6 +394,16 @@ namespace FuzzPhyte.XR
         {
             UpdateButtonState(XRHandedness.Left, XRButton.PrimaryButton, XRInteractionStatus.Hover);
         }
+        [ContextMenu("Testing ControllerManager, Left Joystick Forward")]
+        public void LeftJoystickForwardAction()
+        {
+            UpdateJoystickState(XRHandedness.Left, new Vector2(0f, 1f));
+        }
+        [ContextMenu("Testing ControllerManager, Left Joystick Centered")]
+        public void LeftJoystickCenteredAction()
+        {
+            UpdateJoystickState(XRHandedness.Left, Vector2.zero);
+        }
         #endregion
 #endif
         #region Public Event Listener Registration
@@ -343,6 +426,12 @@ namespace FuzzPhyte.XR
             InformationButtonDeactivated += listener.AnyControllerInfoDeactive;
             ControllerResetLeft += listener.LeftControllerReset;
             ControllerResetRight += listener.RightControllerReset;
+
+            var joystickListener = listener as IFPXRControllerJoystickListener;
+            if (joystickListener != null)
+            {
+                SetupItemForListeningJoystickEvents(joystickListener);
+            }
         }
         /// <summary>
         /// Easy way to remove all events from the listener interface item passed in
@@ -362,13 +451,41 @@ namespace FuzzPhyte.XR
             InformationButtonDeactivated -= listener.AnyControllerInfoDeactive;
             ControllerResetLeft -= listener.LeftControllerReset;
             ControllerResetRight -= listener.RightControllerReset;
+
+            var joystickListener = listener as IFPXRControllerJoystickListener;
+            if (joystickListener != null)
+            {
+                RemoveItemForListeningJoystickEvents(joystickListener);
+            }
+        }
+        /// <summary>
+        /// Easy way to add all joystick events/listeners to our optional interface referenced item.
+        /// </summary>
+        /// <param name="listener">The joystick listener</param>
+        public void SetupItemForListeningJoystickEvents(IFPXRControllerJoystickListener listener)
+        {
+            JoystickMoved += listener.AnyControllerJoystickMoved;
+            JoystickDirectionStarted += listener.AnyControllerJoystickDirectionStarted;
+            JoystickDirectionChanged += listener.AnyControllerJoystickDirectionChanged;
+            JoystickDirectionEnded += listener.AnyControllerJoystickDirectionEnded;
+        }
+        /// <summary>
+        /// Easy way to remove all joystick events from the optional listener interface item passed in.
+        /// </summary>
+        /// <param name="listener">The joystick listener</param>
+        public void RemoveItemForListeningJoystickEvents(IFPXRControllerJoystickListener listener)
+        {
+            JoystickMoved -= listener.AnyControllerJoystickMoved;
+            JoystickDirectionStarted -= listener.AnyControllerJoystickDirectionStarted;
+            JoystickDirectionChanged -= listener.AnyControllerJoystickDirectionChanged;
+            JoystickDirectionEnded -= listener.AnyControllerJoystickDirectionEnded;
         }
         /// <summary>
         /// Removes all delegates/listeners as we've been monitoring them
         /// </summary>
         public void RemoveAllListeners()
         {
-            foreach (var handler in controllerDelegates)
+            foreach (var handler in controllerDelegates.ToArray())
             {
                 ButtonPressed -= handler;
                 ButtonReleased -= handler;
@@ -383,8 +500,20 @@ namespace FuzzPhyte.XR
                 ControllerResetLeft -= handler;
                 ControllerResetRight -= handler;
             }
+            foreach (var handler in controllerJoystickDelegates.ToArray())
+            {
+                JoystickMoved -= handler;
+                JoystickDirectionStarted -= handler;
+                JoystickDirectionEnded -= handler;
+            }
+            foreach (var handler in controllerJoystickDirectionChangedDelegates.ToArray())
+            {
+                JoystickDirectionChanged -= handler;
+            }
             //clear the list
             controllerDelegates.Clear();
+            controllerJoystickDelegates.Clear();
+            controllerJoystickDirectionChangedDelegates.Clear();
         }
         #endregion
         public void EnforceLock()
@@ -658,6 +787,86 @@ namespace FuzzPhyte.XR
             }
         }
         /// <summary>
+        /// External SDKs (e.g., Oculus, Unity XR Toolkit) invoke this to report joystick/thumbstick axis movement.
+        /// Positive Y is treated as Forward once it passes joystickDirectionThreshold.
+        /// </summary>
+        public virtual void UpdateJoystickState(XRHandedness hand, Vector2 axisValue)
+        {
+            XRJoystickDirection currentDirection = CalculateJoystickDirection(axisValue);
+            XRJoystickDirection previousDirection = ReturnJoystickDirection(hand);
+            joystickAxes[hand] = axisValue;
+
+            if (enforceLockState && IsJoystickEventLocked(hand))
+            {
+                return;
+            }
+
+            joystickDirections[hand] = currentDirection;
+            joystickMoved?.Invoke(hand, axisValue, currentDirection);
+
+            if (previousDirection == currentDirection)
+            {
+                return;
+            }
+
+            joystickDirectionChanged?.Invoke(hand, axisValue, previousDirection, currentDirection);
+
+            if (previousDirection != XRJoystickDirection.Centered)
+            {
+                joystickDirectionEnded?.Invoke(hand, axisValue, previousDirection);
+            }
+            if (currentDirection != XRJoystickDirection.Centered)
+            {
+                joystickDirectionStarted?.Invoke(hand, axisValue, currentDirection);
+            }
+        }
+        /// <summary>
+        /// Returns the most recent joystick axis reported for a controller hand.
+        /// </summary>
+        public virtual Vector2 ReturnJoystickAxis(XRHandedness hand)
+        {
+            if (joystickAxes.ContainsKey(hand))
+            {
+                return joystickAxes[hand];
+            }
+            return Vector2.zero;
+        }
+        /// <summary>
+        /// Returns the most recent calculated joystick direction for a controller hand.
+        /// </summary>
+        public virtual XRJoystickDirection ReturnJoystickDirection(XRHandedness hand)
+        {
+            if (joystickDirections.ContainsKey(hand))
+            {
+                return joystickDirections[hand];
+            }
+            return XRJoystickDirection.Centered;
+        }
+        /// <summary>
+        /// Calculates a joystick direction from an axis value using the configured dead zone and direction threshold.
+        /// </summary>
+        public virtual XRJoystickDirection CalculateJoystickDirection(Vector2 axisValue)
+        {
+            float threshold = Mathf.Max(joystickDeadZone, joystickDirectionThreshold);
+            if (axisValue.magnitude < joystickDeadZone)
+            {
+                return XRJoystickDirection.Centered;
+            }
+
+            float absX = Mathf.Abs(axisValue.x);
+            float absY = Mathf.Abs(axisValue.y);
+
+            if (absY >= absX && absY >= threshold)
+            {
+                return axisValue.y >= 0f ? XRJoystickDirection.Forward : XRJoystickDirection.Backward;
+            }
+            if (absX >= threshold)
+            {
+                return axisValue.x >= 0f ? XRJoystickDirection.Right : XRJoystickDirection.Left;
+            }
+            return XRJoystickDirection.Centered;
+        }
+        /// <summary>
         /// External Request for locking a controller button
         /// </summary>
         /// <param name="hand">the controller hand</param>
@@ -844,6 +1053,18 @@ namespace FuzzPhyte.XR
             return feedback.ReturnButtonLockState(button);
         }
         #endregion
+        protected virtual void InitializeJoystickState()
+        {
+            joystickAxes[XRHandedness.Left] = Vector2.zero;
+            joystickAxes[XRHandedness.Right] = Vector2.zero;
+            joystickDirections[XRHandedness.Left] = XRJoystickDirection.Centered;
+            joystickDirections[XRHandedness.Right] = XRJoystickDirection.Centered;
+        }
+        protected virtual bool IsJoystickEventLocked(XRHandedness hand)
+        {
+            FPXRControllerFeedback feedback = GetFeedbackForHand(hand);
+            return feedback != null && (feedback.ControllerLocked || feedback.ReturnButtonLockState(XRButton.Thumbstick));
+        }
         protected virtual FPXRControllerFeedback GetFeedbackForHand(XRHandedness hand)
         {
             return hand == XRHandedness.Left ? leftControllerFeedback : rightControllerFeedback;
