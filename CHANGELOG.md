@@ -16,11 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Added normalized joystick/thumbstick event support without tying FP_XR to a specific XR SDK
     - Added UpdateJoystickState for external SDK layers to pass in Vector2 joystick axis data
     - Added joystick moved, direction started, direction changed, and direction ended events
+    - Added joystick touched, touch released, clicked, and click released events
+    - Added UpdateJoystickTouchState for external SDK layers to pass in capacitive joystick touch state
+    - Added UpdateJoystickClickState for external SDK layers to pass in joystick click state through the normal Thumbstick button path
     - Added dead zone and direction threshold settings for determining centered/forward/backward/left/right joystick directions
     - Added optional joystick listener registration via IFPXRControllerJoystickListener
   - FPXRUtility.cs
     - Added XRJoystickDirection enum
     - Added IFPXRControllerJoystickListener interface
+    - Added IFPXRControllerJoystickTouchListener interface
 
 ## [0.6.1] - 2025-11-11
 

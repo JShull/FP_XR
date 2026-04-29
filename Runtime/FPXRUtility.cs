@@ -286,6 +286,17 @@ namespace FuzzPhyte.XR
         void AnyControllerJoystickDirectionEnded(XRHandedness hand, Vector2 axisValue, XRJoystickDirection direction);
     }
     /// <summary>
+    /// Optional listener for controller joystick/thumbstick touch and click updates handled by FPXRControllerEventManager.
+    /// Kept separate from movement listeners so axis-only listeners do not need touch/click callbacks.
+    /// </summary>
+    public interface IFPXRControllerJoystickTouchListener
+    {
+        void AnyControllerJoystickTouched(XRHandedness hand, Vector2 axisValue, XRJoystickDirection direction);
+        void AnyControllerJoystickTouchReleased(XRHandedness hand, Vector2 axisValue, XRJoystickDirection direction);
+        void AnyControllerJoystickClicked(XRHandedness hand, Vector2 axisValue, XRJoystickDirection direction);
+        void AnyControllerJoystickClickReleased(XRHandedness hand, Vector2 axisValue, XRJoystickDirection direction);
+    }
+    /// <summary>
     /// Functions required to be a full blown button listener for various VR controllers as part of the FPXRControllerFeedback
     /// </summary>
     public interface IFPXRButtonListener

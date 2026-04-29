@@ -218,6 +218,10 @@ namespace FuzzPhyte.XR
         private event XRControllerJoystickEvent joystickMoved;
         private event XRControllerJoystickEvent joystickDirectionStarted;
         private event XRControllerJoystickEvent joystickDirectionEnded;
+        private event XRControllerJoystickEvent joystickTouched;
+        private event XRControllerJoystickEvent joystickTouchReleased;
+        private event XRControllerJoystickEvent joystickClicked;
+        private event XRControllerJoystickEvent joystickClickReleased;
         private event XRControllerJoystickDirectionChangedEvent joystickDirectionChanged;
         public event XRControllerJoystickEvent JoystickMoved
         {
@@ -258,6 +262,58 @@ namespace FuzzPhyte.XR
                 controllerJoystickDelegates.Remove(value);
             }
         }
+        public event XRControllerJoystickEvent JoystickTouched
+        {
+            add
+            {
+                joystickTouched += value;
+                controllerJoystickDelegates.Add(value);
+            }
+            remove
+            {
+                joystickTouched -= value;
+                controllerJoystickDelegates.Remove(value);
+            }
+        }
+        public event XRControllerJoystickEvent JoystickTouchReleased
+        {
+            add
+            {
+                joystickTouchReleased += value;
+                controllerJoystickDelegates.Add(value);
+            }
+            remove
+            {
+                joystickTouchReleased -= value;
+                controllerJoystickDelegates.Remove(value);
+            }
+        }
+        public event XRControllerJoystickEvent JoystickClicked
+        {
+            add
+            {
+                joystickClicked += value;
+                controllerJoystickDelegates.Add(value);
+            }
+            remove
+            {
+                joystickClicked -= value;
+                controllerJoystickDelegates.Remove(value);
+            }
+        }
+        public event XRControllerJoystickEvent JoystickClickReleased
+        {
+            add
+            {
+                joystickClickReleased += value;
+                controllerJoystickDelegates.Add(value);
+            }
+            remove
+            {
+                joystickClickReleased -= value;
+                controllerJoystickDelegates.Remove(value);
+            }
+        }
         public event XRControllerJoystickDirectionChangedEvent JoystickDirectionChanged
         {
             add
@@ -292,6 +348,8 @@ namespace FuzzPhyte.XR
         protected float joystickDirectionThreshold = 0.6f;
         protected Dictionary<XRHandedness, Vector2> joystickAxes = new Dictionary<XRHandedness, Vector2>();
         protected Dictionary<XRHandedness, XRJoystickDirection> joystickDirections = new Dictionary<XRHandedness, XRJoystickDirection>();
+        protected Dictionary<XRHandedness, bool> joystickTouches = new Dictionary<XRHandedness, bool>();
+        protected Dictionary<XRHandedness, bool> joystickClicks = new Dictionary<XRHandedness, bool>();
         protected virtual void Awake()
         {
             if (Instance && Instance != this)
@@ -404,6 +462,26 @@ namespace FuzzPhyte.XR
         {
             UpdateJoystickState(XRHandedness.Left, Vector2.zero);
         }
+        [ContextMenu("Testing ControllerManager, Left Joystick Touch")]
+        public void LeftJoystickTouchAction()
+        {
+            UpdateJoystickTouchState(XRHandedness.Left, true);
+        }
+        [ContextMenu("Testing ControllerManager, Left Joystick Touch Released")]
+        public void LeftJoystickTouchReleasedAction()
+        {
+            UpdateJoystickTouchState(XRHandedness.Left, false);
+        }
+        [ContextMenu("Testing ControllerManager, Left Joystick Click")]
+        public void LeftJoystickClickAction()
+        {
+            UpdateJoystickClickState(XRHandedness.Left, true);
+        }
+        [ContextMenu("Testing ControllerManager, Left Joystick Click Released")]
+        public void LeftJoystickClickReleasedAction()
+        {
+            UpdateJoystickClickState(XRHandedness.Left, false);
+        }
         #endregion
 #endif
         #region Public Event Listener Registration
@@ -432,6 +510,11 @@ namespace FuzzPhyte.XR
             {
                 SetupItemForListeningJoystickEvents(joystickListener);
             }
+            var joystickTouchListener = listener as IFPXRControllerJoystickTouchListener;
+            if (joystickTouchListener != null)
+            {
+                SetupItemForListeningJoystickTouchEvents(joystickTouchListener);
+            }
         }
         /// <summary>
         /// Easy way to remove all events from the listener interface item passed in
@@ -457,6 +540,11 @@ namespace FuzzPhyte.XR
             {
                 RemoveItemForListeningJoystickEvents(joystickListener);
             }
+            var joystickTouchListener = listener as IFPXRControllerJoystickTouchListener;
+            if (joystickTouchListener != null)
+            {
+                RemoveItemForListeningJoystickTouchEvents(joystickTouchListener);
+            }
         }
         /// <summary>
         /// Easy way to add all joystick events/listeners to our optional interface referenced item.
@@ -479,6 +567,28 @@ namespace FuzzPhyte.XR
             JoystickDirectionStarted -= listener.AnyControllerJoystickDirectionStarted;
             JoystickDirectionChanged -= listener.AnyControllerJoystickDirectionChanged;
             JoystickDirectionEnded -= listener.AnyControllerJoystickDirectionEnded;
+        }
+        /// <summary>
+        /// Easy way to add all joystick touch/click events to our optional interface referenced item.
+        /// </summary>
+        /// <param name="listener">The joystick touch/click listener</param>
+        public void SetupItemForListeningJoystickTouchEvents(IFPXRControllerJoystickTouchListener listener)
+        {
+            JoystickTouched += listener.AnyControllerJoystickTouched;
+            JoystickTouchReleased += listener.AnyControllerJoystickTouchReleased;
+            JoystickClicked += listener.AnyControllerJoystickClicked;
+            JoystickClickReleased += listener.AnyControllerJoystickClickReleased;
+        }
+        /// <summary>
+        /// Easy way to remove all joystick touch/click events from the optional listener interface item passed in.
+        /// </summary>
+        /// <param name="listener">The joystick touch/click listener</param>
+        public void RemoveItemForListeningJoystickTouchEvents(IFPXRControllerJoystickTouchListener listener)
+        {
+            JoystickTouched -= listener.AnyControllerJoystickTouched;
+            JoystickTouchReleased -= listener.AnyControllerJoystickTouchReleased;
+            JoystickClicked -= listener.AnyControllerJoystickClicked;
+            JoystickClickReleased -= listener.AnyControllerJoystickClickReleased;
         }
         /// <summary>
         /// Removes all delegates/listeners as we've been monitoring them
@@ -505,6 +615,10 @@ namespace FuzzPhyte.XR
                 JoystickMoved -= handler;
                 JoystickDirectionStarted -= handler;
                 JoystickDirectionEnded -= handler;
+                JoystickTouched -= handler;
+                JoystickTouchReleased -= handler;
+                JoystickClicked -= handler;
+                JoystickClickReleased -= handler;
             }
             foreach (var handler in controllerJoystickDirectionChangedDelegates.ToArray())
             {
@@ -821,6 +935,68 @@ namespace FuzzPhyte.XR
             }
         }
         /// <summary>
+        /// External SDKs invoke this to report capacitive joystick/thumbstick touch state.
+        /// For OVR this usually maps to OVRInput.Touch.PrimaryThumbstick.
+        /// </summary>
+        public virtual void UpdateJoystickTouchState(XRHandedness hand, bool isTouched)
+        {
+            if (enforceLockState && IsJoystickEventLocked(hand))
+            {
+                return;
+            }
+
+            bool previousTouchState = ReturnJoystickTouchState(hand);
+            if (previousTouchState == isTouched)
+            {
+                return;
+            }
+
+            joystickTouches[hand] = isTouched;
+            Vector2 axisValue = ReturnJoystickAxis(hand);
+            XRJoystickDirection currentDirection = ReturnJoystickDirection(hand);
+
+            if (isTouched)
+            {
+                joystickTouched?.Invoke(hand, axisValue, currentDirection);
+            }
+            else
+            {
+                joystickTouchReleased?.Invoke(hand, axisValue, currentDirection);
+            }
+        }
+        /// <summary>
+        /// External SDKs invoke this to report joystick/thumbstick click state.
+        /// This also drives the normal Thumbstick button Select/Unselect path.
+        /// </summary>
+        public virtual void UpdateJoystickClickState(XRHandedness hand, bool isClicked, float controllerData = 1f)
+        {
+            if (enforceLockState && IsJoystickEventLocked(hand))
+            {
+                return;
+            }
+
+            bool previousClickState = ReturnJoystickClickState(hand);
+            if (previousClickState == isClicked)
+            {
+                return;
+            }
+
+            joystickClicks[hand] = isClicked;
+            UpdateButtonState(hand, XRButton.Thumbstick, isClicked ? XRInteractionStatus.Select : XRInteractionStatus.Unselect, controllerData);
+
+            Vector2 axisValue = ReturnJoystickAxis(hand);
+            XRJoystickDirection currentDirection = ReturnJoystickDirection(hand);
+
+            if (isClicked)
+            {
+                joystickClicked?.Invoke(hand, axisValue, currentDirection);
+            }
+            else
+            {
+                joystickClickReleased?.Invoke(hand, axisValue, currentDirection);
+            }
+        }
+        /// <summary>
         /// Returns the most recent joystick axis reported for a controller hand.
         /// </summary>
         public virtual Vector2 ReturnJoystickAxis(XRHandedness hand)
@@ -841,6 +1017,20 @@ namespace FuzzPhyte.XR
                 return joystickDirections[hand];
             }
             return XRJoystickDirection.Centered;
+        }
+        /// <summary>
+        /// Returns the most recent joystick touch state reported for a controller hand.
+        /// </summary>
+        public virtual bool ReturnJoystickTouchState(XRHandedness hand)
+        {
+            return joystickTouches.ContainsKey(hand) && joystickTouches[hand];
+        }
+        /// <summary>
+        /// Returns the most recent joystick click state reported for a controller hand.
+        /// </summary>
+        public virtual bool ReturnJoystickClickState(XRHandedness hand)
+        {
+            return joystickClicks.ContainsKey(hand) && joystickClicks[hand];
         }
         /// <summary>
         /// Calculates a joystick direction from an axis value using the configured dead zone and direction threshold.
@@ -1059,6 +1249,10 @@ namespace FuzzPhyte.XR
             joystickAxes[XRHandedness.Right] = Vector2.zero;
             joystickDirections[XRHandedness.Left] = XRJoystickDirection.Centered;
             joystickDirections[XRHandedness.Right] = XRJoystickDirection.Centered;
+            joystickTouches[XRHandedness.Left] = false;
+            joystickTouches[XRHandedness.Right] = false;
+            joystickClicks[XRHandedness.Left] = false;
+            joystickClicks[XRHandedness.Right] = false;
         }
         protected virtual bool IsJoystickEventLocked(XRHandedness hand)
         {
