@@ -86,7 +86,7 @@ namespace FuzzPhyte.XR
             {
                 if (!(interfaceObjects[i] is IFPXRLabel))
                 {
-                    Debug.LogError($"Object {interfaceObjects[i]?.name} does not implement IPFXRLabel.");
+                    Debug.LogError($"Object interface for FPWorldItem isn't valid, does not implement IPFXRLabel, GameObject Name: {this.gameObject.name}");
                     interfaceObjects[i] = null; // Clear invalid entries
                 }
             }
