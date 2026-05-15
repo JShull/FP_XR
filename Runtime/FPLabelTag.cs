@@ -8,8 +8,6 @@ namespace FuzzPhyte.XR
     using System.Linq;
     using System.Collections.Generic;
 
-    // https://github.com/Antoshidza/NSprites
-    // https://github.com/Fribur/TextMeshDOTS
     public class FPLabelTag
     {
         protected FP_Tag dataTag;
@@ -35,6 +33,19 @@ namespace FuzzPhyte.XR
             this.vocabSupportData.AddRange(vocabSupportData);
             SetupCombinedVocabulary(vocabData.Language);
         }
+        public void UpdateVocabData(FP_Vocab newVocabData)
+        {
+            vocabData = newVocabData;
+            SetupCombinedVocabulary(vocabData.Language);
+        }
+        public void UpdateVocabData(FP_Vocab newVocabData, List<XRVocabSupportData> newSupportData)
+        {
+            vocabData = newVocabData;
+            vocabSupportData = new List<XRVocabSupportData>();
+            vocabSupportData.AddRange(newSupportData);
+            SetupCombinedVocabulary(vocabData.Language);
+        }
+
         /// <summary>
         /// Only returns the first matching support category
         /// </summary>
@@ -192,8 +203,16 @@ namespace FuzzPhyte.XR
 
             if (BackDrop == null)
             {
-                Debug.LogError("BackDrop SpriteRenderer is not assigned.");
-                return points;
+                if (dataTag != null)
+                {
+                    Debug.LogError($"BackDrop SpriteRenderer is not assigned {dataTag.name}");
+                }
+                else
+                {
+                    Debug.LogError($"BackDrop SpriteRenderer is not assigned");
+                }
+
+                    return points;
             }
 
             Bounds bounds = BackDrop.bounds;
