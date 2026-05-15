@@ -35,14 +35,14 @@ namespace FuzzPhyte.XR
         }
         public void UpdateVocabData(FP_Vocab newVocabData)
         {
-            vocabData = newVocabData;
+            this.vocabData = newVocabData;
             SetupCombinedVocabulary(vocabData.Language);
         }
         public void UpdateVocabData(FP_Vocab newVocabData, List<XRVocabSupportData> newSupportData)
         {
-            vocabData = newVocabData;
-            vocabSupportData = new List<XRVocabSupportData>();
-            vocabSupportData.AddRange(newSupportData);
+            this.vocabData = newVocabData;
+            this.vocabSupportData = new List<XRVocabSupportData>();
+            this.vocabSupportData.AddRange(newSupportData);
             SetupCombinedVocabulary(vocabData.Language);
         }
 

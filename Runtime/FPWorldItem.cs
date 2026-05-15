@@ -366,25 +366,28 @@ namespace FuzzPhyte.XR
             }
             DetailedLabelDeactivated.Invoke();
         }
-        public virtual void ActivateDetailedLabelTimer(float time)
+        public virtual TimerData ActivateDetailedLabelTimer(float time)
         {
             if (FP_Timer.CCTimer != null)
             {
                 if(Time.time-lastTimeTimerRan> lastTimerValue)
                 {
                     //timer has already deactivated by now
-                    FP_Timer.CCTimer.StartTimer(time, () => { DeactivateAllLabels(); });
+                    var timerData = FP_Timer.CCTimer.StartTimer(time, () => { DeactivateAllLabels(); });
                     lastTimeTimerRan = Time.time;
                     lastTimerValue = time;
                     Debug.LogWarning($"Timer Activated, Last Time Timer Ran = {lastTimeTimerRan.ToString()}, Last Timer Value = {lastTimerValue}");
                     ItemLabelActivated?.Invoke(this);
+                    return timerData;
                 }
                 else
                 {
                     //already have a timer in the queue
                     Debug.LogWarning($"Already have a timer for deactivating in the queue! - should be running at {lastTimeTimerRan + lastTimerValue} - and we are currently at {Time.time}");
+                    return null;
                 }
             }
+            return null;
         }
         public virtual void ShowAllTheRenderers()
         {
