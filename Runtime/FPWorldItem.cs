@@ -79,18 +79,24 @@ namespace FuzzPhyte.XR
                 interfaceObjects.Add((UnityEngine.Object)newInterfaces[i]);
             }
         }
+#if UNITY_EDITOR
         protected virtual void OnValidate()
         {
             // Validate that all objects in the list implement the interface
-            for (int i = 0; i < interfaceObjects.Count; i++)
+            if (interfaceObjects.Count > 0)
             {
-                if (!(interfaceObjects[i] is IFPXRLabel))
+                for (int i = 0; i < interfaceObjects.Count; i++)
                 {
-                    Debug.LogError($"Object interface for FPWorldItem isn't valid, does not implement IPFXRLabel, GameObject Name: {this.gameObject.name}");
-                    interfaceObjects[i] = null; // Clear invalid entries
+                    if (!(interfaceObjects[i] is IFPXRLabel))
+                    {
+                        Debug.LogError($"Object interface for FPWorldItem isn't valid, does not implement IPFXRLabel, GameObject Name: {this.gameObject.name}");
+                        interfaceObjects[i] = null; // Clear invalid entries
+                    }
                 }
             }
+            
         }
+#endif
         [Space]
         [SerializeField]
         protected FPSocket currentSocket;
