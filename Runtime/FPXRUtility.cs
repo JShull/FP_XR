@@ -204,6 +204,7 @@ namespace FuzzPhyte.XR
         public Color HintIconColor;
         public Sprite InformationIcon;
         public Color InformationIconColor;
+        public bool IsGripTrigger;
     }
     public interface IFPXREventBinder
     {

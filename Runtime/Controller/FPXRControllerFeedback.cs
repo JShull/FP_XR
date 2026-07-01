@@ -358,7 +358,7 @@ namespace FuzzPhyte.XR
                                 //update UI to this
                                 if (controllerRefData != null)
                                 {
-                                    controllerRefData.SetupUI(curButton.ScaleAdjustment,aState.Icon, aState.IconColor,aState.LabelText, aState.LabelFontSetting, aState.ButtonSound, WorldControllerAudioSource);
+                                    controllerRefData.SetupUI(curButton.ScaleAdjustment,aState.Icon, aState.IconColor,aState.LabelText, aState.LabelFontSetting, aState.IsGripTrigger,aState.ButtonSound, WorldControllerAudioSource);
                                     //turn off secondary icon if there is one
                                     controllerRefData.ShowORHideSecondaryVisual(false);
                                 }
@@ -627,11 +627,11 @@ namespace FuzzPhyte.XR
                             }
                             if (button == XRButton.Trigger || button ==XRButton.Grip)
                             {
-                                cachedItem.ApplyUIChanges(label.Icon, label.IconColor, label.LabelText, label.LabelFontSetting, label.ButtonSound, UseCanvas, useDownOffset, label.ScaleAdjust,vectorValue);
+                                cachedItem.ApplyUIChanges(label.Icon, label.IconColor, label.LabelText, label.LabelFontSetting,true, label.ButtonSound, UseCanvas, useDownOffset, label.ScaleAdjust,vectorValue);
                             }
                             else
                             {
-                                cachedItem.ApplyUIChanges(label.Icon, label.IconColor,label.LabelText, label.LabelFontSetting, label.ButtonSound, UseCanvas, useDownOffset,label.ScaleAdjust);
+                                cachedItem.ApplyUIChanges(label.Icon, label.IconColor,label.LabelText, label.LabelFontSetting,false, label.ButtonSound, UseCanvas, useDownOffset,label.ScaleAdjust);
                             }
                                 
 
@@ -893,7 +893,9 @@ namespace FuzzPhyte.XR
         /// <param name="lockState"></param>
         protected virtual void ButtonStateLock(FPXRControllerRef cachedItem)
         {
-            cachedItem.ApplyUIChanges(lockStateDetails.Icon, lockStateDetails.IconColor,lockStateDetails.LabelText, lockStateDetails.LabelFontSetting, lockStateDetails.ButtonSound, UseCanvas);
+            //bool isTriggerOrGrip = false;
+            //lockStateDetails.
+            cachedItem.ApplyUIChanges(lockStateDetails.Icon, lockStateDetails.IconColor,lockStateDetails.LabelText, lockStateDetails.LabelFontSetting, lockStateDetails.IsGripTrigger, lockStateDetails.ButtonSound, UseCanvas);
         }
         /// <summary>
         /// Will update the dictionary to make our button state be in a dual state of Hint

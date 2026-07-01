@@ -44,6 +44,8 @@ namespace FuzzPhyte.XR
         [SerializeField] protected SpriteRenderer buttonAdditionalImage;
         [Tooltip("Seconday icon ref - if Canvas")]
         [SerializeField] protected Image buttonAdditionalCanvasImage;
+        [SerializeField] protected bool triggerGripAudioAlreadyPlayed = false;
+        [SerializeField] protected bool isTriggerGripButton = false;
 
         #region Main Utility Functions for UI Updates
         /// <summary>
@@ -55,11 +57,12 @@ namespace FuzzPhyte.XR
         /// <param name="audioRef"></param>
         /// <param name="audioSourceRef"></param>
         /// <param name="UseCanvas"></param>
-        public void SetupUI(Vector3 localScale,Sprite iconRef, Color iconColor,string textRef, FontSetting fontRef, AudioClip audioRef=null,AudioSource audioSourceRef=null,bool UseCanvas = false)
+        public void SetupUI(Vector3 localScale,Sprite iconRef, Color iconColor,string textRef, FontSetting fontRef,bool isTriggerGrip, AudioClip audioRef=null,AudioSource audioSourceRef=null,bool UseCanvas = false)
         {
             //scale accordingly
             buttonRootParent.transform.localScale = localScale;
             storedLocalScaleAdj=localScale;
+            isTriggerGripButton = isTriggerGrip;
             if (useCanvas)
             {
                 if (buttonCanvasImage != null)
@@ -100,8 +103,15 @@ namespace FuzzPhyte.XR
         /// <param name="fontRef"></param>
         /// <param name="audioRef"></param>
         /// <param name="UseCanvas"></param>
-        public bool ApplyUIChanges(Sprite iconRef, Color iconColor,string textRef, FontSetting fontRef, 
-            AudioClip audioRef=null, bool UseCanvas = false, bool useOffset = false, float useScale = 1,float vectorData= 1.0f)
+        public bool ApplyUIChanges(Sprite iconRef, 
+            Color iconColor,string textRef, 
+            FontSetting fontRef,
+            bool floatAxisButton=false,
+            AudioClip audioRef=null, 
+            bool UseCanvas = false, 
+            bool useOffset = false, 
+            float useScale = 1,
+            float vectorData= 1.0f)
         {
             if (!setupComplete)
             {
@@ -138,7 +148,26 @@ namespace FuzzPhyte.XR
                 worldAudioRef.clip = audioRef;
                 if (worldAudioRef.isActiveAndEnabled)
                 {
-                    worldAudioRef.Play();
+                    if (floatAxisButton&& isTriggerGripButton)
+                    {
+                        if (!triggerGripAudioAlreadyPlayed && vectorData > 0.8f)
+                        {
+                            worldAudioRef.Play();
+                            triggerGripAudioAlreadyPlayed = true;
+                        }
+                        else
+                        {
+                            if(vectorData < 0.15f)
+                            {
+                                triggerGripAudioAlreadyPlayed = false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        worldAudioRef.Play();
+                    }
+                   
                 }
             }
             if (useOffset)
