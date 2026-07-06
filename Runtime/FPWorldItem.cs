@@ -82,9 +82,16 @@ namespace FuzzPhyte.XR
         public virtual void SetLabelInterfaces(List<IFPXRLabel> newInterfaces)
         {
             interfaceObjects.Clear();
-            for(int i = 0;i < newInterfaces.Count; i++)
+            Debug.LogWarning($"Set Label Interfaces called: {newInterfaces.Count} interfaces passed in");
+            for (int i = 0;i < newInterfaces.Count; i++)
             {
-                interfaceObjects.Add((UnityEngine.Object)newInterfaces[i]);
+                var newObj = newInterfaces[i] as UnityEngine.Object;
+                if(newObj == null)
+                {
+                    Debug.LogError($"Object interface for FPWorldItem isn't valid, does not implement IPFXRLabel, GameObject Name: {this.gameObject.name} and interface id # {i} with the name: {newInterfaces[i].ToString()}");
+                    continue;
+                }
+                interfaceObjects.Add(newObj);
             }
         }
 #if UNITY_EDITOR
@@ -97,7 +104,7 @@ namespace FuzzPhyte.XR
                 {
                     if (!(interfaceObjects[i] is IFPXRLabel))
                     {
-                        Debug.LogError($"Object interface for FPWorldItem isn't valid, does not implement IPFXRLabel, GameObject Name: {this.gameObject.name}");
+                        Debug.LogError($"Object interface for FPWorldItem isn't valid, does not implement IPFXRLabel, GameObject Name: {this.gameObject.name} and interface id # {i} with the name: {interfaceObjects[i].name}");
                         interfaceObjects[i] = null; // Clear invalid entries
                     }
                 }

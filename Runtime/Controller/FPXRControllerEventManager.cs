@@ -1,7 +1,6 @@
 // Copyright (c) 2026 John B. Shull
 // FuzzPhyte LLC is a company associated with John B. Shull
 // This file is part of FP_XR Package.
-//
 // Public license: GNU GPLv3-or-later.
 // Commercial/proprietary use requires a separate license from John B. Shull.
 //
@@ -98,7 +97,6 @@ namespace FuzzPhyte.XR
                 controllerDelegates.Remove(value);
             }
         }
-
         private event XRControllerEvent controllerLocked;
         private event XRControllerEvent controllerUnlocked;
         public event XRControllerEvent ControllerLocked
@@ -127,7 +125,6 @@ namespace FuzzPhyte.XR
                 controllerDelegates.Remove(value);
             }
         }
-
         private event XRControllerEvent hintButtonActive;
         private event XRControllerEvent hintButtonDeactivated;
         public event XRControllerEvent HintButtonActive
@@ -156,7 +153,6 @@ namespace FuzzPhyte.XR
                 controllerDelegates.Remove(value);
             }
         }
-
         private event XRControllerEvent informationButtonActive;
         private event XRControllerEvent informationButtonDeactivated;
         public event XRControllerEvent InformationButtonDeactivated
@@ -185,7 +181,6 @@ namespace FuzzPhyte.XR
                 controllerDelegates.Remove(value);
             }
         }
-
         private event XRControllerEvent controllerResetLeft;
         private event XRControllerEvent controllerResetRight;
         public event XRControllerEvent ControllerResetLeft
@@ -214,7 +209,6 @@ namespace FuzzPhyte.XR
                 controllerDelegates.Remove(value);
             }
         }
-
         //raw events - for internal use only and for our hintAcknowledge listeners
         private event XRControllerEvent rawButtonPressed;
         private event XRControllerEvent rawButtonReleased;
