@@ -54,11 +54,7 @@ namespace FuzzPhyte.XR
         
         public virtual void OnDestroy()
         {
-            if (fPXRPhysicsListener != null)
-            {
-                fPXRPhysicsListener.OnCollisionEnterEvent -= FPXRCollisionEnter;
-                fPXRPhysicsListener.OnTriggerEnterEvent -= FPXRTriggerEnter;
-            }
+            DetachPhysicsListener();
         }
         /// <summary>
         /// Inject Rigidbody Reference, you should optionally consider running setup here
@@ -68,6 +64,8 @@ namespace FuzzPhyte.XR
         public virtual void InjectRigidbody(Rigidbody rigidbody,bool runSetup=false)
         {
             _rigidbody = rigidbody;
+            _articulationBody = null;
+            _useArticulation = false;
             if (runSetup)
             {
                 Setup();
@@ -81,6 +79,7 @@ namespace FuzzPhyte.XR
         public virtual void InjectArticulatedbody(ArticulationBody body, bool runSetup = false)
         {
             _articulationBody = body;
+            _rigidbody = null;
             if (runSetup)
             {
                 Setup();
@@ -95,48 +94,50 @@ namespace FuzzPhyte.XR
         }
         protected virtual void Setup()
         {
-            if (_rigidbody == null)
+            DetachPhysicsListener();
+
+            if (_useArticulation && _articulationBody == null)
             {
-                //check for articulated body
-                if(_articulationBody == null)
-                {
-                    Debug.LogError($"Missing Rigidbody reference on {gameObject.name} as well as an articulated body; please assign a Rigidbody or articulated body in the inspector.");
-                    return;
-                }
-                else
-                {
-                    _useArticulation = true;
-                }
+                _useArticulation = false;
             }
-            if (_useArticulation)
+
+            if (!_useArticulation && _rigidbody == null && _articulationBody != null)
             {
-                if (_articulationBody.gameObject.GetComponent<FPXRPhysicsListener>() == null)
-                {
-                    //assign one
-                    fPXRPhysicsListener = _articulationBody.gameObject.AddComponent<FPXRPhysicsListener>();
-                }
-                else
-                {
-                    fPXRPhysicsListener = _articulationBody.gameObject.GetComponent<FPXRPhysicsListener>();
-                }
+                _useArticulation = true;
             }
-            else
+
+            if (_rigidbody == null && _articulationBody == null)
             {
-                if (_rigidbody.gameObject.GetComponent<FPXRPhysicsListener>() == null)
-                {
-                    //assign one
-                    fPXRPhysicsListener = _rigidbody.gameObject.AddComponent<FPXRPhysicsListener>();
-                }
-                else
-                {
-                    fPXRPhysicsListener = _rigidbody.gameObject.GetComponent<FPXRPhysicsListener>();
-                }
+                Debug.LogError($"Missing Rigidbody reference on {gameObject.name} as well as an articulated body; please assign a Rigidbody or articulated body in the inspector.");
+                return;
             }
-            
+
+            GameObject physicsObject = _useArticulation
+                ? _articulationBody.gameObject
+                : _rigidbody.gameObject;
+
+            fPXRPhysicsListener = physicsObject.GetComponent<FPXRPhysicsListener>();
+            if (fPXRPhysicsListener == null)
+            {
+                fPXRPhysicsListener = physicsObject.AddComponent<FPXRPhysicsListener>();
+            }
+
             fPXRPhysicsListener.UseCollisionEnterEvent = true;
             fPXRPhysicsListener.UseTriggerEnterEvent = true;
             fPXRPhysicsListener.OnCollisionEnterEvent += FPXRCollisionEnter;
             fPXRPhysicsListener.OnTriggerEnterEvent += FPXRTriggerEnter;
+        }
+
+        private void DetachPhysicsListener()
+        {
+            if (fPXRPhysicsListener == null)
+            {
+                return;
+            }
+
+            fPXRPhysicsListener.OnCollisionEnterEvent -= FPXRCollisionEnter;
+            fPXRPhysicsListener.OnTriggerEnterEvent -= FPXRTriggerEnter;
+            fPXRPhysicsListener = null;
         }
         /// <summary>
         /// For Trigger Events
@@ -145,8 +146,26 @@ namespace FuzzPhyte.XR
         protected virtual void FPXRTriggerEnter(Collider collider)
         {
             float timeSinceLastImpact = Time.time - _lastImpactTime;
-            if (timeSinceLastImpact < timeBetweenCollisions) return;
-            float magnitude = collider.attachedRigidbody.linearVelocity.magnitude;
+            if (timeSinceLastImpact < timeBetweenCollisions)
+            {
+                return;
+            }
+            Vector3 ownVelocity = _useArticulation
+                ? _articulationBody.linearVelocity
+                : _rigidbody.linearVelocity;
+
+            Vector3 otherVelocity = Vector3.zero;
+
+            if (collider.attachedRigidbody != null)
+            {
+                otherVelocity = collider.attachedRigidbody.linearVelocity;
+            }
+            else if (collider.attachedArticulationBody != null)
+            {
+                otherVelocity = collider.attachedArticulationBody.linearVelocity;
+            }
+
+            float magnitude = (ownVelocity - otherVelocity).magnitude;
             var impactDetails = MagnitudeCheck(magnitude);
             if (impactDetails.Item1)
             {
