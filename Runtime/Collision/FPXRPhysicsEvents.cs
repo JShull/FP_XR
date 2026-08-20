@@ -80,6 +80,7 @@ namespace FuzzPhyte.XR
         {
             _articulationBody = body;
             _rigidbody = null;
+            _useArticulation = true;
             if (runSetup)
             {
                 Setup();
