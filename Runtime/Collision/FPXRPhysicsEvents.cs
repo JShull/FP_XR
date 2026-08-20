@@ -22,6 +22,8 @@ namespace FuzzPhyte.XR
     {
         [Header("Rigidbody Reference")]
         [SerializeField] protected Rigidbody _rigidbody;
+        [SerializeField] protected ArticulationBody _articulationBody;
+        [SerializeField] protected bool _useArticulation;
 
         [Header("Impact Thresholds")]
         [SerializeField] private float lowToMediumThreshold = 2f;
@@ -71,6 +73,19 @@ namespace FuzzPhyte.XR
                 Setup();
             } 
         }
+        /// <summary>
+        /// Inject Articulated Reference, you should optionally consider running setup here
+        /// </summary>
+        /// <param name="body"></param>
+        /// <param name="runSetup"></param>
+        public virtual void InjectArticulatedbody(ArticulationBody body, bool runSetup = false)
+        {
+            _articulationBody = body;
+            if (runSetup)
+            {
+                Setup();
+            }
+        }
         public virtual void InjectThresholdValues(float lowToMedium, float mediumToHigh, float minThreshold, float timeBetwenCol)
         {
             lowToMediumThreshold = lowToMedium;
@@ -82,18 +97,42 @@ namespace FuzzPhyte.XR
         {
             if (_rigidbody == null)
             {
-                Debug.LogError($"Missing Rigidbody reference on {gameObject.name}. Please assign a Rigidbody in the inspector.");
-                return;
+                //check for articulated body
+                if(_articulationBody == null)
+                {
+                    Debug.LogError($"Missing Rigidbody reference on {gameObject.name} as well as an articulated body; please assign a Rigidbody or articulated body in the inspector.");
+                    return;
+                }
+                else
+                {
+                    _useArticulation = true;
+                }
             }
-            if (_rigidbody.gameObject.GetComponent<FPXRPhysicsListener>() == null)
+            if (_useArticulation)
             {
-                //assign one
-                fPXRPhysicsListener = _rigidbody.gameObject.AddComponent<FPXRPhysicsListener>();
+                if (_articulationBody.gameObject.GetComponent<FPXRPhysicsListener>() == null)
+                {
+                    //assign one
+                    fPXRPhysicsListener = _articulationBody.gameObject.AddComponent<FPXRPhysicsListener>();
+                }
+                else
+                {
+                    fPXRPhysicsListener = _articulationBody.gameObject.GetComponent<FPXRPhysicsListener>();
+                }
             }
             else
             {
-                fPXRPhysicsListener = _rigidbody.gameObject.GetComponent<FPXRPhysicsListener>();
+                if (_rigidbody.gameObject.GetComponent<FPXRPhysicsListener>() == null)
+                {
+                    //assign one
+                    fPXRPhysicsListener = _rigidbody.gameObject.AddComponent<FPXRPhysicsListener>();
+                }
+                else
+                {
+                    fPXRPhysicsListener = _rigidbody.gameObject.GetComponent<FPXRPhysicsListener>();
+                }
             }
+            
             fPXRPhysicsListener.UseCollisionEnterEvent = true;
             fPXRPhysicsListener.UseTriggerEnterEvent = true;
             fPXRPhysicsListener.OnCollisionEnterEvent += FPXRCollisionEnter;

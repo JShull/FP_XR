@@ -12,9 +12,11 @@ namespace FuzzPhyte.XR
     using UnityEngine;
     using System;
 
-    [RequireComponent(typeof(Rigidbody))]
+    //[RequireComponent(typeof(Rigidbody))]
     public class FPXRPhysicsListener : MonoBehaviour
     {
+        [SerializeField] protected Rigidbody body;
+        [SerializeField] protected ArticulationBody artBody;
         [Tooltip("List of tags this bin accepts")]
         public string[] acceptedTags;
         [Tooltip("Physics Collisions")]
