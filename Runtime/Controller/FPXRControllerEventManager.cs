@@ -891,8 +891,7 @@ namespace FuzzPhyte.XR
                 Debug.LogWarning($"If you're intention was to lock the controller - please call 'LockControllerButton'!");
             }
             
-            //drives visuals and audio
-            feedback?.SetButtonState(button, buttonState,controllerData);
+            // Feedback is updated above, including when gameplay events are locked out.
             switch(buttonState)
             {
                 case XRInteractionStatus.Select:

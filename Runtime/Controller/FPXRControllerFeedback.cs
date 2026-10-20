@@ -266,6 +266,7 @@ namespace FuzzPhyte.XR
         #endregion
         #region Cached Data Parameters
         protected Dictionary<XRButton,ButtonFeedback> spawnedData = new Dictionary<XRButton, ButtonFeedback>();
+        private readonly HashSet<FPXRControllerRef> lockedFeedbackPlayed = new HashSet<FPXRControllerRef>();
         protected Dictionary<XRButton, FPXRControllerRef> spawnedItems = new Dictionary<XRButton, FPXRControllerRef>();
         protected Dictionary<XRButton, bool> controllerButtonsLocked = new Dictionary<XRButton, bool>();
         protected Dictionary<XRButton, bool> controllerButtonsHint = new Dictionary<XRButton, bool>();
@@ -301,6 +302,7 @@ namespace FuzzPhyte.XR
             //need to then clear data caches
             spawnedData.Clear();
             spawnedItems.Clear();
+            lockedFeedbackPlayed.Clear();
             controllerButtonsLocked.Clear();
             controllerButtonsHint.Clear();
             controllerButtonsInformation.Clear();
@@ -358,7 +360,7 @@ namespace FuzzPhyte.XR
                                 //update UI to this
                                 if (controllerRefData != null)
                                 {
-                                    controllerRefData.SetupUI(curButton.ScaleAdjustment,aState.Icon, aState.IconColor,aState.LabelText, aState.LabelFontSetting, aState.IsGripTrigger,aState.ButtonSound, WorldControllerAudioSource);
+                                    controllerRefData.SetupUI(curButton.ScaleAdjustment,aState.Icon, aState.IconColor,aState.LabelText, aState.LabelFontSetting, matchButton == XRButton.Trigger || matchButton == XRButton.Grip,aState.ButtonSound, WorldControllerAudioSource);
                                     //turn off secondary icon if there is one
                                     controllerRefData.ShowORHideSecondaryVisual(false);
                                 }
@@ -528,6 +530,7 @@ namespace FuzzPhyte.XR
         {
             if (controllerButtonsLocked.ContainsKey(button))
             {
+                lockedFeedbackPlayed.Remove(spawnedItems[button]);
                 controllerButtonsLocked[button] = false;
                 SetButtonState(button, XRInteractionStatus.None);
                 ActivateEventsByButtonByState(button, XRInteractionStatus.None);
@@ -612,8 +615,18 @@ namespace FuzzPhyte.XR
                         //check locked state?
                         if (lockState)
                         {
-                            //go to lock
+                            // A release rearms the next locked attempt without playing release audio.
+                            bool released = currentButtonStatus == XRInteractionStatus.Unselect ||
+                                ((button == XRButton.Trigger || button == XRButton.Grip) && vectorValue < 0.15f);
+                            if (released)
+                            {
+                                lockedFeedbackPlayed.Add(cachedItem);
+                            }
                             ButtonStateLock(cachedItem);
+                            if (released)
+                            {
+                                lockedFeedbackPlayed.Remove(cachedItem);
+                            }
                         }
                         else
                         {
@@ -627,7 +640,7 @@ namespace FuzzPhyte.XR
                             }
                             if (button == XRButton.Trigger || button ==XRButton.Grip)
                             {
-                                cachedItem.ApplyUIChanges(label.Icon, label.IconColor, label.LabelText, label.LabelFontSetting,true, label.ButtonSound, UseCanvas, useDownOffset, label.ScaleAdjust,vectorValue);
+                                cachedItem.ApplyUIChanges(label.Icon, label.IconColor, label.LabelText, label.LabelFontSetting,true, label.ButtonSound, UseCanvas, useDownOffset, label.ScaleAdjust,currentButtonStatus == XRInteractionStatus.Unselect ? 0f : vectorValue);
                             }
                             else
                             {
@@ -893,9 +906,9 @@ namespace FuzzPhyte.XR
         /// <param name="lockState"></param>
         protected virtual void ButtonStateLock(FPXRControllerRef cachedItem)
         {
-            //bool isTriggerOrGrip = false;
-            //lockStateDetails.
-            cachedItem.ApplyUIChanges(lockStateDetails.Icon, lockStateDetails.IconColor,lockStateDetails.LabelText, lockStateDetails.LabelFontSetting, lockStateDetails.IsGripTrigger, lockStateDetails.ButtonSound, UseCanvas);
+            // Locked visuals remain continuous; audio plays once until release or unlock.
+            bool playAudio = lockedFeedbackPlayed.Add(cachedItem);
+            cachedItem.ApplyUIChanges(lockStateDetails.Icon, lockStateDetails.IconColor,lockStateDetails.LabelText, lockStateDetails.LabelFontSetting, false, playAudio ? lockStateDetails.ButtonSound : null, UseCanvas);
         }
         /// <summary>
         /// Will update the dictionary to make our button state be in a dual state of Hint

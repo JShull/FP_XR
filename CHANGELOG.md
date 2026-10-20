@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Apply controller feedback once per input update while preserving raw tutorial acknowledgment and enforced gameplay locks.
+- Identify Trigger/Grip feedback from button type, retain continuous visuals, and rearm analog audio on silent releases.
+- Play locked feedback audio once per attempt and rearm it on release or unlock.
+
 ## [0.7.1] - 2026-06-04
 
 - [@JShull](https://github.com/jshull).

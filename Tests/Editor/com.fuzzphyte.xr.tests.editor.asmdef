@@ -1,0 +1,25 @@
+{
+    "name": "com.fuzzphyte.xr.tests.editor",
+    "rootNamespace": "",
+    "references": [
+        "com.fuzzphyte.xr",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "com.fuzzphyte.utility"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -87,7 +87,8 @@ namespace FuzzPhyte.XR
                 buttonLabelText.text = textRef;
                 FP_UtilityData.ApplyFontSetting(buttonLabelText, fontRef);
             }
-            if (audioSourceRef != null && audioRef !=null)
+            triggerGripAudioAlreadyPlayed = false;
+            if (audioSourceRef != null)
             {
                 worldAudioRef = audioSourceRef;
                 worldAudioRef.clip = audioRef;
@@ -142,32 +143,20 @@ namespace FuzzPhyte.XR
                 buttonLabelText.text = textRef;
                 FP_UtilityData.ApplyFontSetting(buttonLabelText, fontRef);
             }
-            //update audio
-            if (worldAudioRef!=null && audioRef!=null)
+            // Rearm independently of clip/source availability, including silent releases.
+            bool analogFeedback = floatAxisButton && isTriggerGripButton;
+            if (analogFeedback && vectorData < 0.15f)
+            {
+                triggerGripAudioAlreadyPlayed = false;
+            }
+            bool playAudio = !analogFeedback || (!triggerGripAudioAlreadyPlayed && vectorData > 0.8f);
+            if (playAudio && worldAudioRef != null && audioRef != null && worldAudioRef.isActiveAndEnabled)
             {
                 worldAudioRef.clip = audioRef;
-                if (worldAudioRef.isActiveAndEnabled)
+                worldAudioRef.Play();
+                if (analogFeedback)
                 {
-                    if (floatAxisButton&& isTriggerGripButton)
-                    {
-                        if (!triggerGripAudioAlreadyPlayed && vectorData > 0.8f)
-                        {
-                            worldAudioRef.Play();
-                            triggerGripAudioAlreadyPlayed = true;
-                        }
-                        else
-                        {
-                            if(vectorData < 0.15f)
-                            {
-                                triggerGripAudioAlreadyPlayed = false;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        worldAudioRef.Play();
-                    }
-                   
+                    triggerGripAudioAlreadyPlayed = true;
                 }
             }
             if (useOffset)
