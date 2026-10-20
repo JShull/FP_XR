@@ -385,6 +385,38 @@ namespace FuzzPhyte.XR
         {
             LockControllerButton(XRHandedness.Left, XRButton.PrimaryButton);
         }
+        [ContextMenu("Lock Secondary Button-Left")]
+        public void LockLeftControllerSecondary()
+        {
+            LockControllerButton(XRHandedness.Left, XRButton.SecondaryButton);
+        }
+        [ContextMenu("Unlock Secondary Button-Left")]
+        public void UnlockLeftControllerSecondary()
+        {
+            UnlockControllerButton(XRHandedness.Left, XRButton.SecondaryButton);
+        }
+        #region Right Hand
+        [ContextMenu("Lock Primary Button-Right")]
+        public void LockControllerPrimaryButtonRight()
+        {
+            LockControllerButton(XRHandedness.Right, XRButton.PrimaryButton);
+        }
+        [ContextMenu("Unlock Primary Button-Right")]
+        public void UnlockControllerPrimaryButtonRight()
+        {
+            UnlockControllerButton(XRHandedness.Right, XRButton.PrimaryButton);
+        }
+        [ContextMenu("Lock Secondary Button-Right")]
+        public void LockRightControllerSecondary()
+        {
+            LockControllerButton(XRHandedness.Right, XRButton.SecondaryButton);
+        }
+        [ContextMenu("Unlock Secondary Button-Right")]
+        public void UnlockRightControllerSecondary()
+        {
+            UnlockControllerButton(XRHandedness.Right, XRButton.SecondaryButton);
+        }
+        #endregion
         [ContextMenu("Testing ControllerManager, Left Hand, Primary Button, Unlocked")]
         public void UnlockControllerPrimaryButton()
         {
@@ -395,6 +427,7 @@ namespace FuzzPhyte.XR
         {
             LockController(XRHandedness.Left);
         }
+        
         [ContextMenu("Testing ControllerManager, Left Hand, All Unlocked")]
         public void UnlockLeftController()
         {
