@@ -276,7 +276,7 @@ namespace FuzzPhyte.XR
         {
             if (ItemCollider == null)
             {
-                Debug.LogError($"I am missing a collider and I am throwing myself off a cliff");
+                Debug.LogError($"{this.gameObject.name}:I am missing a collider and I am throwing myself off a cliff");
                 Destroy(this);
                 return;
             }
